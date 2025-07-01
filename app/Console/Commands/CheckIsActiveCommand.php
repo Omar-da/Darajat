@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Enums\RoleEnum;
 use App\Models\User;
-use App\Services\FcmService;
+use App\Services\FCM\FcmService;
 use Illuminate\Console\Command;
 
 class CheckIsActiveCommand extends Command
@@ -27,7 +27,7 @@ class CheckIsActiveCommand extends Command
                 continue;
             $current_enthusiasm = $user->statistics()->where('title', 'Current Enthusiasm')->first();
             $max_enthusiasm = $user->statistics()->where('title', 'Max Enthusiasm')->first();
-            
+
             if($user->moreDetail->is_active_today)
             {
                 $current_enthusiasm->pivot->increment('progress');
@@ -36,7 +36,7 @@ class CheckIsActiveCommand extends Command
 
                 if($current_enthusiasm->pivot->progress > $max_enthusiasm->pivot->progress)
                     $max_enthusiasm->pivot->update(['progress' => $current_enthusiasm->pivot->progress]);
-                    
+
             }
             else
             {
@@ -47,7 +47,7 @@ class CheckIsActiveCommand extends Command
                 if($user->moreDetail->num_of_inactive_days == 3)
                 {
                     $this->fcmService->sendNotification(
-                        $user->fcm_token, 
+                        $user->fcm_token,
                         'Your steps call you!',
                         "Three days of absence… every step awaits you. Return to us—you won't climb the 'Darajat' alone!"
                     );
@@ -57,5 +57,5 @@ class CheckIsActiveCommand extends Command
             $user->moreDetail->is_active_today = false;
             $user->moreDetail->save();
         }
-    }   
+    }
 }
