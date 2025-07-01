@@ -42,7 +42,7 @@
     body, table, td {font-family: Arial, sans-serif !important;}
 </style>
 <![endif]-->
-<table class="outer-table" cellspacing="0" border="0" cellpadding="0" width="100%" bgcolor="#f2f3f8">
+{{-- <table class="outer-table" cellspacing="0" border="0" cellpadding="0" width="100%" bgcolor="#f2f3f8">
     <tr>
         <td>
             <table class="responsive-table" style="background-color: #f2f3f8; max-width:670px; margin:0 auto;" width="100%" border="0"
@@ -111,7 +111,7 @@
             </table>
         </td>
     </tr>
-</table>
+</table> --}}
 </body>
 
 </html>

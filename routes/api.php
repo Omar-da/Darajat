@@ -36,6 +36,7 @@ Route::controller(UserController::class)->middleware('auth:api')->prefix('users'
     Route::post('update-profile-image', 'updateProfileImage');
     Route::post('change-password','changePassword');
     Route::post('promote-student-to-teacher','promoteStudentToTeacher');
+    Route::get('stripe-callback', 'stripeCallback')->name('users.stripe_callback');
     Route::delete('delete', 'destroy');
     Route::post('store-fcm-token', 'storeFCMToken');
 });
@@ -82,6 +83,11 @@ Route::controller(CourseController::class)->prefix('course')->group(function(){
     Route::get('free-course','freeCourse');
     Route::get('paid-course','paidCourse');
     Route::get('all-course','showAllCourses');
+    Route::post('payment-process/{course}', 'paymentProcess')->name('courses.payment_process');
+    Route::middleware('get_certificate')->group(function(){
+        Route::post('get-certificate/{course}', 'getCertificate')->name('courses.get_certificate');
+        Route::post('download-certificate/{course}', 'downloadCertificate')->name('courses.download_certificate');
+    });
 });
 
 

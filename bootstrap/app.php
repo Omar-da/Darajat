@@ -1,6 +1,7 @@
 <?php
 
 use App\Console\Commands\CheckIsActiveCommand;
+use App\Http\Middleware\CertificateMiddleware;
 use App\Http\Middleware\CheckTeacher;
 use App\Responses\Response;
 use Illuminate\Console\Scheduling\Schedule;
@@ -26,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'throttle:resend-otp' => ThrottleRequests::class . ':resend-otp',
             'isTeacher' => CheckTeacher::class,
+            'get_certificate' => CertificateMiddleware::class
             ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

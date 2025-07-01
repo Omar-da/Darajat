@@ -10,6 +10,8 @@ use App\Responses\Response;
 use App\Services\User\UserService;
 use Illuminate\Http\JsonResponse;
 use Kreait\Firebase\Request;
+use Stripe\OAuth;
+use Stripe\Stripe;
 use Throwable;
 
 class UserController extends Controller
@@ -73,18 +75,28 @@ class UserController extends Controller
         }
     }
 
-    public function promoteStudentToTeacher(): JsonResponse
+    public function promoteStudentToTeacher()
     {
-        $data = [];
+        $this->userService->promoteStudentToTeacher(); 
+    }
+
+    public function stripeCallback(Request $request)
+    {
+        Stripe::setApiKey(config('stripe.secret'));
+
         try {
-            $data = $this->userService->promoteStudentToTeacher();
-            if($data['code'] == 409)
-                return Response::error([], $data['message'], $data['code']);
-            return Response::success([], $data['message']);
-        } catch (Throwable $th) {
-            $message = $th->getMessage();
-            return Response::error($data, $message);
-        }
+                $response = OAuth::token([
+                    'grant_type' => 'authorization_code',
+                    'code' => $request->code,
+                ]);
+
+                // Save Stripe account ID to teacher
+                auth('api')->user()->update(['stripe_connect_id' => $response->stripe_user_id]);
+
+                return redirect()->route('teacher.dashboard')->with('success', 'Stripe account connected!');
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', 'Connection failed: ' . $e->getMessage());
+            }
     }
 
     public function destroy(): JsonResponse
