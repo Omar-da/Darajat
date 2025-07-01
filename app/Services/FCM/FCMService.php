@@ -1,12 +1,12 @@
-<?php 
+<?php
 
-namespace App\Services;
+namespace App\Services\FCM;
 
 use Illuminate\Support\Facades\Notification;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 
-class FcmService    
+class FCMService
 {
     protected $messaging;
 
@@ -21,7 +21,7 @@ class FcmService
     }
 
 
-    
+
     public function sendNotification($deviceToken, $title, $body, array $data = [])
     {
         $notification = Notification::create($title, $body);

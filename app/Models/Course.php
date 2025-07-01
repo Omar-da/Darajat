@@ -15,12 +15,39 @@ use function PHPUnit\Framework\isEmpty;
 class Course extends Model
 {
     use SoftDeletes;
-    
+
     public $timestamps = false;
 
+    protected $fillable = [
+        'topic_id',
+        'teacher_id',
+        'language_id',
+        'title',
+        'description',
+        'image_url',
+        'difficulty_level',
+        'num_of_hours',
+        'price',
+        'rate',
+        'num_of_episodes',
+        'num_of_students_enrolled',
+        'publishing_date',
+        'published',
+        'has_certificate',
+    ];
     protected $casts = [
         'difficulty_level' => LevelEnum::class
     ];
+
+    public static function popular($query)
+    {
+        return $query->orderBy('rate', 'desc')->limit(5);
+    }
+
+    public function calculatePercentageForValueRate($value): string
+    {
+        return round($this->students()->where('rate', $value)->count() / $this->students()->count() * 100, 2) . '%';
+    }
 
     public function teacher(): BelongsTo
     {
@@ -29,7 +56,12 @@ class Course extends Model
 
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'course_user', 'student_id');
+        return $this->belongsToMany(User::class, 'course_user', 'course_id', 'student_id');
+    }
+
+    public function language(): BelongsTo
+    {
+        return $this->belongsTo(language::class);
     }
 
     public function episodes(): HasMany
@@ -61,7 +93,7 @@ class Course extends Model
         });
     }
      public function studentSubscribe($userId){
-        if($this-> price ==0)
+        if($this->price ==0)
             return true;
         return $this->user()->where('student_id',$userId)->exists();
     }
