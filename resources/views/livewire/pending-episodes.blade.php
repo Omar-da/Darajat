@@ -9,7 +9,7 @@
         @foreach($pendingEpisodes as $episode)
         <div class="pending-episode-card">
             <div class="pending-episode-media">
-                <img src="{{ asset('build/assets/img/episodes/' . $episode->image_url) }}" alt="{{ $episode->title }}" class="pending-episode-thumbnail">
+                <img src="{{ route('protection.images', ['episode_id' => $episode->id]) }}" alt="{{ $episode->title }}" class="pending-episode-thumbnail">
                 <span class="pending-episode-duration">{{ $episode->duration }} min</span>
             </div>
             

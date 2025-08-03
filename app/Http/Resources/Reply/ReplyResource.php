@@ -26,7 +26,7 @@ class ReplyResource extends JsonResource
             'replier' => [
                 'id' => $this->user->id,
                 'full_name' => $this->user->first_name. ' ' .$this->user->last_name,
-                'profile_image_url' => $this->user->profile_image_url ? asset(Storage::url("img/users/{$this->user->profile_image_url}")) : null,
+                'profile_image_url' => $this->user->profile_image_url ? Storage::url("/profiles/{$this->user->profile_image_url}") : null,
             ]
         ];
     }

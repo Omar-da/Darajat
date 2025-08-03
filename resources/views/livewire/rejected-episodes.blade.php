@@ -7,7 +7,7 @@
         @foreach($rejected_episodes as $episode)
         <div class="episode-reject-row">
             <div class="episode-reject-image">
-                <img src="{{ asset('build/assets/img/episodes/' . $episode->image_url) }}" alt="{{ $episode->title }}">
+                <img src="{{ route('protection.images', ['episode_id' => $episode->id]) }}" alt="{{ $episode->title }}">
             </div>
             
             

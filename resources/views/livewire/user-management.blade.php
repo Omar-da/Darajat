@@ -34,9 +34,9 @@
                     <td>
                         <div class="user-name">
                             @if($user->profile_image_url)
-                                <img src="{{ asset("build/assets/img/profiles/$user->profile_image_url") }}" alt="Profile Image" class="user-avatar">
+                                <img src="{{ Storage::url("profiles/$user->profile_image_url") }}" alt="Profile Image" class="user-avatar">
                             @else
-                                <img src="{{ asset('build/assets/img/anonymous_icon.png') }}" alt="Profile Image" class="user-avatar">
+                                <img src="{{ asset('img/icons/anonymous_icon.png') }}" alt="Profile Image" class="user-avatar">
                             @endif
                             {{ $user->first_name }} {{ $user->last_name }}
                         </div>
@@ -52,13 +52,13 @@
                     <td>
                     <img 
                         @if($user->deleted_at != null && $user->moreDetail->is_banned) 
-                            src="{{ asset('build/assets/img/ban_icon_red.png') }}" 
+                            src="{{ asset('img/icons/ban_icon_red.png') }}" 
                             alt="banned user"
                         @elseif($user->deleted_at != null && !$user->moreDetail->is_banned)
-                            src="{{ asset('build/assets/img/delete_icon.png') }}" 
+                            src="{{ asset('img/icons/delete_icon.png') }}" 
                             alt="deleted user"    
                         @else
-                            src="{{ asset('build/assets/img/active_icon.png') }}" 
+                            src="{{ asset('img/icons/active_icon.png') }}" 
                             alt="active user"
                         @endif
                     >

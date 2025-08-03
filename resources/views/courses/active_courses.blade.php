@@ -15,7 +15,7 @@
                     <a href="{{route('courses.show_course', ['course' => $course->id])}}">
                         <div class="course-card">
                             <div class="course-image">
-                                <img src="{{asset("build/assets/img/courses/$course->image_url")}}" alt="Course Image">
+                                <img src="{{Storage::url("courses/$course->image_url")}}" alt="Course Image">
                             </div>
                             <div class="course-details">
                                 <h3 class="course-title">{{$course->title}}</h3>

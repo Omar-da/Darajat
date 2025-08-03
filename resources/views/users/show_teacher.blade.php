@@ -3,7 +3,7 @@
 <x-layouts.header title="Teacher Detailed Profile" :with-footer="true">
     <div class="user-profile-container">
         <header class="user-profile-header">
-            <img src="{{$user->profile_image_url ? asset("build/assets/img/profiles/$user->profile_image_url") : asset('build/assets/img/anonymous_icon.png')}}" alt="User Avatar" class="user-profile-avatar">
+            <img src="{{$user->profile_image_url ? Storage::url("profiles/$user->profile_image_url") : asset('img/icons/anonymous_icon.png')}}" alt="User Avatar" class="user-profile-avatar">
             <div class="user-profile-userinfo">
                 <h1>{{$user->first_name}} {{$user->last_name}}</h1>
                 <p class="user-profile-tagline">{{$user->moreDetail->jobTitle->title}} | {{$user->moreDetail->country->name}}</p>
@@ -145,7 +145,7 @@
                             <a href="{{route('courses.show_course', ['course' => $course->id])}}">
                                 <div class="course-card">
                                     <div class="course-image">
-                                        <img src="{{asset("build/assets/img/courses/$course->image_url")}}" alt="Course Image">
+                                        <img src="{{Storage::url("courses/$course->image_url")}}" alt="Course Image">
                                     </div>
                                     <div class="course-details">
                                         <h3 class="course-title">{{$course->title}}</h3>

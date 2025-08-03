@@ -17,7 +17,7 @@ class CourseWithDetailsResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'image_url' =>  asset("build/assets/img/courses/{$this->image_url}"),
+            'image_url' => Storage::url("/courses/{$this->image_url}"),
             'title' => $this->title,
             'topic' => $this->topic->title,
             'description' => $this->description,
@@ -26,7 +26,7 @@ class CourseWithDetailsResource extends JsonResource
             'teacher' => [
                 'id' => $this->teacher->id,
                 'full_name' => $this->teacher->first_name . ' ' . $this->teacher->last_name,
-                'profile_image_url' => $this->teacher->profile_image_url ? asset(Storage::url("img/users/{$this->teacher->profile_image_url}")) : null
+                'profile_image_url' => $this->teacher->profile_image_url ? Storage::url("/profiles/{$this->teacher->profile_image_url}") : null
             ],
             'difficulty_level' => $this->difficulty_level,
             'num_of_hours' => $this->num_of_hours,

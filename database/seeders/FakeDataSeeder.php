@@ -98,7 +98,6 @@ class FakeDataSeeder extends Seeder
         foreach(Course::all() as $course)
             $user->followed_courses()->attach($course, ['progress' => 2, 'perc_progress' => 66.6, 'num_of_completed_quizzes' => 1, 'rate' => 3]);
 
-        // $duration = FFMpeg::fromDisk('public')->open('build/assets/videos/test.mp4')->getDurationInSeconds();
 
         // episode 1
         Episode::create([

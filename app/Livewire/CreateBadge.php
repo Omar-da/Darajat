@@ -31,7 +31,7 @@ class CreateBadge extends Component
             'created_by' => 'required'
         ]);
 
-        $path = $this->image_url->store('img/badges');
+        $path = $this->image_url->store('badges');
         $image_name = basename($path);
 
         // Create the badge
