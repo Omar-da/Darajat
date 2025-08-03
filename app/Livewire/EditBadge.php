@@ -32,7 +32,7 @@ class EditBadge extends Component
         $badge = $this->badge;
         if($validated['image_url'])
         {
-            $path = $this->image_url->storeAs('img/badges', $badge->image_url);
+            $path = $this->image_url->storeAs('badges', $badge->image_url);
             $new_image_url = basename($path);
         }
 

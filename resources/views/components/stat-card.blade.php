@@ -4,7 +4,7 @@
     <div class="card-icon">
         <div class="icon-backdrop"></div>
         <div class="icon-wrapper">
-            <img src="{{asset('build/assets/img/' . $iconName)}}" alt="{{$alt}}">
+            <img src="{{asset('img/icons/' . $iconName)}}" alt="{{$alt}}">
         </div>
     </div>
     <h3 class="card-title">{{ $cardName }}</h3>

@@ -18,7 +18,7 @@
 
         <div class="badge-card-show">
             <div class="badge-image-container">
-                <img src="{{ asset('build/assets/img/badges/' . $badge->image_url) }}" alt="{{ $badge->description }}" class="badge-image-show">
+                <img src="{{ Storage::url('badges/' . $badge->image_url) }}" alt="{{ $badge->description }}" class="badge-image-show">
             </div>
             
             <div class="badge-details">

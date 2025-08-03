@@ -6,7 +6,6 @@ use App\Models\Topic;
 use App\Models\Course;
 use App\Models\LanguageUser;
 use App\Models\Payment;
-use App\Responses\Response;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
@@ -192,24 +191,20 @@ class CourseController extends Controller
         }
     }
 
-        public function getCertificate(Course $course)
+       public function getCertificate(Course $course)
         {
             $user = auth('api')->user();
-            $userName = $user->first_name . '_' . $user->last_name;
-            $filePath = "assets/build/img/{$userName}/{$course->title}.pdf";
-            
-            if (!file_exists(public_path($filePath))) {
-                $dirPath = public_path($filePath);
-                if (!is_dir(dirname($dirPath)))
-                    mkdir($dirPath, 0755, true);
-                $download_url = $this->downloadFunction($course);
-                $pdfContent = Http::get($download_url)->body();
+            $userName = $user->first_name . '_' . $user->last_name; 
+            $filePath = "private/certificates/{$userName}/{$course->title}.pdf";
 
-                file_put_contents(public_path($filePath), $pdfContent);
+            if (!Storage::disk('local')->exists($filePath)) {
+                $download_url = $this->downloadFunction($course);
+                $pdfContent = Http::get($download_url)->throw()->body();
+
+                Storage::disk('local')->put($filePath, $pdfContent);
             }
 
-            // Display the PDF inline
-            return response()->file(public_path($filePath), [
+            return Storage::disk('local')->response($filePath, [
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => 'inline; filename="certificate.pdf"'
             ]);

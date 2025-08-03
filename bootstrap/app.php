@@ -1,8 +1,10 @@
 <?php
 
 use App\Console\Commands\CheckIsActiveCommand;
+use App\Http\Controllers\episodesProtectionController;
 use App\Http\Middleware\CertificateMiddleware;
 use App\Http\Middleware\CheckTeacher;
+use App\Http\Middleware\ProtectEpisodeAccess;
 use App\Responses\Response;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -27,7 +29,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'throttle:resend-otp' => ThrottleRequests::class . ':resend-otp',
             'isTeacher' => CheckTeacher::class,
-            'get_certificate' => CertificateMiddleware::class
+            'get_certificate' => CertificateMiddleware::class,
+            'episode_protection' => ProtectEpisodeAccess::class
             ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

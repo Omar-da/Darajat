@@ -21,9 +21,9 @@
             <div class="profile-grid">
                 <div class="profile-avatar-container">
                     @if(auth()->user()->profile_image_url)
-                        <img src="{{ asset('build/assets/img/profiles/' . auth()->user()->profile_image_url) }}" alt="Profile Image" class="admin-profile-avatar">
+                        <img src="{{ Storage::url('profiles/' . auth()->user()->profile_image_url) }}" alt="Profile Image" class="admin-profile-avatar">
                     @else
-                        <img src="{{ asset('build/assets/img/anonymous_admin_icon.png') }}" alt="Profile Image" class="admin-profile-avatar">
+                        <img src="{{ asset('img/icons/anonymous_admin_icon.png') }}" alt="Profile Image" class="admin-profile-avatar">
                     @endif
                 </div>
                 <div class="profile-details">

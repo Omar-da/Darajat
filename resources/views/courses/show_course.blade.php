@@ -4,7 +4,7 @@
     <div class="course-details-container">
         <div class="course-details-header">
             <div class="course-details-image">
-                <img src="{{ asset('build/assets/img/courses/' . $course->image_url) }}" alt="{{ $course->title }}">
+                <img src="{{ Storage::url('courses/' . $course->image_url) }}" alt="{{ $course->title }}">
             </div>
             
             <div class="course-details-info">

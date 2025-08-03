@@ -6,6 +6,7 @@ use App\Http\Controllers\Dashboard\CourseController;
 use App\Http\Controllers\Dashboard\HomeController;
 use App\Http\Controllers\Dashboard\WebAuthController;
 use App\Http\Controllers\dashboard\UserController;
+use App\Http\Controllers\episodesProtectionController;
 use App\Livewire\CourseManagement;
 use App\Livewire\CoursesTabNav;
 use App\Livewire\CreateBadge;
@@ -74,6 +75,12 @@ Route::prefix('dashboard')->group(function () {
             Route::delete('ban/{user}',                          'ban_user')->       name('ban');
             Route::get('unban/{user}',                           'unban_user')->     name('unban')->withTrashed();
         });
+
+        // episodes protection
+        Route::middleware('episode_protection')->prefix('protection')->name('protection.')->group(function () {
+            Route::get('/videos/{episode_id}', [episodesProtectionController::class, 'video_protection'])->name('videos');
+            Route::get('/images/{episode_id}', [episodesProtectionController::class, 'image_protection'])->name('images');
+        });
     });
 });
 
@@ -82,3 +89,4 @@ Route::prefix('dashboard')->group(function () {
 //     User::withTrashed()->find(1)->restore();
 //     return to_route('dashboard.login');
 // });
+
