@@ -4,12 +4,14 @@ namespace App\Http\Controllers\App;
 
 use App\Http\Requests\Episode\CreateEpisodeRequest;
 use App\Http\Requests\Episode\UpdateEpisodeRequest;
+use App\Models\Course;
 use App\Models\Episode;
 use App\Models\User;
 use App\Responses\Response;
 use App\Services\Episode\EpisodeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class EpisodeController extends Controller
@@ -171,5 +173,47 @@ class EpisodeController extends Controller
             $message  = $th->getMessage();
             return Response::error($message);
         }
+    }
+
+    public function get_video($episode_id)
+    {
+        $episode = Episode::withTrashed()->where('id', $episode_id)->firstOrFail();
+        $course = Course::where('id', $episode->course_id)->firstOrFail();
+
+        $videoPath = "courses/$course->id/episodes/$episode_id/video.mp4";
+        
+        if (!Storage::disk('local')->exists($videoPath)) {
+            abort(404, 'Video file not found');
+        }
+
+        return Storage::disk('local')->response(
+            $videoPath,
+            'episode-video.mp4',
+            [
+                'Content-Type' => 'video/mp4',
+                'Content-Length' => Storage::disk('local')->size($videoPath),
+                'Content-Disposition' => 'inline',  // Prevents "Save As" dialog
+                'Cache-Control' => 'no-store',      // Disables browser caching
+                'Accept-Ranges' => 'none'
+            ]
+        );
+    }
+
+    public function get_poster($episode_id)
+    {
+        $episode = Episode::withTrashed()->where('id', $episode_id)->firstOrFail();
+        $course = Course::where('id', $episode->course_id)->firstOrFail();
+        $thumbnailPath = "courses/$course->id/episodes/$episode_id/thumbnail.jpg";
+        
+        
+        return response()->file(
+            Storage::disk('local')->path($thumbnailPath),
+            [
+                'Content-Type' => 'image/jpeg',
+                'Content-Disposition' => 'inline',    // Prevents "Save As" dialog
+                'Cache-Control' => 'no-store',        // No caching
+                'X-Content-Type-Options' => 'nosniff' // Blocks MIME-type sniffing
+            ]
+        );
     }
 }

@@ -118,7 +118,7 @@
                                     @endif
                                 </div>
                             </div>
-                            <a href="{{ route('courses.video', ['episode_id' => $episode->id]) }}" class="episode-view-btn">
+                            <a href="{{ route('courses.show_episode', ['episode_id' => $episode->id]) }}" class="episode-view-btn">
                                 @if($episode->published)
                                     <i class="fas fa-play"></i> View
                                 @else

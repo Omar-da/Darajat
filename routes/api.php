@@ -123,19 +123,21 @@ Route::controller(CouponController::class)->middleware('auth:api')->prefix('coup
 
 // episodes
 Route::controller(EpisodeController::class)->middleware('auth:api')->prefix('episodes')->group(function () {
-    Route::middleware('isSubscribed')->group(function () {
+    Route::middleware('episode_protection')->group(function () {
         Route::get('student/{course_id}', 'getToStudent');
         Route::post('add-like/{id}', 'addLikeToEpisode');
         Route::delete('remove-like/{id}', 'removeLikeFromEpisode');
         Route::post('finish/{id}', 'finish_episode');
+        Route::get('/get_video/{episode_id}', 'get_video')->name('get_video');
+        Route::get('/get_poster/{episode_id}', 'get_poster')->name('get_poster');
+        Route::get('teacher/{course_id}', 'getToTeacher');
+        Route::post('{course_id}', 'store');
+        Route::put('update/{id}', 'update');
+        Route::get('show/student/{id}', 'showToStudent');
+        Route::get('show/teacher/{id}', 'showToTeacher');
+        Route::delete('{id}', 'destroy');
     });
 
-    Route::get('teacher/{course_id}', 'getToTeacher');
-    Route::post('{course_id}', 'store');
-    Route::put('update/{id}', 'update');
-    Route::get('show/student/{id}', 'showToStudent');
-    Route::get('show/teacher/{id}', 'showToTeacher');
-    Route::delete('{id}', 'destroy');
 });
 
 // comments

@@ -19,8 +19,6 @@ class EpisodeWithDetailsResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'episode_number' => $this->episode_number,
-            'video_url' => asset(Storage::url($this->video_url)),
-            'image_url' => asset(Storage::url($this->image_url)),
             'duration' => $this->formatted_duration,
             'views' => $this->views ? $this->views : 0,
             'likes' => $this->likes ? $this->likes : 0,

@@ -5,8 +5,8 @@
         <!-- Video Player Section -->
         <div class="video-main-section">
             <div class="video-player-wrapper">
-                <video class="video-player" controls controlsList="nodownload" oncontextmenu="return false;" poster="{{ route('protection.images', $episode->id) }}" ?t={{ time() }}>
-                    <source src="{{ route('protection.videos', ['episode_id' => $episode->id]) }}" type="video/mp4">
+                <video class="video-player" controls controlsList="nodownload" oncontextmenu="return false;" poster="{{ route('courses.get_poster', $episode->id) }}">
+                    <source src="{{ route('courses.get_video', ['episode_id' => $episode->id]) }}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
             </div>

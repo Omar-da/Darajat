@@ -14,7 +14,10 @@ class ProtectEpisodeAccess
         $episodeId = $request->route('episode_id'); // From route parameter
         $episode = Episode::withTrashed()->where('id', $episodeId)->firstOrFail();
         
-        if ($request->is('dashboard/*') && auth()->user() || $request->is('api/*') && auth()->user()->followed_courses()->where('course_id', $episode->course_id)->exists()) {
+        if (auth()->user() ||
+            auth('api')->user()->followed_courses->contains($episodeId) ||
+            auth('api')->user()->published_courses->contains($episodeId) ||
+            $episode->episode_number == 1) {
             return $next($request);
         }
 
