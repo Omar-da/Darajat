@@ -7,7 +7,7 @@
         @foreach($rejected_episodes as $episode)
         <div class="episode-reject-row">
             <div class="episode-reject-image">
-                <img src="{{ route('protection.images', ['episode_id' => $episode->id]) }}" alt="{{ $episode->title }}">
+                <img src="{{ route('courses.get_poster', ['episode_id' => $episode->id]) }}" alt="{{ $episode->title }}">
             </div>
             
             
@@ -45,7 +45,7 @@
             </div>
             
             <div class="episode-reject-actions">
-                <a href="{{route('courses.video', ['episode_id' => $episode->id])}}" class="episode-reject-action-btn episode-reject-appeal-btn">More Detais</a>
+                <a href="{{route('courses.show_episode', ['episode_id' => $episode->id])}}" class="episode-reject-action-btn episode-reject-appeal-btn">More Detais</a>
                 <button wire:click="republish({{$episode->id}})" type="button" class="episode-reject-action-btn episode-reject-restore-btn">Republish</button>
             </div>
         </div>

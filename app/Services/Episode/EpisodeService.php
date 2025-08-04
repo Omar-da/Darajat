@@ -52,10 +52,18 @@ class EpisodeService
         }
 
         $request['course_id'] = $course_id;
-        $request['image_url'] = $request['image_url']->store('img/episodes', 'public');
-        $request['video_url'] = $request['video_url']->store('videos', 'public');
-        $request['duration'] = FFMpeg::fromDisk('public')->open($request['video_url'])->getDurationInSeconds();
         $episode = Episode::query()->create($request);
+        $episode_path = "courses/$course->id/episodes/$episode->id";
+
+        $request['image_url']->storeAs($episode_path, 'thumbnail.jpg', 'local');
+        $request['video_url']->storeAs($episode_path, 'video.mp4', 'local');
+        
+        $request['duration'] = FFMpeg::fromDisk('local')->open("$episode_path/video.mp4")->getDurationInSeconds();
+        
+        $episode->update([
+            'duration' => $request['duration']
+        ]);
+        
         $course->update([
             'num_of_episodes' => $course->num_of_episodes + 1,
             'total_of_time' => $course['total_of_time'] + $request['duration'],
@@ -81,11 +89,10 @@ class EpisodeService
             return ['message' => 'You can\'t update an episode to the course if it has been ' . $episode->course->status . '!', 'code' => 403];
         }
 
-        Storage::disk('public')->delete($episode->image_url);
-        Storage::disk('public')->delete($episode->video_url);
-        $request['image_url'] = $request['image_url']->store('img/episodes', 'public');
-        $request['video_url'] = $request['video_url']->store('videos', 'public');
-        $request['duration'] = FFMpeg::fromDisk('public')->open($request['video_url'])->getDurationInSeconds();
+        $episode_path = "courses/$course->id/episodes/$episode->id";
+        $request['image_url']->storeAs($episode_path, 'thumbnail.jpg', 'local');
+        $request['video_url']->storeAs($episode_path, 'video.mp4', 'local');
+        $request['duration'] = FFMpeg::fromDisk('local')->open("$episode_path/video.mp4")->getDurationInSeconds();
         $episode->update($request);
         return ['data' => new EpisodeWithDetailsResource($episode), 'message' => 'Episode updated successfully', 'code' => 200];
     }

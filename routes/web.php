@@ -43,12 +43,17 @@ Route::prefix('dashboard')->group(function () {
             Route::get('cates_and_topics',              CourseManagement::class)-> name('cates_and_topics');
             Route::get('active_courses/{cate}/{topic}', 'active_courses')->        name('active_courses');
             Route::get('show_course/{course}',          'show_course')->           name('show_course');
-            Route::get('video/{episode_id}',            'video')->                 name('video');
+            Route::get('show_episode/{episode_id}',     'show_episode')->          name('show_episode');
             Route::get('like/{episode}',                'like')->                  name('like');
             Route::get('quiz/{episode}',                'quiz')->                  name('quiz')->withTrashed();
             Route::get('rejected_episodes/{topic}',     RejectedEpisodes::class)-> name('rejected_episodes');
             Route::post('approve/{episode}',            'approve')->               name('approve');
             Route::post('reject/{episode}',             'reject')->                name('reject');
+            // get videos
+            Route::middleware('episode_protection')->group(function () {
+                Route::get('/get_video/{episode_id}', 'get_video')->name('get_video');
+                Route::get('/get_poster/{episode_id}', 'get_poster')->name('get_poster');
+            });
         });
         
         // profile
@@ -76,11 +81,7 @@ Route::prefix('dashboard')->group(function () {
             Route::get('unban/{user}',                           'unban_user')->     name('unban')->withTrashed();
         });
 
-        // episodes protection
-        Route::middleware('episode_protection')->prefix('protection')->name('protection.')->group(function () {
-            Route::get('/videos/{episode_id}', [episodesProtectionController::class, 'video_protection'])->name('videos');
-            Route::get('/images/{episode_id}', [episodesProtectionController::class, 'image_protection'])->name('images');
-        });
+        
     });
 });
 

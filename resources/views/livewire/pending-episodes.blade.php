@@ -9,7 +9,7 @@
         @foreach($pendingEpisodes as $episode)
         <div class="pending-episode-card">
             <div class="pending-episode-media">
-                <img src="{{ route('protection.images', ['episode_id' => $episode->id]) }}" alt="{{ $episode->title }}" class="pending-episode-thumbnail">
+                <img src="{{ route('courses.get_poster', ['episode_id' => $episode->id]) }}" alt="{{ $episode->title }}" class="pending-episode-thumbnail">
                 <span class="pending-episode-duration">{{ $episode->duration }} min</span>
             </div>
             
@@ -43,7 +43,7 @@
                 </div>
                 
                 <div class="pending-episode-actions">
-                    <a href="{{ route('courses.video', ['episode_id' => $episode->id]) }}" class="pending-action-btn pending-details-btn">
+                    <a href="{{ route('courses.show_episode', ['episode_id' => $episode->id]) }}" class="pending-action-btn pending-details-btn">
                         <i class="fas fa-eye"></i> View Details
                     </a>
                         <button wire:click="approve({{$episode->id}})" type="button" class="pending-action-btn pending-approve-btn">

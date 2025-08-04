@@ -34,7 +34,7 @@ class CourseController extends Controller
         return view('courses.show_course', compact('course'));
     }
 
-    public function video($episode_id)
+    public function show_episode($episode_id)
     {
         $episode = Episode::withTrashed()->with(['comments' => function($q) {
         $q->with(['replies' => function($q) {
@@ -46,7 +46,7 @@ class CourseController extends Controller
         }]);
     }])->find($episode_id);
 
-        return view('courses.video', compact('episode'));
+        return view('courses.show_episode', compact('episode'));
     }
 
     public function quiz(Episode $episode)
