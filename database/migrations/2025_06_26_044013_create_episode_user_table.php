@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Episode::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class)->constrained();
+            $table->unique(['episode_id', 'user_id']);
             $table->boolean('pass_quiz')->default(false);
             $table->timestamps();
         });

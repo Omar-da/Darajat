@@ -1,13 +1,11 @@
 <?php
 
-namespace App\Http\Requests\LoadMore;
+namespace App\Http\Requests\Episode;
 
-use App\Traits\HandlesFailedValidationTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoadMoreRequest extends FormRequest
+class UpdateEpisodeRequest extends FormRequest
 {
-    use HandlesFailedValidationTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -24,7 +22,9 @@ class LoadMoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'page' => 'required|integer|min:2',
+            'title' => 'required|string|max:100',
+            'video_url' => 'required|file|mimetypes:video/mp4,video/quicktime|max:102400',
+            'image_url' => 'required|image|mimes:jpeg,png,bmp,jpg,gif,svg|max:2048',
         ];
     }
 }

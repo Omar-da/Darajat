@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Http\Controllers\App\CouponController;
 use App\Http\Controllers\App\JobTitleController;
 use App\Http\Controllers\App\AuthController;
 use App\Http\Controllers\App\CategoryController;
@@ -40,12 +41,14 @@ Route::controller(UserController::class)->middleware('auth:api')->prefix('users'
 });
 Route::get('users/{id}', [UserController::class, 'showProfile']);
 
+// reset password
 Route::controller(ResetPasswordController::class)->prefix('users/password')->group(function () {
     Route::post('email', 'forgotPassword');
     Route::post('code-check', 'checkCode');
     Route::post('reset', 'resetPassword');
 });
 
+// otp
 Route::controller(OTPController::class)->prefix('users/otp')->group(function () {
     Route::post('resend', 'resendOtp')->middleware('throttle:resend-otp');
     Route::post('verify', 'verifyOtp');
@@ -63,11 +66,13 @@ Route::controller(QuizController::class)->middleware('auth:api')->prefix('quizze
     Route::get('result/{quiz_id}', 'getQuizResult');
 });
 
+// categories
 Route::controller(CategoryController::class)->prefix('categories')->group(function () {
     Route::get('', 'index');
     Route::get('search/{title}', 'search');
 });
 
+// topics
 Route::controller(TopicController::class)->prefix('topics')->group(function () {
     Route::get('{category_id}', 'index');
     Route::get('search/{title}', 'search');
@@ -81,21 +86,56 @@ Route::controller(CourseController::class)->prefix('courses')->group(function ()
     Route::get('topic/{topic_id}', 'getCoursesForTopic');
     Route::get('language/{language_id}', 'getCoursesForLanguage');
     Route::get('search/{title}', 'search');
-    Route::get('free', 'freeCourses');
-    Route::get('paid', 'paidCourses');
-    Route::get('{id}', 'show');
     Route::post('payment-process/{course}', 'paymentProcess')->name('courses.payment_process');
     Route::middleware('get_certificate')->group(function(){
         Route::post('get-certificate/{course}', 'getCertificate')->name('courses.get_certificate');
         Route::post('download-certificate/{course}', 'downloadCertificate')->name('courses.download_certificate');
     });
+    Route::get('free', 'getFreeCourses');
+    Route::get('paid', 'getPaidCourses');
+    Route::get('student/{id}', 'showToStudent');
+    Route::middleware('auth:api')->group(function () {
+        Route::middleware('isTeacher')->group(function () {
+            Route::get('draft', 'getDraftCoursesToTeacher');
+            Route::get('pending', 'getPendingCoursesToTeacher');
+            Route::get('approved', 'getApprovedCoursesToTeacher');
+            Route::get('rejected', 'getRejectedCoursesToTeacher');
+            Route::post('', 'store');
+            Route::put('update-draft/{id}', 'updateDraftCourse');
+            Route::patch('update-approved/{id}', 'updateApprovedCourse');
+            Route::delete('{id}', 'destroy');
+            Route::get('teacher/{id}', 'showToTeacher');
+            Route::post('publish/{course_id}', 'publishCourse');
+        });
+        Route::get('with-arrangement/{topic_id}', 'getCoursesForTopicForTeacherWithArrangement');
+        Route::post('evaluation/{course_id}', 'evaluation')->middleware('isSubscribed');
+    });
+
+// coupons
+Route::controller(CouponController::class)->middleware('auth:api')->prefix('coupons')->group(function () {
+    Route::get('{course_id}', 'index');
+    Route::post('{course_id}', 'store');
+    Route::put('{id}', 'update');
+    Route::get('show/{id}', 'show');
+    Route::delete('{id}', 'destroy');
 });
 
-// episodes
-Route::controller(EpisodeController::class)->middleware('auth:api')->prefix('episode')->group(function () {
-    Route::get('episodes-in-course/{id}', 'indexEpisode');
-    Route::get('episode/{id}', 'showEpisode');
 
+// episodes
+Route::controller(EpisodeController::class)->middleware('auth:api')->prefix('episodes')->group(function () {
+    Route::middleware('isSubscribed')->group(function () {
+        Route::get('student/{course_id}', 'getToStudent');
+        Route::post('add-like/{id}', 'addLikeToEpisode');
+        Route::delete('remove-like/{id}', 'removeLikeFromEpisode');
+        Route::post('finish/{id}', 'finish_episode');
+    });
+
+    Route::get('teacher/{course_id}', 'getToTeacher');
+    Route::post('{course_id}', 'store');
+    Route::put('update/{id}', 'update');
+    Route::get('show/student/{id}', 'showToStudent');
+    Route::get('show/teacher/{id}', 'showToTeacher');
+    Route::delete('{id}', 'destroy');
 });
 
 // comments
@@ -105,7 +145,8 @@ Route::controller(CommentController::class)->middleware('auth:api')->prefix('com
     Route::get('get-my-comments/{episode_id}', 'getMyComments');
     Route::post('{episode_id}', 'store');
     Route::put('{id}', 'update');
-    Route::delete('{id}', 'destroy');
+    Route::delete('teacher/{id}', 'destroyForTeacher');
+    Route::delete('student/{id}', 'destroyForStudent');
     Route::post('add-like/{id}', 'addLikeToComment');
     Route::delete('remove-like/{id}', 'removeLikeFromComment');
 });
@@ -115,11 +156,13 @@ Route::controller(ReplyController::class)->middleware('auth:api')->prefix('repli
     Route::get('{comment_id}', 'index');
     Route::post('{comment_id}', 'store');
     Route::put('{id}', 'update');
-    Route::delete('{id}', 'destroy');
+    Route::delete('teacher/{id}', 'destroyForTeacher');
+    Route::delete('student/{id}', 'destroyForStudent');
     Route::post('add-like/{id}', 'addLikeToReply');
     Route::delete('remove-like/{id}', 'removeLikeFromReply');
 });
 
+// constant values
 Route::get('countries', [CountryController::class, 'index']);
 
 Route::get('languages', [LanguageController::class, 'index']);
