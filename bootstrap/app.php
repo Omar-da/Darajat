@@ -5,6 +5,8 @@ use App\Http\Controllers\episodesProtectionController;
 use App\Http\Middleware\CertificateMiddleware;
 use App\Http\Middleware\CheckTeacher;
 use App\Http\Middleware\ProtectEpisodeAccess;
+use App\Http\Middleware\CheckTeacherRole;
+use App\Http\Middleware\CheckStudentSubscribed;
 use App\Responses\Response;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -28,9 +30,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectUsersTo('dashboard/home');
         $middleware->alias([
             'throttle:resend-otp' => ThrottleRequests::class . ':resend-otp',
-            'isTeacher' => CheckTeacher::class,
             'get_certificate' => CertificateMiddleware::class,
             'episode_protection' => ProtectEpisodeAccess::class
+            'isTeacher' => CheckTeacherRole::class,
+            'isSubscribed' => CheckStudentSubscribed::class,
             ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

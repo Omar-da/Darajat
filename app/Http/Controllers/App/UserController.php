@@ -31,7 +31,7 @@ class UserController extends Controller
             return Response::success($data['user'], $data['message']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
-            return Response::error($data, $message);
+            return Response::error($message);
         }
     }
     public function updateProfileImage(ProfileImageRequest $request): JsonResponse
@@ -42,7 +42,7 @@ class UserController extends Controller
             return Response::success($data['user'], $data['message']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
-            return Response::error($data, $message);
+            return Response::error($message);
         }
     }
     public function changePassword(ChangePasswordRequest $request): JsonResponse
@@ -51,12 +51,12 @@ class UserController extends Controller
         try {
             $data = $this->userService->changePassword($request->validated());
             if($data['code'] == 401) {
-                return Response::error([], $data['message'], $data['code']);
+                return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['user'], $data['message']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
-            return Response::error($data, $message);
+            return Response::error($message);
         }
     }
 
@@ -66,18 +66,28 @@ class UserController extends Controller
         try {
             $data = $this->userService->showProfile($id);
             if($data['code'] == 404) {
-                return Response::error([], $data['message'], $data['code']);
+                return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['user'], $data['message']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
-            return Response::error($data, $message);
+            return Response::error( $message);
         }
     }
 
     public function promoteStudentToTeacher()
     {
-        $this->userService->promoteStudentToTeacher(); 
+        $data = [];
+        try
+        {
+            $data = $this->userService->promoteStudentToTeacher();
+            if($data['code'] == 409)
+                return Respِِonse::error($data['message'], $data['code']);
+            return Response::success([], $data['message']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        } 
     }
 
     public function stripeCallback(Request $request)
@@ -97,6 +107,7 @@ class UserController extends Controller
             } catch (\Exception $e) {
                 return redirect()->back()->with('error', 'Connection failed: ' . $e->getMessage());
             }
+
     }
 
     public function destroy(): JsonResponse
@@ -107,7 +118,7 @@ class UserController extends Controller
             return Response::success($data['user'], $data['message']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
-            return Response::error($data, $message);
+            return Response::error($message);
         }
     }
 

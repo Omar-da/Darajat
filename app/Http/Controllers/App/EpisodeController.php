@@ -2,71 +2,174 @@
 
 namespace App\Http\Controllers\App;
 
-use App\Models\Course;
+use App\Http\Requests\Episode\CreateEpisodeRequest;
+use App\Http\Requests\Episode\UpdateEpisodeRequest;
 use App\Models\Episode;
-use App\Models\MoreDetail;
 use App\Models\User;
 use App\Responses\Response;
-use Illuminate\Http\Request;
+use App\Services\Episode\EpisodeService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Throwable;
 
 class EpisodeController extends Controller
 {
+    private EpisodeService $episodeService;
 
-    public function indexEpisode($courseId){
-
-        $course=Course::find($courseId);
-        if(!$course)
-            return Response::error([], 'course not found', 404);
-        $userId = Auth::id();
-        if(!$course->studentSubscribe($userId))
-            return Response::error([], 'no access you must subscribe', 403);
-
-        $episodes = Episode::where('course_id',$courseId)->get();
-        if($episodes->isEmpty())
-            return Response::error([], 'no episodes in this course', 404);
-
-        return Response::success($episodes, 'get episodes successfully');
-    }
-
-    public function showEpisode($episodeId){
-
-        $episode=Episode::find($episodeId);
-        if(!$episode)
-            return Response::error([], 'episode not found', 404);
-        $course = $episode->course;
-         $userId = Auth::id();
-            if(!$course->studentSubscribe($userId))
-                return Response::error([], 'no access you must subscribe', 403);
-         return Response::success($episode, 'get episode successfully');
-    }
-
-    public function finish_episode(Episode $episode)
+    public function __construct(EpisodeService $episodeService)
     {
-        $user = auth()->user();
-        
-        if($user->episodes()->where($episode->id)->first())
-            return response()->json([
-                'message' => 'This episode has been watched before'
-            ]);
+        $this->episodeService = $episodeService;
+    }
 
-        // episode has been watched
-        $user->episodes()->attach($episode);
-        $episode->views->increment();
-        $episode->save();
+    public function getToTeacher($course_id): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->episodeService->getToTeacher($course_id);
+            if($data['code'] == 404) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
+    }
 
-        // update progress in course
-        $course = $user->followed_courses()->where($episode->course->id);
-        $progress = $course->pivot->progress->increment();
-        $course->save();
-        $course->pivot->update(['perc_progress' => ($progress * 100) / $episode->course->episodes->count()]);
-        
-        // update activity of user
-        $user->more_details->is_active_today = true;
-        $user->more_details->save();
-        
-        return response()->json([
-            'message' => 'user today is active'
-        ], 200);
+    public function getToStudent($course_id): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->episodeService->getToStudent($course_id);
+            if($data['code'] == 404) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
+    public function store(CreateEpisodeRequest $request, $course_id): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->episodeService->store($request->validated(), $course_id);
+            if($data['code'] == 403 || $data['code'] == 404) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
+    public function update(UpdateEpisodeRequest $request, $id): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->episodeService->update($request->validated(), $id);
+            if($data['code'] == 403 || $data['code'] == 404) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
+    public function showToTeacher($id): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->episodeService->showToTeacher($id);
+            if($data['code'] == 404) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
+    public function showToStudent($id): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->episodeService->showToStudent($id);
+            if($data['code'] == 403 || $data['code'] == 404) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
+    public function destroy($id): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->episodeService->destroy($id);
+            if($data['code'] == 403 || $data['code'] == 404) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success([], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
+    // Add Like to specific episode.
+    public function addLikeToEpisode($id): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->episodeService->addLikeToEpisode($id);
+            if($data['code'] == 404 || $data['code'] == 409 || $data['code'] == 403) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message  = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
+    // Remove Like from specific episode.
+    public function removeLikeFromEpisode($id): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->episodeService->removeLikeFromEpisode($id);
+            if($data['code'] == 404) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message  = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
+    public function finish_episode($id): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->episodeService->finish_episode($id);
+            if($data['code'] == 409) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success([], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message  = $th->getMessage();
+            return Response::error($message);
+        }
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Course;
 
 use App\Enums\LevelEnum;
 use App\Traits\HandlesFailedValidationTrait;
@@ -25,17 +25,21 @@ class CourseRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'topic_id' => 'required|exists:topics,id',
             'language_id' => 'required|exists:languages,id',
             'title' => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'image_url' => 'nullable|image|mimes:jpeg,png,bmp,jpg,gif,svg|max:2048',
+            'description' => 'required|string',
+            'image_url' => 'required|image|mimes:jpeg,png,bmp,jpg,gif,svg|max:2048',
             'difficulty_level' => ['required', Rule::in(LevelEnum::values())],
-//            'num_of_hours' =>,
             'price' => 'required|numeric|min:0',
-            'num_of_episodes' => 'required|integer|min:1',
-            'has_certificate' => 'required|boolean'
+            'has_certificate' => ['nullable', 'string', 'in:true,false'],
         ];
+
+        if($this->isMethod('PATCH') && count($this->all()) && $this->has('price')) {
+            return ['price' => $rules['price']];
+        }
+
+        return $rules;
     }
 }

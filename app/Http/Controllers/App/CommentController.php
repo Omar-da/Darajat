@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\App;
 
 use App\Http\Requests\Comment\CommentRequest;
-use App\Http\Requests\Comment\ShowMoreRequest;
-use App\Http\Requests\LoadMore\LoadMoreRequest;
+use App\Http\Requests\Comment\LoadMoreCommentsRequest;
 use App\Responses\Response;
 use App\Services\Comment\CommentService;
 use Illuminate\Http\JsonResponse;
@@ -26,28 +25,28 @@ class CommentController extends Controller
         try {
             $data = $this->commentService->index($episode_id);
             if($data['code'] == 404) {
-                return Response::error([], $data['message'], $data['code']);
+                return Response::error($data['message'], $data['code']);
             }
             return Response::successForPaginate($data['data'], $data['meta'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message  = $th->getMessage();
-            return Response::error($data, $message);
+            return Response::error($message);
         }
     }
 
     // Load more comments, they are not appearing on the last page.
-    public function loadMore($episode_id, LoadMoreRequest $request): JsonResponse
+    public function loadMore($episode_id, LoadMoreCommentsRequest $request): JsonResponse
     {
         $data = [];
         try {
             $data = $this->commentService->loadMore($episode_id, $request->validated());
             if($data['code'] == 404) {
-                return Response::error([], $data['message'], $data['code']);
+                return Response::error($data['message'], $data['code']);
             }
             return Response::successForPaginate($data['data'], $data['meta'],$data['message'], $data['code']);
         } catch (Throwable $th) {
             $message  = $th->getMessage();
-            return Response::error($data, $message);
+            return Response::error($message);
         }
     }
 
@@ -58,12 +57,12 @@ class CommentController extends Controller
         try {
             $data = $this->commentService->getMyComments($episode_id);
             if($data['code'] == 404) {
-                return Response::error([], $data['message'], $data['code']);
+                return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message  = $th->getMessage();
-            return Response::error($data, $message);
+            return Response::error($message);
         }
     }
 
@@ -74,12 +73,12 @@ class CommentController extends Controller
         try {
             $data = $this->commentService->store($request, $episode_id);
             if($data['code'] == 404) {
-                return Response::error([], $data['message'], $data['code']);
+                return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message  = $th->getMessage();
-            return Response::error($data, $message);
+            return Response::error($message);
         }
     }
 
@@ -90,28 +89,44 @@ class CommentController extends Controller
         try {
             $data = $this->commentService->update($request->validated(), $id);
             if($data['code'] == 404 || $data['code'] == 401) {
-                return Response::error([], $data['message'], $data['code']);
+                return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message  = $th->getMessage();
-            return Response::error($data, $message);
+            return Response::error($message);
         }
     }
 
-    // Delete specific comment.
-    public function destroy($id): JsonResponse
+    // Delete a specific comment by the course teacher.
+    public function destroyForTeacher($id): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->commentService->destroy($id);
+            $data = $this->commentService->destroyForTeacher($id);
             if($data['code'] == 404 || $data['code'] == 401) {
-                return Response::error([], $data['message'], $data['code']);
+                return Response::error($data['message'], $data['code']);
             }
             return Response::success([], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message  = $th->getMessage();
-            return Response::error($data, $message);
+            return Response::error($message);
+        }
+    }
+
+    // Delete a specific comment by the comment's owner.
+    public function destroyForStudent($id): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->commentService->destroyForStudent($id);
+            if($data['code'] == 404 || $data['code'] == 401) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success([], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message  = $th->getMessage();
+            return Response::error($message);
         }
     }
 
@@ -122,12 +137,12 @@ class CommentController extends Controller
         try {
             $data = $this->commentService->addLikeToComment($id);
             if($data['code'] == 404 || $data['code'] == 401) {
-                return Response::error([], $data['message'], $data['code']);
+                return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message  = $th->getMessage();
-            return Response::error($data, $message);
+            return Response::error($message);
         }
     }
 
@@ -138,12 +153,12 @@ class CommentController extends Controller
         try {
             $data = $this->commentService->removeLikeFromComment($id);
             if($data['code'] == 404) {
-                return Response::error([], $data['message'], $data['code']);
+                return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message  = $th->getMessage();
-            return Response::error($data, $message);
+            return Response::error($message);
         }
     }
 }

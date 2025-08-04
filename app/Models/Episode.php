@@ -15,6 +15,23 @@ class Episode extends Model
 
     public $timestamps = false;
 
+    protected $fillable = [
+        'course_id',
+        'title',
+        'episode_number',
+        'video_url',
+        'duration',
+        'image_url',
+        'views',
+        'likes'
+    ];
+
+    public function getFormattedDurationAttribute(): string
+    {
+        $seconds = $this->duration;
+        return gmdate("i:s", $seconds);
+    }
+
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
@@ -30,11 +47,6 @@ class Episode extends Model
         return $this->hasOne(Quiz::class);
     }
 
-    public function admin(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public function userLikes(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'episode_likes');
@@ -42,6 +54,6 @@ class Episode extends Model
 
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, foreignPivotKey: 'user_id')->withPivot('pass_quiz');
+        return $this->belongsToMany(User::class, 'episode_user')->withPivot('pass_quiz');
     }
 }
