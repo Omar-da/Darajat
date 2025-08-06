@@ -20,6 +20,7 @@ class CourseForStudentResource extends JsonResource
             'image_url' =>  Storage::url("courses/{$this->image_url}"),
             'title' => $this->title,
             'teacher' => $this->teacher->first_name . ' ' . $this->teacher->last_name,
+            'teacher_id' => $this->teacher->id,
             'price' => $this->price . '$',
             'rate' => $this->rate,
             'language' => $this->language->name,
