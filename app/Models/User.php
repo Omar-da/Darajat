@@ -53,6 +53,10 @@ class User extends Authenticatable
             'otp_sent_at' => 'datetime'
         ];
     }
+    public function isTeacher(): bool
+{
+    return $this->role === 'teacher';
+}
 
     public function setFirstNameAttribute($value): void
     {

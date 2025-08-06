@@ -14,27 +14,47 @@ use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 class EpisodeService
 {
     public function getToTeacher($course_id): array
-    {
-        $course = Course::query()
-            ->where([
-                'teacher_id' => auth('api')->id(),
-                'id' => $course_id
-            ])->first();
-        if (is_null($course)) {
-            return ['message' => 'Course not found!', 'code' => 404];
-        }
-        $episodes = $course->episodes;
-        return ['data' => EpisodeResource::collection($episodes), 'message' => 'Episodes retrieved successfully', 'code' => 200];
+{
+    $course = Course::query()
+        ->where([
+            'teacher_id' => auth('api')->id(),
+            'id' => $course_id
+        ])
+        ->with(['episodes.quiz.questions']) // Eager load relationships
+        ->first();
+
+    if (is_null($course)) {
+        return ['message' => 'Course not found!', 'code' => 404];
     }
 
-    public function getToStudent($course_id): array
-    {
-        $user = auth('api')->user();
-        $course = $user->followed_courses()->where('course_id', $course_id)->first();
-        $episodes['episodes'] = EpisodeResource::collection($course->episodes);
-        $episodes['progress_percentage'] = $course->pivot->perc_progress . '%';
-        return ['data' => $episodes, 'message' => 'Episodes retrieved successfully', 'code' => 200];
+    return [
+        'data' => EpisodeResource::collection($course->episodes),
+        'message' => 'Episodes retrieved successfully',
+        'code' => 200
+    ];
+}
+
+public function getToStudent($course_id): array
+{
+    $user = auth('api')->user();
+    $course = $user->followed_courses()
+        ->where('course_id', $course_id)
+        ->with(['episodes.quiz.questions']) // Eager load relationships
+        ->first();
+
+    if (!$course) {
+        return ['message' => 'Course not found!', 'code' => 404];
     }
+
+    return [
+        'data' => [
+            'episodes' => EpisodeResource::collection($course->episodes),
+            'progress_percentage' => $course->pivot->perc_progress . '%'
+        ],
+        'message' => 'Episodes retrieved successfully',
+        'code' => 200
+    ];
+}
 
     public function store($request, $course_id): array
     {
