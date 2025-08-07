@@ -30,16 +30,20 @@ Route::controller(AuthController::class)->prefix('users')->group(function () {
 });
 
 // profile
-Route::controller(UserController::class)->middleware('auth:api')->prefix('users')->group(function () {
-    Route::post('update-profile', 'updateProfile');
-    Route::post('update-profile-image', 'updateProfileImage');
-    Route::post('change-password','changePassword');
-    Route::post('promote-student-to-teacher','promoteStudentToTeacher');
-    Route::get('stripe-callback', 'stripeCallback')->name('users.stripe_callback');
-    Route::delete('delete', 'destroy');
-    Route::post('store-fcm-token', 'storeFCMToken');
+Route::controller(UserController::class)->prefix('users')->group(function () {
+    Route::middleware('auth:api')->group(function() {
+        Route::post('update-profile', 'updateProfile');
+        Route::post('update-profile-image', 'updateProfileImage');
+        Route::post('change-password','changePassword');
+        Route::post('promote-student-to-teacher','promoteStudentToTeacher');
+        Route::get('stripe-callback', 'stripeCallback')->name('users.stripe_callback');
+        Route::delete('delete', 'destroy');
+        Route::post('store-fcm-token', 'storeFCMToken');
+    });
+    Route::get('show-profile/{id}', 'showProfile');
+    Route::get('get-certificates/{user_id}', 'get_certificates');
 });
-Route::get('users/{id}', [UserController::class, 'showProfile']);
+
 
 // reset password
 Route::controller(ResetPasswordController::class)->prefix('users/password')->group(function () {
@@ -88,7 +92,7 @@ Route::controller(CourseController::class)->prefix('courses')->group(function ()
     Route::get('search/{title}', 'search');
     Route::post('payment-process/{course}', 'paymentProcess')->name('courses.payment_process');
     Route::middleware('get_certificate')->group(function(){
-        Route::post('get-certificate/{course}', 'getCertificate')->name('courses.get_certificate');
+        Route::post('obtain-certificate/{course}', 'obtainCertificate')->name('courses.obtain_certificate');
         Route::post('download-certificate/{course}', 'downloadCertificate')->name('courses.download_certificate');
     });
     Route::get('free', 'getFreeCourses');
@@ -110,6 +114,7 @@ Route::controller(CourseController::class)->prefix('courses')->group(function ()
         Route::get('with-arrangement/{topic_id}', 'getCoursesForTopicForTeacherWithArrangement');
         Route::post('evaluation/{course_id}', 'evaluation')->middleware('isSubscribed');
     });
+});
 
 // coupons
 Route::controller(CouponController::class)->middleware('auth:api')->prefix('coupons')->group(function () {
@@ -177,4 +182,3 @@ Route::controller(EnumController::class)->group(function () {
     Route::get('levels', 'levels');
     Route::get('educations', 'educations');
 });
-

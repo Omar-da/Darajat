@@ -115,9 +115,7 @@ class FakeDataSeeder extends Seeder
             'course_id' => 1,
             'title' => 'Basics of Laravel and MVC',
             'episode_number' => 1,
-            'video_url' => 'videos/video.mp4',
             'duration' => 151,
-            'image_url' => 'episode1.png',
         ]);
 
         // episode 2
@@ -125,9 +123,7 @@ class FakeDataSeeder extends Seeder
             'course_id' => 1,
             'title' => 'Routes and Controllers',
             'episode_number' => 2,
-            'video_url' => 'videos/video.mp4',
             'duration' => 151,
-            'image_url' => 'episode2.png',
         ]);
 
         // episode 3
@@ -135,9 +131,7 @@ class FakeDataSeeder extends Seeder
             'course_id' => 1,
             'title' => 'Blade Engine',
             'episode_number' => 3,
-            'video_url' => 'videos/video.mp4',
             'duration' => 43,
-            'image_url' => 'episode3.png',
         ]);
 
         // comment 1

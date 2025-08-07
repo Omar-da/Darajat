@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Responses\Response;
 use App\Services\User\UserService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 use Kreait\Firebase\Request;
 use Stripe\OAuth;
 use Stripe\Stripe;
@@ -82,7 +83,7 @@ class UserController extends Controller
         {
             $data = $this->userService->promoteStudentToTeacher();
             if($data['code'] == 409)
-                return Respِِonse::error($data['message'], $data['code']);
+                return Response::error($data['message'], $data['code']);
             return Response::success([], $data['message']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
@@ -103,9 +104,13 @@ class UserController extends Controller
                 // Save Stripe account ID to teacher
                 auth('api')->user()->update(['stripe_connect_id' => $response->stripe_user_id]);
 
-                return redirect()->route('teacher.dashboard')->with('success', 'Stripe account connected!');
+                return response()->json([
+                    'message' => 'Promotion succeeded'
+                ]);
             } catch (\Exception $e) {
-                return redirect()->back()->with('error', 'Connection failed: ' . $e->getMessage());
+                return response()->json([
+                    'error' => 'Connection failed'
+                ]);
             }
 
     }
@@ -127,6 +132,15 @@ class UserController extends Controller
         $user = User::find($request->user_id);
         $user->update(['fcm_token' => $request->device_token]);
         return response()->json(['success' => true]);
+    }
+
+    public function get_certificates($user_id)
+    {
+        return collect(Storage::disk('public')->files("certificates/$user_id"))
+            ->map(function ($file) {
+                return Storage::disk('public')->url($file);
+            })
+            ->all();
     }
 
 }

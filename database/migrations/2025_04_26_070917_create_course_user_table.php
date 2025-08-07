@@ -25,6 +25,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('num_of_quizzes')->default(0);
             $table->timestamp('purchase_date')->useCurrent();
             $table->tinyInteger('rate')->nullable();
+            $table->boolean('get_certificate')->default(false);
         });
     }
 

@@ -3,6 +3,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Course;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,9 +17,15 @@ class CertificateMiddleware
         // Extract course ID from route (assuming route is like /certificates/{course})
         $courseId = $request->route('course'); 
 
+        $course = Course::findOrFail($courseId);
         $followedCourse = $user->moreDetail->followed_courses()
                             ->where('course_id', $courseId)
                             ->first();
+                            
+        if(!$course->has_certificate)
+            return response()->json([
+                'message' => 'Course has not certificate'
+            ]);
 
         // Check if course exists in user's profile
         if (!$followedCourse) {

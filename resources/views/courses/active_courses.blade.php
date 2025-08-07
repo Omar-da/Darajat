@@ -9,7 +9,6 @@
             <div class="category-card">
                 <h2 class="category-title">{{$cate}}</h2>
                 <h3 class="topic-title"><span class="arrow">-></span> {{$topic}}</h3>
-                
                 <div class="courses-grid">
                     @forEach($courses as $course)
                     <a href="{{route('courses.show_course', ['course' => $course->id])}}">
