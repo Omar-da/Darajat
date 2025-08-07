@@ -25,7 +25,7 @@
                     @endif
                     @if($episode->quiz)
                         <a href="{{route('courses.quiz', ['episode' => $episode->id])}}" class="video-quiz-btn">
-                            <i class="fas fa-question-circle"></i> Start Quiz
+                            <i class="fas fa-question-circle"></i> Show Quiz
                         </a>   
                     @endif
                 </div>

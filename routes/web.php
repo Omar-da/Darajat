@@ -1,18 +1,17 @@
 <?php
 
+use App\Http\Controllers\App\EpisodeController;
 use App\Http\Controllers\Dashboard\AdminProfileController;
 use App\Http\Controllers\Dashboard\BadgeController;
 use App\Http\Controllers\Dashboard\CourseController;
 use App\Http\Controllers\Dashboard\HomeController;
 use App\Http\Controllers\Dashboard\WebAuthController;
 use App\Http\Controllers\dashboard\UserController;
-use App\Http\Controllers\episodesProtectionController;
 use App\Livewire\CourseManagement;
 use App\Livewire\CoursesTabNav;
 use App\Livewire\CreateBadge;
 use App\Livewire\EditBadge;
 use App\Livewire\EditProfile;
-use App\Livewire\IndexUsersTabs;
 use App\Livewire\LoginForm;
 use App\Livewire\RegisterForm;
 use App\Livewire\RejectedEpisodes;
@@ -50,7 +49,7 @@ Route::prefix('dashboard')->group(function () {
             Route::post('approve/{episode}',            'approve')->               name('approve');
             Route::post('reject/{episode}',             'reject')->                name('reject');
             // get videos
-            Route::middleware('episode_protection')->group(function () {
+            Route::middleware('episode_protection')->controller(EpisodeController::class)->group(function () {
                 Route::get('/get_video/{episode_id}', 'get_video')->name('get_video');
                 Route::get('/get_poster/{episode_id}', 'get_poster')->name('get_poster');
             });

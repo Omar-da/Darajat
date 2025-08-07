@@ -1,0 +1,117 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Speciality;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class SpecialitiesSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $specialities = [
+            ['name' => 'Medicine'],
+            ['name' => 'Dentistry'],
+            ['name' => 'Pharmacy'],
+            ['name' => 'Nursing'],
+            ['name' => 'Public Health'],
+            ['name' => 'Veterinary Medicine'],
+            ['name' => 'Engineering'],
+            ['name' => 'Computer Science'],
+            ['name' => 'Information Technology'],
+            ['name' => 'Software Engineering'],
+            ['name' => 'Civil Engineering'],
+            ['name' => 'Mechanical Engineering'],
+            ['name' => 'Electrical Engineering'],
+            ['name' => 'Mechatronics'],
+            ['name' => 'Architecture'],
+            ['name' => 'Business Administration'],
+            ['name' => 'Accounting'],
+            ['name' => 'Finance'],
+            ['name' => 'Marketing'],
+            ['name' => 'Management Information Systems'],
+            ['name' => 'Economics'],
+            ['name' => 'Political Science'],
+            ['name' => 'Law'],
+            ['name' => 'Psychology'],
+            ['name' => 'Sociology'],
+            ['name' => 'Social Work'],
+            ['name' => 'Education'],
+            ['name' => 'Early Childhood Education'],
+            ['name' => 'Special Education'],
+            ['name' => 'English Language and Literature'],
+            ['name' => 'Arabic Language and Literature'],
+            ['name' => 'French Language and Literature'],
+            ['name' => 'Linguistics'],
+            ['name' => 'Translation'],
+            ['name' => 'History'],
+            ['name' => 'Philosophy'],
+            ['name' => 'Geography'],
+            ['name' => 'Mathematics'],
+            ['name' => 'Statistics'],
+            ['name' => 'Physics'],
+            ['name' => 'Chemistry'],
+            ['name' => 'Biology'],
+            ['name' => 'Biochemistry'],
+            ['name' => 'Environmental Science'],
+            ['name' => 'Geology'],
+            ['name' => 'Astronomy'],
+            ['name' => 'Anthropology'],
+            ['name' => 'Archaeology'],
+            ['name' => 'Fine Arts'],
+            ['name' => 'Graphic Design'],
+            ['name' => 'Interior Design'],
+            ['name' => 'Fashion Design'],
+            ['name' => 'Music'],
+            ['name' => 'Theatre'],
+            ['name' => 'Film and Television'],
+            ['name' => 'Journalism'],
+            ['name' => 'Media Studies'],
+            ['name' => 'Communications'],
+            ['name' => 'Hospitality Management'],
+            ['name' => 'Tourism Management'],
+            ['name' => 'Culinary Arts'],
+            ['name' => 'Sports Science'],
+            ['name' => 'Physical Education'],
+            ['name' => 'Library and Information Science'],
+            ['name' => 'Artificial Intelligence'],
+            ['name' => 'Cybersecurity'],
+            ['name' => 'Data Science'],
+            ['name' => 'Robotics'],
+            ['name' => 'Biomedical Engineering'],
+            ['name' => 'Industrial Engineering'],
+            ['name' => 'Petroleum Engineering'],
+            ['name' => 'Chemical Engineering'],
+            ['name' => 'Agricultural Engineering'],
+            ['name' => 'Agriculture'],
+            ['name' => 'Forestry'],
+            ['name' => 'Horticulture'],
+            ['name' => 'Animal Science'],
+            ['name' => 'Food Science'],
+            ['name' => 'Marine Biology'],
+            ['name' => 'Oceanography'],
+            ['name' => 'Forensic Science'],
+            ['name' => 'Criminology'],
+            ['name' => 'Religious Studies'],
+            ['name' => 'Islamic Studies'],
+            ['name' => 'Christian Theology'],
+            ['name' => 'Jewish Studies'],
+            ['name' => 'Gender Studies'],
+            ['name' => 'Development Studies'],
+            ['name' => 'Peace and Conflict Studies'],
+            ['name' => 'International Relations'],
+            ['name' => 'Logistics and Supply Chain Management'],
+            ['name' => 'Entrepreneurship'],
+            ['name' => 'Actuarial Science'],
+            ['name' => 'Game Design'],
+            ['name' => 'Animation'],
+        ];
+
+        foreach($specialities as $speciality)
+            Speciality::create($speciality);
+    }
+}

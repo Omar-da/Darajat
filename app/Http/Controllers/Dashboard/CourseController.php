@@ -46,7 +46,7 @@ class CourseController extends Controller
         }]);
     }])->find($episode_id);
 
-        return view('courses.show_episode', compact('episode'));
+        return view('courses.video', compact('episode'));
     }
 
     public function quiz(Episode $episode)

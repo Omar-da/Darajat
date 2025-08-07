@@ -15,8 +15,8 @@ class ProtectEpisodeAccess
         $episode = Episode::withTrashed()->where('id', $episodeId)->firstOrFail();
         
         if (auth()->user() ||
-            auth('api')->user()->followed_courses->contains($episodeId) ||
-            auth('api')->user()->published_courses->contains($episodeId) ||
+            auth('api')->user()->followed_courses->contains($episode->course_id) ||
+            auth('api')->user()->published_courses->contains($episode->course_id) ||
             $episode->episode_number == 1) {
             return $next($request);
         }

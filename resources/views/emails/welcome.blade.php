@@ -53,11 +53,11 @@
                 <tr>
                     <td class="logo-container" style="text-align:center;">
                         <a href="{{ config('app.url') }}" title="logo" target="_blank" style="display: inline-block;">
-                            <img src="{{ $message->embed(asset('img/icons/Darajat.png'), 'Darajat.png', 'image/png') }}"
+                            {{-- <img src="{{ $message->embed(asset('img/icons/Darajat.png'), 'Darajat.png', 'image/png') }}"
                                  class="logo-img"
                                  alt="{{ config('app.name') }} Logo"
                                  width="200"
-                                 style="display: block; width: 100%; max-width: 200px; height: auto;">
+                                 style="display: block; width: 100%; max-width: 200px; height: auto;"> --}}
                         </a>
                     </td>
                 </tr>

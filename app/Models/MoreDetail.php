@@ -15,8 +15,6 @@ class MoreDetail extends Model
         'country_id',
         'linked_in_url',
         'education',
-        'university',
-        'speciality',
         'work_experience',
         'is_banned',
     ];
@@ -52,5 +50,13 @@ class MoreDetail extends Model
         return $this->belongsTo(Country::class);
     }
 
+    public function university()
+    {
+        return $this->belongsTo(University::class);
+    }
 
+    public function speciality()
+    {
+        return $this->belongsTo(Speciality::class);
+    }
 }
