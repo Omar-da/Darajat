@@ -36,12 +36,11 @@ Route::controller(UserController::class)->prefix('users')->group(function () {
         Route::post('update-profile-image', 'updateProfileImage');
         Route::post('change-password','changePassword');
         Route::post('promote-student-to-teacher','promoteStudentToTeacher');
-        Route::get('stripe-callback', 'stripeCallback')->name('users.stripe_callback');
+        Route::post('stripe-callback', 'stripeCallback')->name('users.stripe_callback');
         Route::delete('delete', 'destroy');
         Route::post('store-fcm-token', 'storeFCMToken');
     });
     Route::get('show-profile/{id}', 'showProfile');
-    Route::get('get-certificates/{user_id}', 'get_certificates');
 });
 
 
@@ -91,10 +90,7 @@ Route::controller(CourseController::class)->prefix('courses')->group(function ()
     Route::get('language/{language_id}', 'getCoursesForLanguage');
     Route::get('search/{title}', 'search');
     Route::post('payment-process/{course}', 'paymentProcess')->name('courses.payment_process');
-    Route::middleware('get_certificate')->group(function(){
-        Route::post('obtain-certificate/{course}', 'obtainCertificate')->name('courses.obtain_certificate');
-        Route::post('download-certificate/{course}', 'downloadCertificate')->name('courses.download_certificate');
-    });
+    Route::post('get-certificate/{course}', 'getCertificate')->name('courses.get_certificate')->middleware('get_certificate');
     Route::get('free', 'getFreeCourses');
     Route::get('paid', 'getPaidCourses');
     Route::get('student/{id}', 'showToStudent');
@@ -133,8 +129,8 @@ Route::controller(EpisodeController::class)->middleware('auth:api')->prefix('epi
         Route::post('add-like/{id}', 'addLikeToEpisode');
         Route::delete('remove-like/{id}', 'removeLikeFromEpisode');
         Route::post('finish/{id}', 'finish_episode');
-        Route::get('/get_video/{episode_id}', 'get_video')->name('get_video');
-        Route::get('/get_poster/{episode_id}', 'get_poster')->name('get_poster');
+        Route::get('get_video/{episode_id}', 'get_video')->name('get_video');
+        Route::get('get_poster/{episode_id}', 'get_poster')->name('get_poster');
         Route::get('teacher/{course_id}', 'getToTeacher');
         Route::post('{course_id}', 'store');
         Route::put('update/{id}', 'update');

@@ -99,18 +99,7 @@ class UserService
 
     public function promoteStudentToTeacher()
     {
-        $user = auth('api')->user();
-        if($user['role'] === RoleEnum::TEACHER) {
-            return ['message' => 'You are already a Teacher!', 'code' => 409];
-        }
-        $user->update([
-            'role' => 'teacher'
-        ]);
-
-        $clientId = config('services.stripe.connect');
-        $redirectUri = urlencode(route('users.stripe_callback'));
         
-        return redirect("https://connect.stripe.com/oauth/authorize?response_type=code&client_id={$clientId}&scope=read_write&redirect_uri={$redirectUri}");
     }
 
     public function delete(): array

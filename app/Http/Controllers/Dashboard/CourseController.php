@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Enums\CourseStatusEnum;
 use App\Http\Controllers\App\Controller;
 use App\Models\Category;
 use App\Models\Course;
@@ -13,7 +14,7 @@ class CourseController extends Controller
 {
     public function active_courses(Category $cate, Topic $topic)
     {
-        $courses = Course::where(['topic_id' => $topic->id, 'published' => 'true'])->with(['teacher' => function($q) {
+        $courses = Course::where(['topic_id' => $topic->id, 'status' => CourseStatusEnum::APPROVED])->with(['teacher' => function($q) {
             $q->withTrashed();
         }])->get();
 

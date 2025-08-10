@@ -356,66 +356,52 @@ class CourseController extends Controller
         }
     }
 
-       public function obtainCertificate(Course $course)
+       public function getCertificate(Course $course)
         {
             $user = auth('api')->user();
-            $filePath = "certificates/{$user->id}/{$course->id}.pdf";
+            $apiKey = env('CERTIFIER_API_KEY'); 
             $followed_course = $user->followed_courses()->where('course_id', $course->id)->firstOrFail();  
 
             if ($followed_course->pivot->get_certificate) 
                 return response()->json([
                     'message' => 'You have already obtained certificate'
                 ]);
-            $download_url = $this->downloadFunction($course);
-            $pdfContent = Http::get($download_url)->throw()->body();
-
-            Storage::disk('public')->put($filePath, $pdfContent);
-            $followed_course->pivot->update(['get_certificate' => true]);
-
-            // Force download
-            return redirect()->away($download_url);
-        }
-
-        public function downloadCertificate(Course $course)
-        {
-            // Always re-download fresh copy for download route
-            $download_url = $this->downloadFunction($course);
-
-            // Force download
-            return redirect()->away($download_url);
-        }
-
-        private function downloadFunction(Course $course)
-        {
-            $user = auth('api')->user();
-    
-            // Fetch from Certifier API (replace with your actual API call)
-            $apiKey = env('CERTIFIER_API_KEY'); 
-            $baseUrl = 'https://api.certifier.io/v1/credentials';
+            
 
             $client = new Client();
 
-            $response = $client->post("{$baseUrl}/issue", [
+            $response = $client->request('POST', 'https://api.certifier.io/v1/credentials/create-issue-send', 
+            [
                 'headers' => [
-                    'Authorization' => "Bearer {$apiKey}",
-                    'Content-Type' => 'application/json',
+                    'Certifier-Version' => '2022-10-26',
+                    'accept' => 'application/json',
+                    'authorization' => "Bearer $apiKey",
+                    'content-type' => 'application/json',
                 ],
-                'json' => [
+                'json' => [  
+                    'groupId' => '01jsxgwpm02gd1j9pq679rx3de',
                     'recipient' => [
-                        'name' => "$user->first_name $user->last_name", 
+                        'name' => $user->first_name . ' ' . $user->last_name,
+                        'email' => 'omaraldalati3@gmail.com',
                     ],
-                    'template_id' => '01jsm7nt1nc9kwc5g1c9tn1ryk',
-                    'issued_on' => now()->toDateString(),
-                    'metadata' => [
-                        'degree' => "$course->teacher->first_name $course->teacher->last_name",
-                        'course_name' => $course->title,
-                        'course_classification' => $course->topic->category
+                    'certificate' => [
+                        'issued_on' => now()->toDateString(),
                     ],
-                ],
+                    'customAttributes' => [
+                        'custom.course_classification' => $course->topic->category->title,
+                        'custom.course_name' => $course->title,
+                        'custom.degree' => $course->teacher->first_name . ' ' . $course->teacher->last_name, 
+                    ]
+                ]
             ]);
-            
-            $credential = json_decode($response->getBody(), true);
-            return $credential['download_url']; // e.g., "https://certifier.io/cred/CRED_123"
+
+            $body = $response->getBody()->getContents();
+            $credentialData = json_decode($body, true);
+
+            return response()->json([
+                'success' => true,
+                'credential_url' => "https://credsverse.com/credentials/{$credentialData['publicId']}"
+            ]);
         }
 }
 
