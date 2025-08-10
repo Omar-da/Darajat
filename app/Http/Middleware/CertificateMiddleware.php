@@ -13,14 +13,12 @@ class CertificateMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $user = auth('api')->user();
+        $course = $request->route('course'); 
         
-        // Extract course ID from route (assuming route is like /certificates/{course})
-        $courseId = $request->route('course'); 
-
-        $course = Course::findOrFail($courseId);
-        $followedCourse = $user->moreDetail->followed_courses()
-                            ->where('course_id', $courseId)
-                            ->first();
+        $course = Course::findOrFail($course->id);
+        $followedCourse = $user->followed_courses()
+        ->where('course_id', $course->id)
+        ->first();
                             
         if(!$course->has_certificate)
             return response()->json([
@@ -35,18 +33,18 @@ class CertificateMiddleware
         }
 
         // Check course progress
-        if ($followedCourse->pivot->perc_progress != 100) {
-            return response()->json([
-                'message' => 'Course is not completed yet'
-            ], 403);
-        }
+        // if ($followedCourse->pivot->perc_progress != 100) {
+        //     return response()->json([
+        //         'message' => 'Course is not completed yet'
+        //     ], 403);
+        // }
 
         // Check quizzes completion
-        if ($followedCourse->num_of_quizzes != $followedCourse->num_of_completed_quizzes) {
-            return response()->json([
-                'message' => 'Quizzes are not completed yet'
-            ], 403);
-        }
+        // if ($followedCourse->num_of_quizzes != $followedCourse->num_of_completed_quizzes) {
+        //     return response()->json([
+        //         'message' => 'Quizzes are not completed yet'
+        //     ], 403);
+        // }
 
         return $next($request);
     }
