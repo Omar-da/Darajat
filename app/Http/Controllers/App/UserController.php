@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\App;
 
+use App\Enums\RoleEnum;
 use App\Http\Requests\User\ChangePasswordRequest;
 use App\Http\Requests\User\ProfileImageRequest;
 use App\Http\Requests\User\ProfileRequest;
@@ -76,30 +77,31 @@ class UserController extends Controller
         }
     }
 
-    public function promoteStudentToTeacher(): JsonResponse
+    public function promoteStudentToTeacher()
     {
-        $data = [];
-        try {
-            $data = $this->userService->promoteStudentToTeacher();
-            if($data['code'] == 409)
-                return Response::error($data['message'], $data['code']);
-            return Response::success([], $data['message']);
-        } catch (Throwable $th) {
-            $message = $th->getMessage();
-            return Response::error($message);
-        }
-    }
+        // $data = [];
+        // try
+        // {
+        //     $data = $this->userService->promoteStudentToTeacher();
+        //     if($data['code'] == 409)
+        //         return Response::error($data['message'], $data['code']);
+        //     return Response::success([], $data['message']);
+        // } catch (Throwable $th) {
+        //     $message = $th->getMessage();
+        //     return Response::error($message);
+        // }
+        // $user = auth('api')->user();
+        // if($user['role'] === RoleEnum::TEACHER) {
+        //     return ['message' => 'You are already a Teacher!', 'code' => 409];
+        // }
+        // $user->update([
+        //     'role' => 'teacher'
+        // ]);
 
-    public function destroy(): JsonResponse
-    {
-        $data = [];
-        try {
-            $data = $this->userService->delete();
-            return Response::success($data['user'], $data['message']);
-        } catch (Throwable $th) {
-            $message = $th->getMessage();
-            return Response::error($message);
-        }
+        $clientId = config('services.stripe.connect');
+        $redirectUri = urlencode(route('users.stripe_callback'));
+
+        return redirect("https://connect.stripe.com/oauth/authorize?response_type=code&client_id={$clientId}&scope=read_write&redirect_uri={$redirectUri}");
     }
 
     public function stripeCallback(Request $request)
@@ -126,20 +128,22 @@ class UserController extends Controller
 
     }
 
+    public function destroy(): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->userService->delete();
+            return Response::success($data['user'], $data['message']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
     public function storeFCMToken(Request $request)
     {
         $user = User::find($request->user_id);
         $user->update(['fcm_token' => $request->device_token]);
         return response()->json(['success' => true]);
     }
-
-    public function get_certificates($user_id)
-    {
-        return collect(Storage::disk('public')->files("certificates/$user_id"))
-            ->map(function ($file) {
-                return Storage::disk('public')->url($file);
-            })
-            ->all();
-    }
-
 }
