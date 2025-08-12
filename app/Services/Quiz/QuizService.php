@@ -108,11 +108,9 @@ class QuizService
             $course = $user->followed_courses()->where('course_id', $quiz->episode->course_id)->first();
             $course->pivot->increment('num_of_completed_quizzes');
 
-            if (true) {
+            if ($course->pivot->num_of_completed_quizzes == $course->total_quizzes) {
                 $course->pivot->update(['quizzes_completed' => true]);
                 if ($course->pivot->episodes_completed) {
-                    $course->pivot->update(['get_certificate' => true]);
-                    $user->statistics()->where('title->en', 'Num Of Certificates')->first()->pivot->increment('progress');
                     $this->checkStatistic($course);
                 }
             }

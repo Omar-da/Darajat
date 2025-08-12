@@ -93,11 +93,7 @@
                 <tr>
                     <td class="logo-container" style="text-align:center;">
                         <a href="{{ config('app.url') }}" title="logo" target="_blank" style="display: inline-block;">
-<<<<<<< HEAD
                             <img src="{{ $message->embed(public_path('img/icons/logo.png'), 'logo.png', 'image/png') }}"
-=======
-                            <img src="{{ $message->embed(asset('img/icons/Darajat.png'), 'Darajat.png', 'image/png') }}"
->>>>>>> 673be79e96ccb8e9aee066c3aaa777873f2d27f8
                                  class="logo-img"
                                  alt="{{ config('app.name') }} Logo"
                                  width="200"

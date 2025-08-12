@@ -198,8 +198,6 @@ class EpisodeService
         if ($course->pivot->perc_progress == 100) {
             $course->pivot->update(['episodes_completed' => true]);
             if ($course->pivot->quizzes_completed) {
-                $course->pivot->update(['get_certificate' => true]);
-                $user->statistics()->where('title->en', 'Num Of Certificates')->first()->pivot->increment('progress');
                 $this->checkStatistic($course);
             }
         }
