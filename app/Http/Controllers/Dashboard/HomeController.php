@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Enums\CourseStatusEnum;
 use App\Enums\RoleEnum;
 use App\Http\Controllers\App\Controller;
 use App\Models\Country;
@@ -13,7 +14,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $courses = Course::where('published', 'true')->get();
+        $courses = Course::where('status', CourseStatusEnum::APPROVED)->get();
         $num_of_courses = count($courses);
         $num_of_students = User::whereIn('role', [RoleEnum::STUDENT, RoleEnum::TEACHER])->count();
         $num_of_teachers = User::where('role', RoleEnum::TEACHER)->count();

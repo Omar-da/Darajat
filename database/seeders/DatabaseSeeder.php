@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call(TopicSeeder::class);
         $this->call(StatisticsSeeder::class);
         $this->call(FakeDataSeeder::class);
-        $this->call(UniversitiesSeeder::class);
+        // $this->call(UniversitiesSeeder::class);
         $this->call(SpecialitiesSeeder::class);
     }
 }

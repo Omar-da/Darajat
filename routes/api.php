@@ -43,7 +43,6 @@ Route::controller(UserController::class)->middleware('set_language')->prefix('us
         Route::post('store-fcm-token', 'storeFCMToken');
     });
     Route::get('show-profile/{id}', 'showProfile');
-    Route::get('get-certificates/{user_id}', 'get_certificates');
 });
 
 
@@ -92,10 +91,7 @@ Route::controller(CourseController::class)->middleware('set_language')->prefix('
     Route::get('language/{language_id}', 'getCoursesForLanguage');
     Route::get('search/{title}', 'search');
     Route::post('payment-process/{course}', 'paymentProcess')->name('courses.payment_process');
-    Route::middleware('get_certificate')->group(function () {
-        Route::post('obtain-certificate/{course}', 'obtainCertificate')->name('courses.obtain_certificate');
-        Route::post('download-certificate/{course}', 'downloadCertificate')->name('courses.download_certificate');
-    });
+    Route::post('get-certificate/{course}', 'getCertificate')->name('courses.get_certificate')->middleware('get_certificate');
     Route::get('free', 'getFreeCourses');
     Route::get('paid', 'getPaidCourses');
     Route::get('student/{id}', 'showToStudent');
