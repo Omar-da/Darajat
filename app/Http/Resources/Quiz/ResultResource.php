@@ -16,9 +16,9 @@ class ResultResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'mark' => $this->mark . '/' . Quiz::query()->find($this->quiz_id)->num_of_questions,
-            'percentage_mark' => $this->percentage_mark . '%',
-            'success' => $this->success
+            'mark' => $this->pivot->mark . '/' . $this->num_of_questions,
+            'percentage_mark' => $this->pivot->percentage_mark . '%',
+            'success' => $this->pivot->success
         ];
     }
 }

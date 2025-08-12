@@ -5,6 +5,7 @@ namespace App\Services\Course;
 use App\Enums\CourseStatusEnum;
 use App\Http\Resources\Course\Student\CourseForStudentResource;
 use App\Http\Resources\Course\Student\CourseWithDetailsForStudentResource;
+use App\Http\Resources\Course\Student\EnrolledCourseForStudentResource;
 use App\Http\Resources\Course\Teacher\CourseForTeacherResource;
 use App\Http\Resources\Course\Teacher\CourseWithArrangementForTeacherResource;
 use App\Http\Resources\Course\Teacher\CourseWithDetailsForTeacherResource;
@@ -273,7 +274,7 @@ class CourseService
     public function store($request): array
     {
         $request['teacher_id'] = auth('api')->id();
-        $request['image_url'] = $request['image_url']->store('img/courses', 'public');
+        $request['image_url'] = $request['image_url']->store('courses');
         $course = Course::query()->create($request);
         $course->refresh();
         return ['data' => new CourseWithDetailsForTeacherResource($course), 'message' => 'Course created successfully', 'code' => 201];
@@ -294,8 +295,8 @@ class CourseService
             return ['message' => 'You can\'t edit this course in '. $course->status .' status!', 'code' => 403];
         }
 
-        Storage::disk('public')->delete("img/courses/{$course->image_url}");
-        $request['image_url'] = $request['image_url']->store('img/courses', 'public');
+        Storage::disk('public')->delete($course->image_url);
+        $request['image_url'] = $request['image_url']->store('courses');
         $course->update($request);
 
         return ['data' => new CourseForTeacherResource($course), 'message' => 'Course updated successfully', 'code' => 200];
@@ -406,6 +407,15 @@ class CourseService
                                     ->get();
         return ['data' => CourseWithArrangementForTeacherResource::collection($courses), 'message' => 'Course retrieved successfully', 'code' => 200];
 
+    }
+
+    public function getFollowedCoursesForStudent(): array
+    {
+        $user = auth('api')->user();
+
+        $followed_courses = $user->followed_courses;
+
+        return ['data' => EnrolledCourseForStudentResource::collection($followed_courses), 'message' => __('msg.courses_retrieved')];
     }
 
 }

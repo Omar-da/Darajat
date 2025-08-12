@@ -1,9 +1,13 @@
 <?php
 
 use App\Console\Commands\CheckIsActiveCommand;
+use App\Http\Middleware\CheckOwnerCourse;
 use App\Http\Middleware\CheckTeacherRole;
-use App\Http\Middleware\CheckStudentSubscribed;
+use App\Http\Middleware\CertificateMiddleware;
+use App\Http\Middleware\ProtectEpisodeAccess;
+use App\Http\Middleware\SetLanguage;
 use App\Responses\Response;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -26,9 +30,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectUsersTo('dashboard/home');
         $middleware->alias([
             'throttle:resend-otp' => ThrottleRequests::class . ':resend-otp',
-            'isTeacher' => CheckTeacherRole::class,
-            'isSubscribed' => CheckStudentSubscribed::class,
-            ]);
+            'is_teacher' => CheckTeacherRole::class,
+            'get_certificate' => CertificateMiddleware::class,
+            'episode_protection' => ProtectEpisodeAccess::class,
+            'set_language' => SetLanguage::class,
+            'is_owner' => CheckOwnerCourse::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->renderable(function (ThrottleRequestsException $e, $request) {
@@ -39,6 +46,15 @@ return Application::configure(basePath: dirname(__DIR__))
                 $message = 'Too many attempts. Please wait ' . $retryAfterSeconds . ' seconds before trying again.';
             }
             return Response::error([], $message, $code);
+        });
+        $exceptions->renderable(function (AuthenticationException $e, $request) {
+            $locale = $request->header('Accept-Language', config('app.locale'));
+            if ($locale == 'ar') {
+                $message =  '!يجب تسجيل الدخول أولاً';
+            } else {
+                $message = 'Unauthenticated!';
+            }
+            return Response::error($message, 401);
         });
     })->withSchedule(function (Schedule $schedule) {
         $schedule->command('active:check')->dailyAt('03:00')->timezone('Asia/Damascus');

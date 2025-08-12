@@ -11,14 +11,14 @@ class TopicService
     public function index($category_id): array
     {
         if (!Category::query()->find($category_id)) {
-            return ['message' => 'Category not found!', 'code' => 404];
+            return ['message' => __('msg.category_not_found'), 'code' => 404];
         }
         $topics = Topic::query()
             ->select('id', 'title')
             ->where('category_id', $category_id)
             ->orderBy('title')
             ->get();
-        return ['data' => $topics, 'message' =>'Topics retrieved successfully', 'code' => 200];
+        return ['data' => $topics, 'message' => __('msg.topics_retrieved'), 'code' => 200];
     }
 
     public function search($title): array
@@ -31,11 +31,11 @@ class TopicService
         if($topics->isEmpty()) {
             return [
                 'data' => [],
-                'message' => "No topics found for '{$title}'.",
+                'message' =>  __('msg.no_topics') . $title,
                 'suggestions' => Topic::popular(Topic::query())->pluck('title'),
                 'code' => 200
             ];
         }
-        return ['data' => $topics, 'message' => 'Topics retrieved successfully', 'code' => 200];
+        return ['data' => $topics, 'message' => __('msg.topics_retrieved'), 'code' => 200];
     }
 }

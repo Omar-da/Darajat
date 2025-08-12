@@ -2,71 +2,60 @@
 
 namespace App\Services\Quiz;
 
-use App\Http\Resources\Quiz\QuestionStudentResource;
-use App\Http\Resources\Quiz\QuestionTeacherResource;
+use App\Http\Resources\Quiz\QuizTeacherResource;
 use App\Http\Resources\Quiz\ResultResource;
 use App\Models\Episode;
 use App\Models\Question;
 use App\Models\Quiz;
+use App\Traits\BadgeTrait;
+use Illuminate\Support\Facades\Gate;
 
 class QuizService
 {
-    public function store($request): array
+    use BadgeTrait;
+
+    public function store($episode_id, $request): array
     {
+        $episode = Episode::query()->find($episode_id);
+
+        if(is_null($episode)){
+            return ['message' => __('msg.episode_not_found'), 'code' => 404];
+        }
+
+        if(!is_null($episode->quiz)) {
+            return ['message' => __('msg.quiz_already_exists'), 'code' => 409];
+        }
+
+        Gate::authorize('quizAction', $episode->course);
         $quiz = Quiz::query()->create([
-            'episode_id' => $request['episode_id'],
+            'episode_id' => $episode_id,
             'num_of_questions' => $request['num_of_questions'],
         ]);
 
         $quiz->questions()->createMany($request['questions']);
-        return ['data' => $quiz, 'message' => 'Quiz created successfully', 'code' => 201];
-    }
+        $quiz->episode->course->increment('total_quizzes');
 
-    public function show($episode_id): array
-    {
-        $episode = Episode::query()->find($episode_id);
-        if(is_null($episode)) {
-            return ['message' => 'Episode not found!', 'code' => 404];
-        }
-        $quiz = $episode->quiz;
-        $questions = $quiz->questions->all();
-        $quiz_q['quiz_id'] = $quiz->id;
-        $quiz_q['num_of_questions'] = $quiz->num_of_questions;
-        $quiz_q['questions'] = QuestionTeacherResource::collection($questions);
-        return ['data' => $quiz_q, 'message' => 'Quiz retrieved successfully', 'code' => 200];
-    }
-
-    public function startQuiz($episode_id): array
-    {
-        $user = auth('api')->user();
-        $quiz = Episode::query()->findOrFail($episode_id)->quiz;
-        if(is_null($quiz)) {
-            return ['message' => 'There is no quiz for this episode.', 'code' => 404];
-        }
-        if($user->quizzes()->where('quiz_id', $quiz->id)->first()) {
-            return ['message' => 'It looks like you have already completed this quiz.Our quizzes are generally set up for a single attempt.', 'code' => 409];
-        }
-        $user->quizzes()->attach($quiz->id);
-        $quiz_q['quiz_id'] = $quiz->id;
-        $quiz_q['num_of_questions'] = $quiz->num_of_questions;
-        $quiz_q['questions'] = QuestionStudentResource::collection($quiz->questions);
-        return ['data' => $quiz_q, 'message' => 'You have just started the quiz! Focus well, read the questions carefully, We are confident in your abilities! Good luck!', 'code' => 200];
+        return ['data' => new QuizTeacherResource($quiz), 'message' => __('msg.quiz_created'), 'code' => 201];
     }
 
     public function processAnswer($request): array
     {
         $user = auth('api')->user();
-        $quiz = Quiz::query()->findOrFail($request['quiz_id']);
+        $quiz = Quiz::query()->find($request['quiz_id']);
+
         $question = $quiz->questions()->where('question_number', $request['question_number'])->first();
-        if(is_null($question)) {
-            return ['message' => 'Question not found!', 'code' => 404];
+        if (is_null($question)) {
+            return ['message' => __('msg.question_not_found'), 'code' => 404];
         }
-        if($question->right_answer == $request['answer']) {
+
+        Gate::authorize('haveAccess', $quiz);
+
+        if ($question->right_answer == $request['answer']) {
             $data['is_correct'] = true;
-            $message = 'Great job, '. $user['first_name'] .'! That is the right answer!';
+            $message = __('msg.correct_answer.great_job') . $user['first_name'] . __('msg.correct_answer.correct');
         } else {
             $data['is_correct'] = false;
-            $message = 'Oops, '. $user['first_name'] .'! That is not correct. Do not worry, try to focus more!';
+            $message = __('msg.incorrect_answer.oops') . $user['first_name'] . __('msg.incorrect_answer.incorrect');
         }
         $data['right_answer'] = $question->right_answer;
         $data['explanation'] = $question->explanation;
@@ -76,49 +65,95 @@ class QuizService
     public function calculateQuizResult($quiz_id, $request): array
     {
         $user = auth('api')->user();
-        if(is_null($user->quizzes()->wherePivot('quiz_id', $quiz_id)->first())) {
-            return ['message' => 'You have not started this quiz yet.', 'code' => 404];
-        }
-        $quiz_user = $user->quizzes()->wherePivot('quiz_id', $quiz_id)->first()->pivot;
-        if(!is_null($quiz_user->success)) {
-            return ['message' => 'You have already taken your result', 'code' => 409];
+        $quiz = Quiz::query()->find($quiz_id);
+        if (is_null($quiz)) {
+            return ['message' => __('msg.quiz_not_found'), 'code' => 404];
         }
 
-        if(count($request) < Quiz::query()->findOrFail($quiz_id)->num_of_questions) {
-            return ['message' => 'You have not answered all the questions yet! Please complete the entire quiz before viewing your result.', 'code' => 403];
+        Gate::authorize('haveAccess', $quiz);
+
+        if (count($request) < $quiz->num_of_questions) {
+            return ['message' => __('msg.not_answered_all_questions'), 'code' => 403];
         }
 
+        $quiz_user = $user->quizzes()->find($quiz_id);
+        if(is_null($quiz_user)) {
+            $user->quizzes()->attach($quiz_id);
+        } else if($quiz_user->pivot->success) {
+            return ['message' => __('msg.already_succeeded_quiz'), 'code' => 409];
+        }
+
+        $quiz_user = $user->quizzes()->find($quiz_id);
         $mark = 0;
-        foreach($request as $question) {
-            if($question['answer'] == Question::query()->findOrFail($question['question_id'])->right_answer) {
+        foreach ($request as $question) {
+            if ($question['answer'] == Question::query()->findOrFail($question['question_id'])->right_answer) {
                 $mark++;
             }
         }
         $percentage_mark = round($mark / count($request) * 100, 2);
-        $quiz_user->update(
-        [
-            'mark' => $mark,
-            'percentage_mark' => $percentage_mark,
-            'success' => $percentage_mark >= 60 ? 1 : 0,
-        ]);
+        $quiz_user->pivot->update(
+            [
+                'mark' => $mark,
+                'percentage_mark' => $percentage_mark,
+                'success' => $percentage_mark >= 60 ? 1 : 0,
+            ]);
         $result = new ResultResource($quiz_user);
-        if($result['success']) {
-            $message = 'Congratulations '. $user['first_name'] .'! You passed the quiz!';
+        if ($result['success']) {
+            // Update the episode quiz status to mark that the user has passed the quiz
+            $episode = $user->episodes()->where('episode_id', $quiz->episode_id)->first();
+            $episode->pivot->pass_quiz = true;
+            $episode->pivot->save();
+
+            // Update the course quiz to increment field num_of_completed_quizzes
+            $course = $user->followed_courses()->where('course_id', $quiz->episode->course_id)->first();
+            $course->pivot->increment('num_of_completed_quizzes');
+
+            if (true) {
+                $course->pivot->update(['quizzes_completed' => true]);
+                if ($course->pivot->episodes_completed) {
+                    $course->pivot->update(['get_certificate' => true]);
+                    $user->statistics()->where('title->en', 'Num Of Certificates')->first()->pivot->increment('progress');
+                    $this->checkStatistic($course);
+                }
+            }
+
+            $message = __('msg.result_success.cong') . $user['first_name'] . __('msg.result_success.passed');
         } else {
-            $message = 'You did not pass this time. Keep practicing, and you will get it!';
+            $message = __('msg.result_failed');
         }
         return ['data' => $result, 'message' => $message, 'code' => 200];
     }
 
-    public function getQuizResult($quiz_id): array
+    public function update($quiz_id, $request): array
     {
         $user = auth('api')->user();
-        if(is_null($user->quizzes()->wherePivot('quiz_id', $quiz_id)->first())) {
-            return ['message' => 'You have not started this quiz yet.', 'code' => 404];
+        $quiz = Quiz::query()->find($quiz_id);
+        if (is_null($quiz)) {
+            return ['message' => __('msg.quiz_not_found'), 'code' => 404];
         }
-        $quiz_user = $user->quizzes()->wherePivot('quiz_id', $quiz_id)->first()->pivot;
-        $result = new ResultResource($quiz_user);
-        return ['data' => $result, 'message' => 'Result retrieved successfully', 'code' => 200];
+
+        Gate::authorize('quizAction', $quiz->episode->course);
+
+        $quiz->questions()->delete();
+        $quiz->update([
+            'num_of_questions' => $request['num_of_questions'],
+        ]);
+        $quiz->questions()->createMany($request['questions']);
+
+        return ['data' => new QuizTeacherResource($quiz), 'message' => __('msg.quiz_updated'), 'code' => 201];
     }
 
+    public function destroy($id): array
+    {
+        $quiz = Quiz::query()->find($id);
+        if (is_null($quiz)) {
+            return ['message' => __('msg.quiz_not_found'), 'code' => 404];
+        }
+
+        Gate::authorize('quizAction', $quiz->episode->course);
+
+        $quiz->delete();
+
+        return ['message' => __('msg.quiz_deleted'), 'code' => 200];
+    }
 }

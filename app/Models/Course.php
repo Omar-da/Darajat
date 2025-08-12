@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\LevelEnum;
 use App\Enums\RoleEnum;
+use App\Traits\TranslationTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -14,7 +15,7 @@ use function PHPUnit\Framework\isEmpty;
 
 class Course extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, TranslationTrait;
 
     public $timestamps = false;
 
@@ -37,9 +38,61 @@ class Course extends Model
         'has_certificate',
     ];
 
-    protected $casts = [
-        'difficulty_level' => LevelEnum::class
-    ];
+    protected function casts(): array
+    {
+        return [
+            'difficulty_level' => LevelEnum::class,
+            'title' => 'array',
+            'description' => 'array',
+            'has_certificate' => 'array',
+        ];
+    }
+
+    public function setTitleAttribute($value): void
+    {
+        $lang = $this->detectLanguage($value);
+        $translatedContent = $this->translateContent($value, $lang);
+        $this->attributes['title'] = json_encode($translatedContent, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function getTitleAttribute($value)
+    {
+        $title = json_decode($value, true);
+        $lang = app()->getLocale();
+        return $title[$lang] ?? $title['en'] ?? $value;
+    }
+
+    public function setDescriptionAttribute($value): void
+    {
+        $lang = $this->detectLanguage($value);
+        $translatedContent = $this->translateContent($value, $lang);
+        $this->attributes['description'] = json_encode($translatedContent, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function getDescriptionAttribute($value)
+    {
+        $description = json_decode($value, true);
+        $lang = app()->getLocale();
+        return $description[$lang] ?? $description['en'] ?? $value;
+    }
+
+    public function setHasCertificateAttribute($value): void
+    {
+        if($value === true) {
+            $value = ['en' => 'Yes', 'ar' => 'نعم'];
+        }
+        else {
+            $value = ['en' => 'No', 'ar' => 'لا'];
+        }
+        $this->attributes['has_certificate'] = json_encode($value, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function getHasCertificateAttribute($value)
+    {
+        $has_certificate = json_decode($value, true);
+        $lang = app()->getLocale();
+        return $has_certificate[$lang] ?? $has_certificate['en'] ?? $value;
+    }
 
     public static function popular($query)
     {
@@ -99,10 +152,10 @@ class Course extends Model
 //                throw new \Exception('Upload one episode at least');
 //        });
     }
-     public function studentSubscribe($userId){
-        if($this->price ==0)
-            return true;
-        return $this->user()->where('student_id',$userId)->exists();
-    }
+//     public function studentSubscribe($userId){
+//        if($this->price ==0)
+//            return true;
+//        return $this->user()->where('student_id',$userId)->exists();
+//    }
 
 }

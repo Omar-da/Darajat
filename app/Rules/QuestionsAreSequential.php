@@ -17,7 +17,7 @@ class QuestionsAreSequential implements ValidationRule
         for($i = 0; $i < count($value); $i++) {
             $s = $i + 1;
             if($value[$i]['question_number'] !== $s) {
-                $fail("Question numbers must be sequential, starting from 1. Expected {$s} for question at field.No {$s}.");
+                $fail(__('msg.questions_are_sequential') . $s . __('msg.field') . $s);
                 return;
             }
         }

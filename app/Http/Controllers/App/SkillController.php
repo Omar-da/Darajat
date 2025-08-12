@@ -11,6 +11,6 @@ class SkillController extends Controller
     public function index(): JsonResponse
     {
         $skills = Skill::all();
-        return Response::success($skills, 'Skills retrieved successfully');
+        return Response::success($skills, __('msg.skills_retrieved'));
     }
 }

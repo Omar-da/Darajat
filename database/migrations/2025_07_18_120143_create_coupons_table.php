@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\DiscountTypeEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('course_id')->constrained('courses')->cascadeOnDelete();
             $table->string('code')->unique();
-            $table->enum('discount_type', ['percentage', 'fixed']);
+            $table->enum('discount_type', DiscountTypeEnum::values());
             $table->decimal('discount_value', 10, 2);
             $table->dateTime('expires_at')->nullable();
             $table->integer('max_uses')->nullable();

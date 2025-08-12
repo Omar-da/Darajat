@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\App\EpisodeController;
 use App\Http\Controllers\Dashboard\AdminProfileController;
 use App\Http\Controllers\Dashboard\BadgeController;
 use App\Http\Controllers\Dashboard\CourseController;
@@ -7,11 +8,9 @@ use App\Http\Controllers\Dashboard\HomeController;
 use App\Http\Controllers\Dashboard\WebAuthController;
 use App\Http\Controllers\dashboard\UserController;
 use App\Livewire\CourseManagement;
-use App\Livewire\CoursesTabNav;
 use App\Livewire\CreateBadge;
 use App\Livewire\EditBadge;
 use App\Livewire\EditProfile;
-use App\Livewire\IndexUsersTabs;
 use App\Livewire\LoginForm;
 use App\Livewire\RegisterForm;
 use App\Livewire\RejectedEpisodes;
@@ -28,7 +27,7 @@ Route::prefix('dashboard')->group(function () {
     Route::middleware('guest:web')->controller(WebAuthController::class)->group(function () {
         Route::get('login', LoginForm::class)->name('dashboard.login');
         Route::post('login', LoginForm::class);
-        
+
         Route::get('register', RegisterForm::class)->name('dashboard.register');
         Route::post('register', RegisterForm::class);
     });
@@ -36,20 +35,25 @@ Route::prefix('dashboard')->group(function () {
     Route::middleware('auth:web')->group(function () {
         Route::post('logout', [WebAuthController::class, 'logout'])->name('dashboard.logout');
         Route::get('home', [HomeController::class, 'index'])->name('home');
-        
+
         // courses
         Route::prefix('courses')->name('courses.')->controller(CourseController::class)->group(function(){
             Route::get('cates_and_topics',              CourseManagement::class)-> name('cates_and_topics');
             Route::get('active_courses/{cate}/{topic}', 'active_courses')->        name('active_courses');
             Route::get('show_course/{course}',          'show_course')->           name('show_course');
-            Route::get('video/{episode_id}',            'video')->                 name('video');
+            Route::get('show_episode/{episode_id}',     'show_episode')->          name('show_episode');
             Route::get('like/{episode}',                'like')->                  name('like');
             Route::get('quiz/{episode}',                'quiz')->                  name('quiz')->withTrashed();
             Route::get('rejected_episodes/{topic}',     RejectedEpisodes::class)-> name('rejected_episodes');
             Route::post('approve/{episode}',            'approve')->               name('approve');
             Route::post('reject/{episode}',             'reject')->                name('reject');
+            // get videos
+            Route::middleware('episode_protection')->controller(EpisodeController::class)->group(function () {
+                Route::get('/get_video/{episode_id}', 'get_video')->name('get_video');
+                Route::get('/get_poster/{episode_id}', 'get_poster')->name('get_poster');
+            });
         });
-        
+
         // profile
         Route::get('profile/edit', EditProfile::class)->name('profile.edit');
         Route::prefix('profile')->name('profile.')->controller(AdminProfileController::class)->group(function(){
@@ -64,7 +68,7 @@ Route::prefix('dashboard')->group(function () {
             Route::resource('badges', BadgeController::class)->except(['create', 'store', 'edit', 'update']);
         });
 
-        
+
         // users
         Route::prefix('users')->name('users.')->controller(UserController::class)->group(function(){
             Route::get('{type}',                                 UserManagement::class)->          name('index');
@@ -74,6 +78,8 @@ Route::prefix('dashboard')->group(function () {
             Route::delete('ban/{user}',                          'ban_user')->       name('ban');
             Route::get('unban/{user}',                           'unban_user')->     name('unban')->withTrashed();
         });
+
+
     });
 });
 
@@ -82,3 +88,4 @@ Route::prefix('dashboard')->group(function () {
 //     User::withTrashed()->find(1)->restore();
 //     return to_route('dashboard.login');
 // });
+

@@ -8,14 +8,20 @@ use App\Http\Requests\Course\LoadMoreCoursesRequest;
 use App\Responses\Response;
 use App\Services\Course\CourseService;
 use Illuminate\Http\JsonResponse;
+use App\Models\Course;
+use App\Models\Payment;
+use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Stripe\PaymentIntent;
+use Stripe\Stripe;
 use Throwable;
 
 class CourseController extends Controller
 {
     private CourseService $courseService;
 
-    public function __construct(CourseService $courseService)
-    {
+    public function __construct(CourseService $courseService) {
         $this->courseService = $courseService;
     }
 
@@ -310,5 +316,119 @@ class CourseController extends Controller
             return Response::error($message);
         }
     }
+
+    public function getFollowedCoursesForStudent(): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->courseService->getFollowedCoursesForStudent();
+            return Response::success($data['data'], $data['message']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
+    public function paymentProcess(Course $course)
+    {
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        $teacher = $course->teacher;
+        $student = auth('api')->user();
+        $platformFee = $course->price * 0.10; // 10% fee
+
+        try {
+            if($teacher->id != $student->id) {
+                $paymentIntent = PaymentIntent::create([
+                    'amount' => $course->price * 100, // in cents
+                    'currency' => 'usd',
+                    'application_fee_amount' => $platformFee * 100, // 10% platform fee
+                    'transfer_data' => [
+                        'destination' => $teacher->stripe_connect_id,
+                    ],
+                ]);
+
+                // Save payment record
+                Payment::create([
+                    'course_id' => $course->id,
+                    'student_id' => $student->id,
+                    'teacher_id' => $teacher->id,
+                    'amount' => $course->price,
+                    'platform_fee' => $platformFee,
+                    'currency' => 'usd',
+                    'stripe_payment_id' => $paymentIntent->id,
+                    'status' => $paymentIntent->status,
+                ]);
+            }
+
+            $student->followed_courses()->attach($course);
+
+            return back()->with('success', 'Payment successful!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Payment failed: ' . $e->getMessage());
+        }
+    }
+
+       public function obtainCertificate(Course $course)
+        {
+            $user = auth('api')->user();
+            $filePath = "certificates/{$user->id}/{$course->id}.pdf";
+            $followed_course = $user->followed_courses()->where('course_id', $course->id)->firstOrFail();
+
+            if ($followed_course->pivot->get_certificate)
+                return response()->json([
+                    'message' => 'You have already obtained certificate'
+                ]);
+            $download_url = $this->downloadFunction($course);
+            $pdfContent = Http::get($download_url)->throw()->body();
+
+            Storage::disk('public')->put($filePath, $pdfContent);
+            $followed_course->pivot->update(['get_certificate' => true]);
+
+            // Force download
+            return redirect()->away($download_url);
+        }
+
+        public function downloadCertificate(Course $course)
+        {
+            // Always re-download fresh copy for download route
+            $download_url = $this->downloadFunction($course);
+
+            // Force download
+            return redirect()->away($download_url);
+        }
+
+        private function downloadFunction(Course $course)
+        {
+            $user = auth('api')->user();
+
+            // Fetch from Certifier API (replace with your actual API call)
+            $apiKey = env('CERTIFIER_API_KEY');
+            $baseUrl = 'https://api.certifier.io/v1/credentials';
+
+            $client = new Client();
+
+            $response = $client->post("{$baseUrl}/issue", [
+                'headers' => [
+                    'Authorization' => "Bearer {$apiKey}",
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'recipient' => [
+                        'name' => "$user->first_name $user->last_name",
+                    ],
+                    'template_id' => '01jsm7nt1nc9kwc5g1c9tn1ryk',
+                    'issued_on' => now()->toDateString(),
+                    'metadata' => [
+                        'degree' => "$course->teacher->first_name $course->teacher->last_name",
+                        'course_name' => $course->title,
+                        'course_classification' => $course->topic->category
+                    ],
+                ],
+            ]);
+
+            $credential = json_decode($response->getBody(), true);
+            return $credential['download_url']; // e.g., "https://certifier.io/cred/CRED_123"
+        }
 }
 

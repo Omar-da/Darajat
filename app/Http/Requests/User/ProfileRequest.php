@@ -12,6 +12,7 @@ use Illuminate\Validation\Rules\Password;
 class ProfileRequest extends FormRequest
 {
     use HandlesFailedValidationTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -30,8 +31,8 @@ class ProfileRequest extends FormRequest
         return [
             'first_name' => 'required|string|max:50|regex:/^[\pL\s]+$/u',
             'last_name' => 'required|string|max:50|regex:/^[\pL\s]+$/u',
-            'country_id' =>  'required|exists:countries,id',
-            'languages' =>  'array|required',
+            'country_id' => 'required|exists:countries,id',
+            'languages' => 'array|required',
             'languages.*.language_id' => 'exists:languages,id|distinct',
             'languages.*.level' => Rule::in(LevelEnum::values()),
             'job_title_id' => 'exists:job_titles,id',

@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum CourseStatusEnum : string
+enum CourseStatusEnum: string
 {
     case DRAFT = 'draft';
 
@@ -17,5 +17,8 @@ enum CourseStatusEnum : string
         return array_column(self::cases(), 'value');
     }
 
-
+    public function label(): string
+    {
+        return __("enums.course_status.$this->value");
+    }
 }

@@ -33,11 +33,6 @@ class User extends Authenticatable
         'otp_locked_until',
     ];
 
-    protected $casts = [
-        'role' => RoleEnum::class,
-    ];
-
-
     protected $hidden = [
         'password',
         'remember_token',
@@ -46,6 +41,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'role' => RoleEnum::class,
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'otp_locked_until' => 'datetime',
@@ -79,14 +75,14 @@ class User extends Authenticatable
         return $this->hasMany(Episode::class);
     }
 
-      public function published_courses(): HasMany
-      {
+    public function published_courses(): HasMany
+    {
         return $this->hasMany(Course::class, 'teacher_id');
     }
 
     public function followed_courses(): BelongsToMany
     {
-        return $this->belongsToMany(Course::class, 'course_user', 'student_id')->withPivot(['course_id', 'perc_progress', 'progress', 'num_of_completed_quizzes', 'purchase_date','rate']);
+        return $this->belongsToMany(Course::class, 'course_user', 'student_id')->withPivot(['perc_progress', 'progress', 'num_of_completed_quizzes', 'purchase_date','rate', 'episodes_completed', 'quizzes_completed', 'get_certificate']);
     }
 
     public function statistics(): BelongsToMany
@@ -116,7 +112,7 @@ class User extends Authenticatable
 
     public function topics(): BelongsToMany
     {
-        return $this->belongsToMany(Topic::class, 'completed_courses');
+        return $this->belongsToMany(Topic::class, 'completed_courses')->withPivot('progress');
     }
 
     public function likeEpisode(): BelongsToMany
@@ -136,6 +132,11 @@ class User extends Authenticatable
 
     public function episodes(): BelongsToMany
     {
-        return $this->belongsToMany(Episode::class)->withPivot('episode_id', 'pass_quiz');
+        return $this->belongsToMany(Episode::class)->withPivot('pass_quiz');
+    }
+
+    public function appliedCoupons(): BelongsToMany
+    {
+        return $this->belongsToMany(Coupon::class, 'coupon_user', 'student_id', 'coupon_id');
     }
 }

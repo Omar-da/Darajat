@@ -9,6 +9,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class CreateEpisodeRequest extends FormRequest
 {
     use HandlesFailedValidationTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -26,9 +27,10 @@ class CreateEpisodeRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:100',
-            'episode_number' => ['required','integer', new ConsecutiveEpisodeNumber()],
+            'episode_number' => ['required', 'integer', new ConsecutiveEpisodeNumber()],
             'video_url' => 'required|file|mimetypes:video/mp4,video/quicktime|max:102400',
             'image_url' => 'required|image|mimes:jpeg,png,bmp,jpg,gif,svg|max:2048',
+            'file_url' => 'nullable|file|mimes:pdf,ppt,pptx,txt,zip,sql,json,py,java,php,js|mimetypes:application/pdf,text/plain,application/zip,application/json|max:102400',
         ];
     }
 }

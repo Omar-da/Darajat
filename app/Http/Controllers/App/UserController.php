@@ -9,7 +9,10 @@ use App\Models\User;
 use App\Responses\Response;
 use App\Services\User\UserService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 use Kreait\Firebase\Request;
+use Stripe\OAuth;
+use Stripe\Stripe;
 use Throwable;
 
 class UserController extends Controller
@@ -99,11 +102,44 @@ class UserController extends Controller
         }
     }
 
+    public function stripeCallback(Request $request)
+    {
+        Stripe::setApiKey(config('stripe.secret'));
+
+        try {
+                $response = OAuth::token([
+                    'grant_type' => 'authorization_code',
+                    'code' => $request->code,
+                ]);
+
+                // Save Stripe account ID to teacher
+                auth('api')->user()->update(['stripe_connect_id' => $response->stripe_user_id]);
+
+                return response()->json([
+                    'message' => 'Promotion succeeded'
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'error' => 'Connection failed'
+                ]);
+            }
+
+    }
+
     public function storeFCMToken(Request $request)
     {
         $user = User::find($request->user_id);
         $user->update(['fcm_token' => $request->device_token]);
         return response()->json(['success' => true]);
+    }
+
+    public function get_certificates($user_id)
+    {
+        return collect(Storage::disk('public')->files("certificates/$user_id"))
+            ->map(function ($file) {
+                return Storage::disk('public')->url($file);
+            })
+            ->all();
     }
 
 }

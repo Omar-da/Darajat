@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\App;
 
-use App\Http\Requests\Coupon\CouponRequest;
+use App\Http\Requests\Coupon\CouponApplyRequest;
+use App\Http\Requests\Coupon\CouponStoreRequest;
+use App\Http\Requests\Coupon\CouponUpdateRequest;
 use App\Responses\Response;
 use App\Services\Coupon\CouponService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -35,7 +37,7 @@ class CouponController extends Controller
         }
     }
 
-    public function store(CouponRequest $request, $course_id): JsonResponse
+    public function store(CouponStoreRequest $request, $course_id): JsonResponse
     {
         $data = [];
         try {
@@ -53,7 +55,7 @@ class CouponController extends Controller
     }
 
     // Update specific coupon.
-    public function update(CouponRequest $request, $id): JsonResponse
+    public function update(CouponUpdateRequest $request, $id): JsonResponse
     {
         $data = [];
         try {
@@ -93,6 +95,21 @@ class CouponController extends Controller
         try {
             $data = $this->couponService->destroy($id);
             return Response::success([], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message  = $th->getMessage();
+            if($th instanceof AuthorizationException) {
+                return Response::error($message, $th->getCode());
+            }
+            return Response::error($message);
+        }
+    }
+
+    public function applyCoupon($id, CouponApplyRequest $request): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->couponService->applyCoupon($id, $request->validated());
+            return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message  = $th->getMessage();
             if($th instanceof AuthorizationException) {

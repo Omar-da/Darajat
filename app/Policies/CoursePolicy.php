@@ -70,11 +70,21 @@ class CoursePolicy
     {
         return $user->id === $course->teacher_id
             ? Response::allow()
-            : Response::deny('You are not the owner of this course!', 403);
+            : Response::deny(__('msg.are_not_owner'), 403);
     }
 
-    public function createCoupon(User $user, Course $course): bool
+
+    public function statusApproved(User $user, Course $course): Response
     {
-        return $this->owner($user, $course) && $course->status === CourseStatusEnum::APPROVED;
+        return $course->status == 'approved'
+            ? Response::allow()
+            : Response::deny(__('msg.course_not_approved'), 403);
+    }
+
+    public function quizAction(User $user, Course $course): Response
+    {
+        return ($course->status == 'draft' || $course->status == 'rejected')
+            ? Response::allow()
+            : Response::deny(__('msg.quiz_action'), 403);
     }
 }

@@ -70,7 +70,7 @@ class FakeDataSeeder extends Seeder
         $MoreDetail2->languages()->attach(2, ['level' => 'beginner']);
 
         DB::insert("INSERT INTO 'courses' ('id', 'title', 'description', 'image_url', 'topic_id', 'teacher_id', 'admin_id', 'difficulty_level', 'total_of_time', 'price', 'rate', 'language_id', 'num_of_episodes', 'num_of_students_enrolled', 'publishing_request_date', 'publishing_date', 'status', 'has_certificate', 'total_quizzes') VALUES
-        ('1', 'Laravel for Beginner', 'Laravel course that explains the basics of back-end concepts', 'course1.png', '2', '2', '1', 'beginner', '23', '0', '4', '1', '20', '1', '2004-08-23', '2005-08-23', 'approved', 'true', '0');
+        ('1', 'Laravel for Beginner', 'Laravel course that explains the basics of back-end concepts', 'course1.png', '2', '2', '1', 'beginner', '23', '0', '4', '1', '20', '1', '2004-08-23', '2005-08-23', 'approved', 'true', '3');
         ");
         DB::insert("INSERT INTO 'courses' ('id', 'title', 'description', 'image_url', 'topic_id', 'teacher_id', 'admin_id', 'difficulty_level', 'total_of_time', 'price', 'rate', 'language_id', 'num_of_episodes', 'num_of_students_enrolled', 'publishing_request_date', 'deleted_at', 'status', 'has_certificate', 'total_quizzes') VALUES
         ('2', 'Laravel for Intermediate', 'Laravel course that explains the intermediate concepts of back-end', 'course2.png', '2', '2', '1', 'intermediate', '19', '10', '3', '1', '10', '0', '2004-08-23', '2005-08-23', 'rejected', 'false', '2');
@@ -109,14 +109,13 @@ class FakeDataSeeder extends Seeder
         foreach(Course::all() as $course)
             $user->followed_courses()->attach($course, ['progress' => 2, 'perc_progress' => 66.6, 'num_of_completed_quizzes' => 1, 'rate' => 3]);
 
+
         // episode 1
         Episode::create([
             'course_id' => 1,
             'title' => 'Basics of Laravel and MVC',
             'episode_number' => 1,
-            'video_url' => 'videos/video.mp4',
             'duration' => 151,
-            'image_url' => 'episode1.png',
         ]);
 
         // episode 2
@@ -124,9 +123,7 @@ class FakeDataSeeder extends Seeder
             'course_id' => 1,
             'title' => 'Routes and Controllers',
             'episode_number' => 2,
-            'video_url' => 'videos/video.mp4',
             'duration' => 151,
-            'image_url' => 'episode2.png',
         ]);
 
         // episode 3
@@ -134,9 +131,7 @@ class FakeDataSeeder extends Seeder
             'course_id' => 1,
             'title' => 'Blade Engine',
             'episode_number' => 3,
-            'video_url' => 'videos/video.mp4',
             'duration' => 43,
-            'image_url' => 'episode3.png',
         ]);
 
         // comment 1

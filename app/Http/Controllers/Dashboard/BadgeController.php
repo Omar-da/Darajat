@@ -29,7 +29,7 @@ class BadgeController extends Controller
     {
         try {
             // Delete associated image
-            Storage::delete("img/badges/$badge->image_url");
+            Storage::delete("badges/$badge->image_url");
 
             $badge->delete();
 

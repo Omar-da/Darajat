@@ -3,7 +3,7 @@
 <x-layouts.header title="User Detailed Profile" :with-footer="true">
     <div class="user-profile-container">
         <header class="user-profile-header">
-            <img src="{{$user->profile_image_url ? asset("build/assets/img/profiles/$user->profile_image_url") : asset('build/assets/img/anonymous_icon.png')}}" alt="User Avatar" class="user-profile-avatar">
+            <img src="{{$user->profile_image_url ? Storage::url("profiles/$user->profile_image_url") : asset('img/icons/anonymous_icon.png')}}" alt="User Avatar" class="user-profile-avatar">
             <div class="user-profile-userinfo">
                 <h1>{{$user->first_name}} {{$user->last_name}}</h1>
                 <p class="user-profile-tagline">{{$user->moreDetail->jobTitle->title}} | {{$user->moreDetail->country->name}}</p>
@@ -195,7 +195,7 @@
                 <div class="user-profile-badges">
                         @foreach($user->badges as $badge)
                         <div class="user-profile-badge">
-                                <div class="user-profile-badge-icon"><img class="user-profile-badge-image" src="{{asset("build/assets/img/badges/$badge->image_url")}}" alt="{{$badge->imge_url}}"></div>
+                                <div class="user-profile-badge-icon"><img class="user-profile-badge-image" src="{{Storage::url("badges/$badge->image_url")}}" alt="{{$badge->imge_url}}"></div>
                             </div>
                         @endforeach
                     </div>
@@ -223,7 +223,7 @@
                             @foreach($user->followed_courses as $course)
                             <a href="{{route('users.followed_course', ['user_id' => $user->id, 'course_id' => $course->id])}}">
                                 <div class="user-profile-course-card">
-                                    <img src="{{asset("build/assets/img/courses/$course->image_url")}}" alt="{{$course->title}}" class="user-profile-course-thumbnail">
+                                    <img src="{{Storage::url("courses/$course->image_url")}}" alt="{{$course->title}}" class="user-profile-course-thumbnail">
                                     <div class="user-profile-course-content">
                                         <h3 class="user-profile-course-title">{{$course->title}}</h3>
                                         <div class="user-profile-progress-container">

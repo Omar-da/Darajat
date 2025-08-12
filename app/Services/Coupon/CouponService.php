@@ -19,7 +19,6 @@ class CouponService
             return ['message' => 'Course not found!', 'code' => 404];
         }
 
-        Gate::authorize('owner', $course);
         $coupons = $course->coupons;
 
         return ['data' => CouponResource::collection($coupons), 'message' => 'Coupons retrieved successfully', 'code' => 200];
@@ -33,7 +32,6 @@ class CouponService
             return ['message' => 'Course not found!', 'code' => 404];
         }
 
-        Gate::authorize('owner', $course);
         $coupon = Coupon::query()->create([
             'course_id' => $course_id,
             'code' => strtoupper($request['code']),
@@ -54,10 +52,6 @@ class CouponService
             return ['message' => 'Coupon not found!', 'code' => 404];
         }
 
-        if(auth('api')->id() != $coupon->course->teacher_id) {
-            return ['message' => 'You are not the owner of this course', 'code' => 403];
-        }
-
         $coupon->update($request->all());
 
         return ['data' => new CouponWithDetailsResource($coupon), 'message' => 'Coupon updated successfully', 'code' => 200];
@@ -70,8 +64,6 @@ class CouponService
             return ['message' => 'Coupon not found!', 'code' => 404];
         }
 
-        Gate::authorize('owner', $coupon->course);
-
         return ['data' => new CouponWithDetailsResource($coupon), 'message' => 'Coupon retrieved successfully', 'code' => 200];
     }
 
@@ -80,10 +72,6 @@ class CouponService
         $coupon = Coupon::query()->find($id);
         if(is_null($coupon)) {
             return ['message' => 'Coupon not found!', 'code' => 404];
-        }
-
-        if(auth('api')->id() != $coupon->course->teacher_id) {
-            return ['message' => 'You are not the owner of this course', 'code' => 403];
         }
 
         $coupon->delete();

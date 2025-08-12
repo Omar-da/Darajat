@@ -2,16 +2,20 @@
 <html lang="en-US">
 
 <head>
-    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
     <title>Reset Password - {{ config('app.name') }}</title>
     <meta name="description" content="Password Reset Email Template.">
     <style type="text/css">
-        a:hover { text-decoration: underline !important; }
+        a:hover {
+            text-decoration: underline !important;
+        }
+
         .logo-container {
             padding: 15px 0;
             line-height: 0;
             font-size: 0;
         }
+
         .logo-img {
             width: 100%;
             max-width: 200px;
@@ -20,6 +24,7 @@
             margin: 0 auto;
             border: 0;
         }
+
         .otp-code {
             background: #f8f9fa;
             padding: 15px 25px;
@@ -33,6 +38,7 @@
             font-family: 'Rubik', sans-serif;
             border: 1px solid #e0e0e0;
         }
+
         .action-button {
             background: #2E86C1;
             text-decoration: none !important;
@@ -44,18 +50,22 @@
             border-radius: 50px;
             margin: 20px 0;
         }
+
         .outer-table {
             border-collapse: collapse;
             mso-table-lspace: 0pt;
             mso-table-rspace: 0pt;
         }
+
         @media only screen and (max-width: 480px) {
             .responsive-table {
                 width: 100% !important;
             }
+
             .responsive-padding {
                 padding: 0 15px !important;
             }
+
             .otp-code {
                 font-size: 24px;
                 padding: 12px 20px;
@@ -64,16 +74,18 @@
     </style>
 </head>
 
-<body marginheight="0" topmargin="0" marginwidth="0" style="margin: 0px; background-color: #f2f3f8; font-family: 'Open Sans', sans-serif;" leftmargin="0">
-<!--[if mso]>
+<body marginheight="0" topmargin="0" marginwidth="0"
+      style="margin: 0px; background-color: #f2f3f8; font-family: 'Open Sans', sans-serif;" leftmargin="0">
 <style type="text/css">
-    body, table, td {font-family: Arial, sans-serif !important;}
+    body, table, td {
+        font-family: Arial, sans-serif !important;
+    }
 </style>
-<![endif]-->
 <table class="outer-table" cellspacing="0" border="0" cellpadding="0" width="100%" bgcolor="#f2f3f8">
     <tr>
         <td>
-            <table class="responsive-table" style="background-color: #f2f3f8; max-width:670px; margin:0 auto;" width="100%" border="0"
+            <table class="responsive-table" style="background-color: #f2f3f8; max-width:670px; margin:0 auto;"
+                   width="100%" border="0"
                    align="center" cellpadding="0" cellspacing="0">
                 <tr>
                     <td style="height:60px; line-height:60px;">&nbsp;</td>
@@ -81,7 +93,7 @@
                 <tr>
                     <td class="logo-container" style="text-align:center;">
                         <a href="{{ config('app.url') }}" title="logo" target="_blank" style="display: inline-block;">
-                            <img src="{{ $message->embed(public_path('build/assets/img/logo.png'), 'logo.png', 'image/png') }}"
+                            <img src="{{ $message->embed(public_path('img/icons/logo.png'), 'logo.png', 'image/png') }}"
                                  class="logo-img"
                                  alt="{{ config('app.name') }} Logo"
                                  width="200"
@@ -104,7 +116,8 @@
                                     <h1 style="color:#1e1e2d; font-weight:500; margin:0; font-size:32px; font-family:'Rubik',sans-serif;">
                                         Reset Your Password
                                     </h1>
-                                    <span style="display:inline-block; vertical-align:middle; margin:29px 0 26px; border-bottom:1px solid #cecece; width:100px;"></span>
+                                    <span
+                                        style="display:inline-block; vertical-align:middle; margin:29px 0 26px; border-bottom:1px solid #cecece; width:100px;"></span>
                                     <p style="color:#455056; font-size:15px; line-height:24px; margin:0;">
                                         You've requested to reset your password for {{ config('app.name') }}.
                                         Please use the following verification code to proceed:
@@ -113,7 +126,8 @@
                                     <div class="otp-code">{{ $code }}</div>
 
                                     <p style="color:#455056; font-size:15px; line-height:24px; margin:0;">
-                                        This code is valid for <strong>15 minutes</strong>. Please do not share it with anyone.
+                                        This code is valid for <strong>15 minutes</strong>. Please do not share it with
+                                        anyone.
                                     </p>
 
                                     {{--                                    <a href="{{ config('app.url') }}/verify" class="action-button">--}}
@@ -121,7 +135,8 @@
                                     {{--                                    </a>--}}
 
                                     <p style="color:#455056; font-size:15px; line-height:24px; margin-top:20px;">
-                                        If you didn't request this password reset, please ignore this email or contact our support team.
+                                        If you didn't request this password reset, please ignore this email or contact
+                                        our support team.
                                     </p>
                                 </td>
                             </tr>
@@ -137,7 +152,8 @@
                 <tr>
                     <td style="text-align:center; padding:0 15px;">
                         <p style="font-size:14px; color:rgba(69, 80, 86, 0.74); line-height:18px; margin:0 0 15px 0;">
-                            Need help? <a href="mailto:support@{{ parse_url(config('app.url'), PHP_URL_HOST) }}" style="color:#2E86C1; text-decoration:none;">Contact our support team</a>
+                            Need help? <a href="mailto:support@{{ parse_url(config('app.url'), PHP_URL_HOST) }}"
+                                          style="color:#2E86C1; text-decoration:none;">Contact our support team</a>
                         </p>
                         <p style="font-size:12px; color:rgba(69, 80, 86, 0.54); line-height:18px; margin:0;">
                             &copy; {{ date('Y') }} <strong>{{ config('app.name') }}</strong>. All rights reserved.

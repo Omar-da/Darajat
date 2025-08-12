@@ -2,11 +2,11 @@
 
 namespace App\Enums;
 
-enum EducationEnum : string
+enum EducationEnum: string
 {
     case NONE = 'none';
     case ELEMENTARY = 'elementary';
-    case MIDDLE_SCHOOL = 'middle_school';   
+    case MIDDLE_SCHOOL = 'middle_school';
     case HIGH_SCHOOL = 'high_school';
     case ASSOCIATE = 'associate';
     case UNDERGRADUATE = 'undergraduate';
@@ -18,9 +18,13 @@ enum EducationEnum : string
     case PROFESSIONAL = 'professional';
     case OTHER = 'other';
 
-
     public static function values(): array
     {
         return array_column(self::cases(), 'value');
+    }
+
+    public function label(): string
+    {
+        return __("enums.education.$this->value");
     }
 }

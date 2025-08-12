@@ -48,36 +48,37 @@ class UserService
             }
         }
         $moreDetail->skills()->sync($syncSkillData);
-        return ['user' => new UserResource($user), 'message' => 'Profile updated successfully'];
+        return ['user' => new UserResource($user), 'message' => __('msg.profile_updated')];
     }
 
     public function updateProfileImage($request): array
     {
         $user = User::query()->find(auth('api')->id());
-        Storage::disk('public')->delete("img/users/{$user->profile_image_url}");
+        Storage::delete("profiles/{$user->profile_image_url}");
         if (!empty($request['profile_image_url'])) {
+            $path = $request['profile_image_url']->store('profiles');
             $user->update([
-                'profile_image_url' => $request['profile_image_url']->store('img/users', 'public'),
+                'profile_image_url' => $path,
             ]);
         } else {
             $user->update([
                 'profile_image_url' => null,
             ]);
         }
-        return ['user' => new UserResource($user), 'message' => 'Profile image updated successfully'];
+        return ['user' => new UserResource($user), 'message' => __('msg.profile_image_updated')];
     }
 
     public function changePassword($request): array
     {
         $user = User::query()->find(Auth::id());
         if(!Hash::check($request['old_password'], $user['password'])) {
-            $message = 'Your old password is incorrect, please try again!';
+            $message = __('msg.old_password');
             $code = 401;
         } else {
             $user->update([
                 'password' => Hash::make($request['new_password']),
             ]);
-            $message = 'You have successfully changed your password';
+            $message = __('msg.change_password');
             $code = 200;
         }
         return ['user' => new UserResource($user), 'message' => $message, 'code' => $code];
@@ -87,32 +88,36 @@ class UserService
     {
         $user = User::query()->find($id);
         if(!$user) {
-            $message = 'User not found!';
+            $message = __('msg.user_not_found');
             $code = 404;
         } else {
-            $message = 'User retrieved successfully';
+            $message = __('msg.user_retrieved');
             $code = 200;
         }
         return ['user' => new UserResource($user), 'message' => $message, 'code' => $code];
     }
 
-    public function promoteStudentToTeacher(): array
+    public function promoteStudentToTeacher()
     {
         $user = auth('api')->user();
         if($user['role'] === RoleEnum::TEACHER) {
-            return ['message' => 'You are already a Teacher!', 'code' => 409];
+            return ['message' => __('msg.already_teacher'), 'code' => 409];
         }
         $user->update([
             'role' => 'teacher'
         ]);
-        return ['message' => 'Successfully promoted to Teacher. You can now access all teacher features.', 'code' => 200];
+
+        $clientId = config('services.stripe.connect');
+        $redirectUri = urlencode(route('users.stripe_callback'));
+
+        return redirect("https://connect.stripe.com/oauth/authorize?response_type=code&client_id={$clientId}&scope=read_write&redirect_uri={$redirectUri}");
     }
 
     public function delete(): array
     {
         $user = User::query()->find(Auth::id());
         $user->delete();
-        return ['user' => $user, 'message' => 'User deleted successfully'];
+        return ['user' => $user, 'message' => __('msg.user_deleted')];
     }
 
 

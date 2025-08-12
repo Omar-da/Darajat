@@ -49,7 +49,7 @@ class RegisterRequest extends FormRequest
 //                    }
 //
 //                    if ($result['status'] !== 'valid') {
-//                        $fail('The email address is invalid or does not exist.');
+//                        $fail(__('msg.email_address'));
 //                    }
 //                },
             ],

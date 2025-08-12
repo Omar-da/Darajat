@@ -9,13 +9,12 @@
             <div class="category-card">
                 <h2 class="category-title">{{$cate}}</h2>
                 <h3 class="topic-title"><span class="arrow">-></span> {{$topic}}</h3>
-                
                 <div class="courses-grid">
                     @forEach($courses as $course)
                     <a href="{{route('courses.show_course', ['course' => $course->id])}}">
                         <div class="course-card">
                             <div class="course-image">
-                                <img src="{{asset("build/assets/img/courses/$course->image_url")}}" alt="Course Image">
+                                <img src="{{Storage::url("courses/$course->image_url")}}" alt="Course Image">
                             </div>
                             <div class="course-details">
                                 <h3 class="course-title">{{$course->title}}</h3>

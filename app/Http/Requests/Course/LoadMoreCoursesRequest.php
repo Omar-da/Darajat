@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class LoadMoreCoursesRequest extends FormRequest
 {
     use HandlesFailedValidationTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      */

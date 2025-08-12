@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum TypeEnum : string
+enum TypeEnum: string
 {
     case USER = 'user';
     case TEACHER = 'teacher';

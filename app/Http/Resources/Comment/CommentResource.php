@@ -22,11 +22,12 @@ class CommentResource extends JsonResource
             'num_of_replies' => $this->replies->count(),
             'comment_date' => Carbon::parse($this->comment_date)->diffForHumans(),
             'is_liked' => (bool)auth('api')->user()->likeComment()->where('comment_id', $this->id)->exists(),
+            'is_my_comment' => $this->user->id == auth('api')->id(),
             'likes' => $this->likes ? $this->likes : 0,
             'commenter' => [
                 'id' => $this->user->id,
                 'full_name' => $this->user->first_name . ' ' . $this->user->last_name,
-                'profile_image_url' => $this->user->profile_image_url ? asset(Storage::url("img/users/{$this->user->profile_image_url}")) : null,
+                'profile_image_url' => $this->user->profile_image_url ? Storage::url("/profiles/{$this->user->profile_image_url}") : null,
             ]
         ];
     }

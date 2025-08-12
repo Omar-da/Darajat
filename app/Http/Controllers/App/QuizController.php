@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\App;
 
 use App\Http\Requests\Quiz\AnswerRequest;
-use App\Http\Requests\Quiz\QuizRequest;
+use App\Http\Requests\Quiz\CreateQuizRequest;
 use App\Http\Requests\Quiz\ResultRequest;
+use App\Http\Requests\Quiz\UpdateQuizRequest;
 use App\Responses\Response;
 use App\Services\Quiz\QuizService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Throwable;
 
@@ -20,46 +22,20 @@ class QuizController extends Controller
     }
 
     // For Teacher
-    public function store(QuizRequest $request): JsonResponse
+    public function store($episode_id, CreateQuizRequest $request): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->quizService->store($request->validated());
-            return Response::success($data['data'], $data['message'], $data['code']);
-        } catch (Throwable $th) {
-            $message = $th->getMessage();
-            return Response::error($message);
-        }
-    }
-
-    // For Teacher
-    public function show($episode_id): JsonResponse
-    {
-        $data = [];
-        try {
-            $data = $this->quizService->show($episode_id);
-            if($data['code'] == 404) {
-                return Response::error($data['message'], $data['code']);
-            }
-            return Response::success($data['data'], $data['message'], $data['code']);
-        } catch (Throwable $th) {
-            $message = $th->getMessage();
-            return Response::error($message);
-        }
-    }
-
-    // For Student
-    public function startQuiz($episode_id): JsonResponse
-    {
-        $data = [];
-        try {
-            $data = $this->quizService->startQuiz($episode_id);
+            $data = $this->quizService->store($episode_id, $request->validated());
             if($data['code'] == 404 || $data['code'] == 409) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
+            if($th instanceof AuthorizationException) {
+                return Response::error($message, $th->getCode());
+            }
             return Response::error($message);
         }
     }
@@ -76,6 +52,9 @@ class QuizController extends Controller
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
+            if($th instanceof AuthorizationException) {
+                return Response::error($message, $th->getCode());
+            }
             return Response::error($message);
         }
     }
@@ -92,23 +71,49 @@ class QuizController extends Controller
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
+            if($th instanceof AuthorizationException) {
+                return Response::error($message, $th->getCode());
+            }
             return Response::error($message);
         }
     }
 
-    // For Student
-    public function getQuizResult($quiz_id): JsonResponse
+    // For Teacher
+    public function update($quiz_id, UpdateQuizRequest $request): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->quizService->getQuizResult($quiz_id);
+            $data = $this->quizService->update($quiz_id, $request->validated());
             if($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
+            if($th instanceof AuthorizationException) {
+                return Response::error($message, $th->getCode());
+            }
             return Response::error($message);
         }
     }
+
+    // For Teacher
+    public function destroy($quiz_id): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->quizService->destroy($quiz_id);
+            if($data['code'] == 404) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success([], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            if($th instanceof AuthorizationException) {
+                return Response::error($message, $th->getCode());
+            }
+            return Response::error($message);
+        }
+    }
+
 }
