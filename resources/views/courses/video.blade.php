@@ -5,7 +5,10 @@
         <!-- Video Player Section -->
         <div class="video-main-section">
             <div class="video-player-wrapper">
-                <iframe src="{{$episode->video_url}}" frameborder="0" allowfullscreen></iframe>
+                <video class="video-player" controls controlsList="nodownload" oncontextmenu="return false;" poster="{{ route('courses.get_poster', $episode->id) }}">
+                    <source src="{{ route('courses.get_video', ['episode_id' => $episode->id]) }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
             </div>
             
             <div class="video-actions-container">
@@ -22,7 +25,7 @@
                     @endif
                     @if($episode->quiz)
                         <a href="{{route('courses.quiz', ['episode' => $episode->id])}}" class="video-quiz-btn">
-                            <i class="fas fa-question-circle"></i> Start Quiz
+                            <i class="fas fa-question-circle"></i> Show Quiz
                         </a>   
                     @endif
                 </div>
@@ -42,9 +45,9 @@
                                 <div class="video-comment-header">
                                     <div class="video-comment-user">
                                         @if($comment->user->profile_image_url)
-                                            <img src="{{asset('build/assets/img/profiles/' . $comment->user->profile_image_url)}}" alt="User Image" class="video-user-avatar">
+                                            <img src="{{Storage::url('profiles/' . $comment->user->profile_image_url)}}" alt="User Image" class="video-user-avatar">
                                         @else
-                                            <img src="{{asset('build/assets/img/anonymous_icon.png')}}" alt="User Image" class="video-user-avatar">
+                                            <img src="{{asset('img/icons/anonymous_icon.png')}}" alt="User Image" class="video-user-avatar">
                                         @endif
                                         <span class="video-username">{{$comment->user->first_name}} {{$comment->user->last_name}}</span>
                                     </div>
@@ -104,9 +107,9 @@
                                                         <div class="video-comment-header">
                                                             <div class="video-comment-user">
                                                                 @if($reply->user->profile_image_url)
-                                                                    <img src="{{asset('build/assets/img/profiles/' . $reply->user->profile_image_url)}}" alt="User Image" class="video-user-avatar">
+                                                                    <img src="{{Storage::url('profiles/' . $reply->user->profile_image_url)}}" alt="User Image" class="video-user-avatar">
                                                                 @else
-                                                                    <img src="{{asset('build/assets/img/anonymous_icon.png')}}" alt="User Image" class="video-user-avatar">
+                                                                    <img src="{{asset('img/icons/anonymous_icon.png')}}" alt="User Image" class="video-user-avatar">
                                                                 @endif
                                                                 <span class="video-username">{{$reply->user->first_name}} {{$reply->user->last_name}}</span>
                                                             </div>

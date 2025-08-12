@@ -11,7 +11,7 @@
             @endforeach
         </div>
         <div class="category-img">
-            <img src="{{ asset('build/assets/img/categories/' . $category->image_url)}}" alt="{{$alt}}">
+            <img src="{{ asset('img/categories/' . $category->image_url)}}" alt="{{$alt}}">
         </div>
     </div>
 </div>

@@ -60,7 +60,7 @@
         <div class="form-group">
             <label for="image_url" class="form-label">Badge Image</label>
             <div class="current-image">
-                <img src="{{ asset("build/assets/img/badges/$badge->image_url") }}" alt="Current badge image" width="100">
+                <img src="{{ Storage::url("badges/$badge->image_url") }}" alt="Current badge image" width="100">
                 <span>Current Image</span>
             </div>
             <input wire:model="image_url"

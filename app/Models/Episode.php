@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\TranslationTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Episode extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, TranslationTrait;
 
     public $timestamps = false;
 
@@ -22,9 +23,31 @@ class Episode extends Model
         'video_url',
         'duration',
         'image_url',
+        'file_url',
         'views',
         'likes'
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'title' => 'array'
+        ];
+    }
+
+    public function setTitleAttribute($value): void
+    {
+        $lang = $this->detectLanguage($value);
+        $translatedContent = $this->translateContent($value, $lang);
+        $this->attributes['title'] = json_encode($translatedContent, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function getTitleAttribute($value)
+    {
+        $title = json_decode($value, true);
+        $lang = app()->getLocale();
+        return $title[$lang] ?? $title['en'];
+    }
 
     public function getFormattedDurationAttribute(): string
     {

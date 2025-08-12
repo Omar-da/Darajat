@@ -13,19 +13,19 @@ class StatisticsSeeder extends Seeder
     public function run(): void
     {
         $statistics = [
-            ['title' => 'Current Enthusiasm'],
-            ['title' => 'Max Enthusiasm'],
-            ['title' => 'Total Completed Courses'],
-            ['title' => 'Max Of Total Completed Courses In One Topic'],
-            ['title' => 'Published Courses'],
-            ['title' => 'Granted Likes'],
-            ['title' => 'Acquired Likes'],
-            ['title' => 'Acquired Views'],
-            ['title' => 'Num Of Certificates'],
-            ['title' => 'Num Of Badges'],
-            ['title' => 'Num Of Bronze Badges'],
-            ['title' => 'Num Of Silver Badges'],
-            ['title' => 'Num Of Gold Badges'],
+            ['title' => ['en' => 'Current Enthusiasm', 'ar' => 'الحماس الحالي']],
+            ['title' => ['en' => 'Max Enthusiasm', 'ar' => 'أقصى حماس']],
+            ['title' => ['en' => 'Total Completed Courses', 'ar' => 'إجمالي الدورات المكتملة']],
+            ['title' => ['en' => 'Max Of Total Completed Courses In One Topic', 'ar' => 'الحد الأقصى للدورات المكتملة في موضوع واحد']],
+            ['title' => ['en' => 'Published Courses', 'ar' => 'الدورات المنشورة']],
+            ['title' => ['en' => 'Granted Likes', 'ar' => 'الإعجابات الممنوحة']],
+            ['title' => ['en' => 'Acquired Likes', 'ar' => 'الإعجابات المكتسبة']],
+            ['title' => ['en' => 'Acquired Views', 'ar' => 'المشاهدات المكتسبة']],
+            ['title' => ['en' => 'Num Of Certificates', 'ar' => 'عدد الشهادات']],
+            ['title' => ['en' => 'Num Of Badges', 'ar' => 'عدد الشارات']],
+            ['title' => ['en' => 'Num Of Bronze Badges', 'ar' => 'عدد الشارات البرونزية']],
+            ['title' => ['en' => 'Num Of Silver Badges', 'ar' => 'عدد الشارات الفضية']],
+            ['title' => ['en' => 'Num Of Gold Badges', 'ar' => 'عدد الشارات الذهبية']],
         ];
 
         foreach($statistics as $statistic)

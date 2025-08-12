@@ -13,20 +13,20 @@ class CheckIsActiveCommand extends Command
 
     protected $description = 'check if user is active daily';
 
-    public function __construct(public FcmService $fcmService)    // Injection the fcm sevice
+    public function __construct(public FcmService $fcmService)    // Injection the fcm service
     {
         parent::__construct();
     }
 
-    public function handle()
+    public function handle(): void
     {
 
         foreach(User::all() as $user)
         {
             if($user->role === RoleEnum::ADMIN)
                 continue;
-            $current_enthusiasm = $user->statistics()->where('title', 'Current Enthusiasm')->first();
-            $max_enthusiasm = $user->statistics()->where('title', 'Max Enthusiasm')->first();
+            $current_enthusiasm = $user->statistics()->where('title->en', 'Current Enthusiasm')->first();
+            $max_enthusiasm = $user->statistics()->where('title->en', 'Max Enthusiasm')->first();
 
             if($user->moreDetail->is_active_today)
             {
@@ -36,6 +36,24 @@ class CheckIsActiveCommand extends Command
 
                 if($current_enthusiasm->pivot->progress > $max_enthusiasm->pivot->progress)
                     $max_enthusiasm->pivot->update(['progress' => $current_enthusiasm->pivot->progress]);
+
+                switch ($current_enthusiasm->pivot->progress) {
+                    case 20:
+                        $user->badges()->attach(1);
+                        $user->statistics()->where('title->en', 'Num Of Bronze Badges')->first()->pivot->increment('progress');
+                        $user->statistics()->where('title->en', 'Num Of Badges')->first()->pivot->increment('progress');
+                        break;
+                    case 50:
+                        $user->badges()->attach(2);
+                        $user->statistics()->where('title->en', 'Num Of Silver Badges')->first()->pivot->increment('progress');
+                        $user->statistics()->where('title->en', 'Num Of Badges')->first()->pivot->increment('progress');
+                        break;
+                    case 100:
+                        $user->badges()->attach(3);
+                        $user->statistics()->where('title->en', 'Num Of Gold Badges')->first()->pivot->increment('progress');
+                        $user->statistics()->where('title->en', 'Num Of Badges')->first()->pivot->increment('progress');
+                        break;
+                }
 
             }
             else
@@ -48,8 +66,8 @@ class CheckIsActiveCommand extends Command
                 {
                     $this->fcmService->sendNotification(
                         $user->fcm_token,
-                        'Your steps call you!',
-                        "Three days of absence… every step awaits you. Return to us—you won't climb the 'Darajat' alone!"
+                        __('msg.steps'),
+                        __('msg.three_days')
                     );
                 }
             }

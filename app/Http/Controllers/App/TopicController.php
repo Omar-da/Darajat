@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\App;
 
-use App\Models\Topic;
 use App\Responses\Response;
 use App\Services\Topic\TopicService;
 use Illuminate\Http\JsonResponse;

@@ -4,11 +4,14 @@ namespace App\Http\Requests\Quiz;
 
 use App\Models\Question;
 use App\Models\Quiz;
+use App\Traits\HandlesFailedValidationTrait;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class ResultRequest extends FormRequest
 {
+    use HandlesFailedValidationTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -27,9 +30,10 @@ class ResultRequest extends FormRequest
         return [
             '*' => 'required|array',
             '*.question_id' => ['required', 'integer',
-                                Rule::exists('questions', 'id')->where(function ($query) {
-                                $query->where('quiz_id', $this->route('quiz_id'));})
-                                ],
+                Rule::exists('questions', 'id')->where(function ($query) {
+                    $query->where('quiz_id', $this->route('quiz_id'));
+                })
+            ],
             '*.answer' => 'required|in:a,b,c,d',
         ];
     }
@@ -42,7 +46,7 @@ class ResultRequest extends FormRequest
             if ($duplicates->isNotEmpty()) {
                 $validator->errors()->add(
                     'questions',
-                    'Duplicate questions found: ' . $duplicates->implode(', ')
+                    __('msg.duplicate_questions') . $duplicates->implode(', ')
                 );
             }
         });
@@ -51,7 +55,7 @@ class ResultRequest extends FormRequest
     public function messages(): array
     {
         return [
-            '*.question_id.*' => 'The selected question does not exist in this quiz.',
+            '*.question_id.*' => __('msg.question_does_not_exist'),
         ];
     }
 }

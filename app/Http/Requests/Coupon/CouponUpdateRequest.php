@@ -29,7 +29,7 @@ class CouponUpdateRequest extends FormRequest
             'code' => ['required', 'string', 'max:50',
                 function ($attribute, $value, $fail) {
                     if (!Coupon::isCodeUnique($value, request()->route('id'))) {
-                        $fail('The ' . $attribute . ' has already been taken.');
+                        $fail(__('msg.the') . $attribute . __('msg.already_taken'));
                     }
                 }],
             'discount_type' => 'required|in:fixed,percentage',
@@ -42,7 +42,7 @@ class CouponUpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'discount_type.in' => 'The discount type must be one of fixed or percentage.',
+            'discount_type.in' => __('msg.discount_type'),
         ];
     }
 }

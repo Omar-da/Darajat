@@ -11,6 +11,6 @@ class LanguageController extends Controller
     public function index(): JsonResponse
     {
         $countries = Language::all();
-        return Response::success($countries, 'Countries retrieved successfully');
+        return Response::success($countries, __('msg.languages_retrieved'));
     }
 }

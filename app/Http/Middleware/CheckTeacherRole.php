@@ -16,7 +16,7 @@ class CheckTeacherRole
             return $next($request);
         }
 
-        return Response::error([], 'Unauthorized. Only teachers are allowed!', 403);
+        return Response::error('Unauthorized. Only teachers are allowed!', 403);
     }
 
 }

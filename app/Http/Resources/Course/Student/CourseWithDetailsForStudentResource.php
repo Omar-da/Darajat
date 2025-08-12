@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Course\Student;
 
+use App\Enums\CourseStatusEnum;
 use App\Http\Resources\Episode\EpisodeWithDetailsResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -30,7 +31,7 @@ class CourseWithDetailsForStudentResource extends JsonResource
                 'full_name' => $this->teacher->first_name . ' ' . $this->teacher->last_name,
                 'profile_image_url' => $this->teacher->profile_image_url ? asset(Storage::url($this->teacher->profile_image_url)) : null
             ],
-            'difficulty_level' => $this->difficulty_level,
+            'difficulty_level' => $this->difficulty_level->label(),
             'num_of_hours' => $this->total_of_time ? floor($this->total_of_time / 3600) : 0,
             'price' => $this->price . '$',
             'rate' => [
@@ -42,7 +43,7 @@ class CourseWithDetailsForStudentResource extends JsonResource
                 '1' => $this->calculatePercentageForValueRate(1),
             ],
             'num_of_episodes' => $this->num_of_episodes ? $this->num_of_episodes  : 0,
-            'status' => $this->status,
+            'status' => CourseStatusEnum::from($this->status)->label(),
             'publishing_date' => $this->publishing_date,
             'has_certificate' =>  $this->has_certificate,
             'total_quizzes' =>  $this->total_quizzes ? $this->total_quizzes : 0,

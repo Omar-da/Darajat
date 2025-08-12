@@ -24,6 +24,9 @@ return new class extends Migration
             $table->unsignedSmallInteger('num_of_completed_quizzes')->default(0);
             $table->timestamp('purchase_date')->useCurrent();
             $table->tinyInteger('rate')->nullable();
+            $table->boolean('episodes_completed')->default(false);
+            $table->boolean('quizzes_completed')->default(false);
+            $table->boolean('get_certificate')->default(false);
         });
     }
 

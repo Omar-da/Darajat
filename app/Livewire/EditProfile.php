@@ -32,9 +32,9 @@ class EditProfile extends Component
         if($validated['profile_image'])
         {
             if($user->profile_image_url)
-                $path = $this->profile_image->storeAs('img/profiles', $user->profile_image_url);
+                $path = $this->profile_image->storeAs('profiles', $user->profile_image_url);
             else
-                $path = $this->profile_image->store('img/profiles');
+                $path = $this->profile_image->store('profiles');
                 
             $new_image_url = basename($path);
         }
@@ -54,7 +54,7 @@ class EditProfile extends Component
     public function destroy_profile_image()
     {
         $user = auth()->user();
-        Storage::delete("img/profiles/$user->profile_image_url");
+        Storage::delete("profiles/$user->profile_image_url");
         $user->profile_image_url = null;
         $user->save();
 

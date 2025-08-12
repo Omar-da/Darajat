@@ -4,7 +4,7 @@
     <div class="course-details-container">
         <div class="course-details-header">
             <div class="course-details-image">
-                <img src="{{ asset('build/assets/img/courses/' . $course->image_url) }}" alt="{{ $course->title }}">
+                <img src="{{ Storage::url('courses/' . $course->image_url) }}" alt="{{ $course->title }}">
             </div>
             
             <div class="course-details-info">
@@ -118,7 +118,7 @@
                                     @endif
                                 </div>
                             </div>
-                            <a href="{{ route('courses.video', ['episode_id' => $episode->id]) }}" class="episode-view-btn">
+                            <a href="{{ route('courses.show_episode', ['episode_id' => $episode->id]) }}" class="episode-view-btn">
                                 @if($episode->published)
                                     <i class="fas fa-play"></i> View
                                 @else

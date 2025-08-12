@@ -9,12 +9,12 @@
                 <!-- Avatar Upload Section -->
             <div class="avatar-upload-container">
                 @if(auth()->user()->profile_image_url)
-                    <img src="{{ asset('build/assets/img/profiles/' . auth()->user()->profile_image_url) }}" 
+                    <img src="{{ Storage::url('profiles/' . auth()->user()->profile_image_url) }}" 
                         alt="Profile Image" 
                         class="avatar-preview" 
                         id="avatar-preview">
                 @else
-                    <img src="{{ asset('build/assets/img/anonymous_admin_icon.png') }}" 
+                    <img src="{{ asset('img/icons/anonymous_admin_icon.png') }}" 
                     alt="Profile Image" 
                     class="admin-profile-avatar">
                 @endif

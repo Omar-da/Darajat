@@ -6,6 +6,7 @@ use App\Enums\LevelEnum;
 use App\Http\Resources\User\UserResource;
 use App\Models\Language;
 use App\Models\MoreDetail;
+use App\Models\Statistic;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -28,7 +29,7 @@ class AuthService
             'role' => 'student'
         ]);
         if(!$user) {
-            $message = 'User registration failed!';
+            $message = __('msg.registration_failed');
             $code = 422;
         } else {
             $this->otpService->sendOTP($user);
@@ -42,8 +43,7 @@ class AuthService
                     'more_detail_id' => $moreDetail->id,
                     'level' => LevelEnum::MOTHER_TONGUE
                 ]);
-
-            $message = "Registration successful! An OTP has been sent to your email. Please check your inbox to verify your account.";
+            $message = __('msg.registration_success');
             $code = 202;
         }
         return ['user' => new UserResource($user), 'message' => $message, 'code' => $code];
@@ -54,17 +54,17 @@ class AuthService
         $user = User::query()->where('email', $request['email'])->first();
         if(!is_null($user)) {
             if(!Auth::attempt($request->only(['email', 'password']))) {
-                $message = 'User email & password does not match our records!';
+                $message = __('msg.not_match');
                 $code = 401;
             } else {
                 $token = $user->createToken('Personal Access Token')->accessToken;
                 $user = (new UserResource($user))->toArray(request());
                 $user['token'] = $token;
-                $message = 'User logged in successfully';
+                $message = __('msg.login_success');
                 $code = 200;
             }
         } else {
-            $message = 'User not found!';
+            $message = __('msg.user_not_found');;
             $code = 404;
         }
         return ['user' => $user, 'message' => $message, 'code' => $code];
@@ -73,14 +73,9 @@ class AuthService
     public function logout(): array
     {
         $user = auth('api')->user();
-        if(!is_null($user)) {
-            $user->token()->revoke();
-            $message = 'User logged out successfully';
-            $code = 200;
-        } else {
-            $message = 'Invalid user token!';
-            $code = 404;
-        }
+        $user->token()->revoke();
+        $message = __('msg.logout_success');
+        $code = 200;
         return ['user' => [], 'message' => $message, 'code' => $code];
     }
 }

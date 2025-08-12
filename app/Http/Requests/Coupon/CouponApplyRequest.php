@@ -5,7 +5,6 @@ namespace App\Http\Requests\Coupon;
 use App\Models\Coupon;
 use App\Traits\HandlesFailedValidationTrait;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class CouponApplyRequest extends FormRequest
 {
@@ -27,17 +26,7 @@ class CouponApplyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code' =>
-                [
-                    'required',
-                    'string',
-                    'exists:coupons,code',
-                    function ($attribute, $value, $fail) {
-                        if (Coupon::query()->where('code', $value)->first()->students()->where('student_id', $this->user()->id)->exists()) {
-                            $fail('You already applied for this coupon!');
-                        }
-                    }
-                ]
+            'code' => 'required|string|exists:coupons,code',
         ];
     }
 }

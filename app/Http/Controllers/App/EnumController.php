@@ -12,12 +12,12 @@ class EnumController extends Controller
     public function levels(): JsonResponse
     {
         $levels = LevelEnum::values();
-        return Response::success($levels, 'Levels retrieved successfully');
+        return Response::success($levels, __('msg.levels_retrieved'));
     }
 
     public function educations(): JsonResponse
     {
         $educations = EducationEnum::values();
-        return Response::success($educations, 'Educations retrieved successfully');
+        return Response::success($educations, __('msg.educations_retrieved'));
     }
 }

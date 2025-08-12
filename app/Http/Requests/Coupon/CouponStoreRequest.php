@@ -5,11 +5,11 @@ namespace App\Http\Requests\Coupon;
 use App\Models\Coupon;
 use App\Traits\HandlesFailedValidationTrait;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class CouponRequest extends FormRequest
+class CouponStoreRequest extends FormRequest
 {
     use HandlesFailedValidationTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -28,8 +28,8 @@ class CouponRequest extends FormRequest
         return [
             'code' => ['required', 'string', 'max:50',
                 function ($attribute, $value, $fail) {
-                    if(!Coupon::isCodeUnique($value)) {
-                        $fail('The ' .$attribute.' has already been taken.');
+                    if (!Coupon::isCodeUnique($value)) {
+                        $fail(__('msg.the') . $attribute . __('msg.already_taken'));
                     }
                 }],
             'discount_type' => 'required|in:fixed,percentage',
@@ -42,7 +42,7 @@ class CouponRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'discount_type.in' => 'The discount type must be one of fixed or percentage.',
+            'discount_type.in' => __('msg.discount_type'),
         ];
     }
 }

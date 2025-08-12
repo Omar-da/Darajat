@@ -2,16 +2,16 @@
 
 namespace App\Providers;
 
-use App\Enums\TypeEnum;
 use App\Models\Course;
+use App\Models\Quiz;
 use App\Models\User;
 use App\Observers\UserObserver;
 use App\Policies\CoursePolicy;
+use App\Policies\QuizPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,9 +26,6 @@ class AppServiceProvider extends ServiceProvider
 
     protected array $policies = [
         Course::class => CoursePolicy::class,
-
-        'owner' => CoursePolicy::class,
-        'createCoupon' => CoursePolicy::class,
     ];
 
     /**
@@ -46,16 +43,15 @@ class AppServiceProvider extends ServiceProvider
         });
 
         if (app()->environment('local')) {
-        $this->app->booted(function () {
-            $schedule = app(Schedule::class);
-            $schedule->command('active:check')
-                // ->dailyAt('03:00') // Runs at 3 AM daily
-                ->everyMinute()
-                ->timezone('Asia/Damascus');
+            $this->app->booted(function () {
+                $schedule = app(Schedule::class);
+                $schedule->command('active:check')
+                    // ->dailyAt('03:00') // Runs at 3 AM daily
+                    ->everyMinute()
+                    ->timezone('Asia/Damascus');
             });
         }
     }
 }
-//composer require laravel/passport  php artisan passport:install
 
 

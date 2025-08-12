@@ -12,7 +12,6 @@ class Coupon extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'teacher_id',
         'course_id',
         'code',
         'discount_type',
@@ -21,6 +20,7 @@ class Coupon extends Model
         'max_uses',
         'use_count',
     ];
+
 
     public function course(): BelongsTo
     {
@@ -47,5 +47,12 @@ class Coupon extends Model
         return !$this->isExpired() && !$this->isFullyUsed();
     }
 
-
+    public static function isCodeUnique($value, $id = null) : bool
+    {
+        if(isset($id))
+        {
+            return !Coupon::query()->where('code', strtoupper($value))->whereNot('id', $id)->exists();
+        }
+        return !Coupon::query()->where('code', strtoupper($value))->exists();
+    }
 }

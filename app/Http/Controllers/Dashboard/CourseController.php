@@ -34,7 +34,7 @@ class CourseController extends Controller
         return view('courses.show_course', compact('course'));
     }
 
-    public function video($episode_id)
+    public function show_episode($episode_id)
     {
         $episode = Episode::withTrashed()->with(['comments' => function($q) {
         $q->with(['replies' => function($q) {

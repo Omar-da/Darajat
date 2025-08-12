@@ -23,11 +23,11 @@ class ConsecutiveEpisodeNumber implements ValidationRule
         $last_episode = Episode::query()->where('course_id', request()->route('course_id'))->orderBy('episode_number', 'desc')->first();
         if(is_null($last_episode)) {
             if(request('episode_number') != 1) {
-                $fail('First episode number must be 1.');
+                $fail(__('msg.first_episode'));
             }
         } else if(request('episode_number') != $last_episode['episode_number'] + 1) {
             $n = $last_episode['episode_number'] + 1;
-            $fail("Episodes numbers must be sequential, Expected {$n} ");
+            $fail(__('msg.episodes_number_sequential') . $n);
         }
     }
 }

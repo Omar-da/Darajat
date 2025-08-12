@@ -5,7 +5,7 @@
         <!-- Course Header Section -->
         <section class="course-header">
             <div class="course-hero">
-                <img src="{{ asset("build/assets/img/courses/$course->image_url") }}" alt="Course image" class="course-hero-image">
+                <img src="{{ Storage::url("courses/$course->image_url") }}" alt="Course image" class="course-hero-image">
                 <div class="course-basic-info">
                     <h1 class="course-title">{{ $course->title }}</h1>
                     <p class="course-description">{{ $course->description }}</p>
