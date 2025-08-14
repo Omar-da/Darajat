@@ -15,22 +15,77 @@
     margin-bottom: 2rem;
 }
 
-.course-hero-image {
-    width: 400px;
-    height: 250px;
-    object-fit: fill;
-    border-radius: 8px;
-}
-
 .course-basic-info {
     flex: 1;
 }
 
+.student-badge-container {
+    display: flex;
+    justify-content: center;
+}
+
+.student-badge-with-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 50px;
+  gap: 8px;
+  background: var(--font-gradient);
+  background-clip: text;
+  color: transparent;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: xx-large;
+  cursor: pointer;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
+  -o-border-radius: 6px;
+}
+
+.student-badge-with-icon i {
+    font-size: xx-large;
+}
+
+.course-title-container {
+    display: flex;
+    align-items: center;
+}
 .course-title {
     font-size: 2rem;
     margin-top: 0;
-    margin-bottom: 1rem;
-    color: var(--primary);
+    color: var(--neutral);
+}
+
+/* CSS for animated arrow */
+.arrow-container {
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    transition: transform 0.2s;
+}
+
+.arrow-container:hover {
+    transform: scale(1.1);
+}
+
+.arrow {
+    width: 15px;
+    height: 15px;
+    border: 2px solid var(--primary); /* Blue-500 */
+    border-left: 0;
+    border-top: 0;
+    transform: rotate(-45deg);
+    transition: all 0.3s ease;
+}
+
+.arrow-container:hover .arrow {
+    transform: rotate(-45deg) translate(3px, -3px);
+    border-color: var(--secondary); /* Blue-600 */
 }
 
 .course-description {

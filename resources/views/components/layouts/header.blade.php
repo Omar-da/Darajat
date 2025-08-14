@@ -30,7 +30,7 @@
     <link rel="stylesheet" href="{{asset('css/users/followed_course.css')}}">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    
+    <link rel="icon" href="{{ asset('img/icons/DarajatTrans.png') }}" sizes="192x192" type="image/png">
 </head>
 <body>
     @use('App\Enums\TypeEnum')
@@ -45,7 +45,7 @@
         <ul class="nav-menu">
             <li><a href="{{route('home')}}" class="nav-link">Home</a></li>
             <li><a href="{{route('courses.cates_and_topics')}}" class="nav-link">Courses</a></li>
-            <li><a href="{{route('users.index', ['type' => TypeEnum::USER])}}" class="nav-link">Users</a></li>
+        <li><a href="{{route('users.index', ['type' => TypeEnum::USER])}}" class="nav-link">Users</a></li>
             <li><a href="{{route('users.index', ['type' => TypeEnum::TEACHER])}}" class="nav-link">Teachers</a></li>
             <li><a href="{{route('badges.index')}}" class="nav-link">Badges</a></li>
         </ul>

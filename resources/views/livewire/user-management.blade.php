@@ -38,7 +38,7 @@
                             @else
                                 <img src="{{ asset('img/icons/anonymous_icon.png') }}" alt="Profile Image" class="user-avatar">
                             @endif
-                            {{ $user->first_name }} {{ $user->last_name }}
+                            {{ $user->full_name }}
                         </div>
                     </td>
                     <td>

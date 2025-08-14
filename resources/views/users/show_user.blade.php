@@ -5,7 +5,7 @@
         <header class="user-profile-header">
             <img src="{{$user->profile_image_url ? Storage::url("profiles/$user->profile_image_url") : asset('img/icons/anonymous_icon.png')}}" alt="User Avatar" class="user-profile-avatar">
             <div class="user-profile-userinfo">
-                <h1>{{$user->first_name}} {{$user->last_name}}</h1>
+                <h1>{{$user->full_name}}</h1>
                 <p class="user-profile-tagline">{{$user->moreDetail->jobTitle->title}} | {{$user->moreDetail->country->name}}</p>
                 
                 <div class="user-profile-stats">

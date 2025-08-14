@@ -137,9 +137,14 @@
 }
 
 .course-image img {
+    border-radius: 10px;
     width: 100%;
     height: 250px;
     object-fit: fill;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
 }
 
 .course-details {
@@ -190,22 +195,23 @@
     font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     letter-spacing: 2px;
     font-weight: 500;
-    font-size: large;
+    font-size: xx-large;
 }
 
 .price i {
-    font-size: large;
+    font-size: xx-large;
 }
 
-.course-date {
+.course-date-line {
     color: var(--secondary);
+    margin-bottom: 1rem;
+    gap: 10px;
     font-size: 0.8rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
 }
 
-.course-date .date {
+.course-date.course-date {
     color: var(--neutral);
 }
 

@@ -83,7 +83,7 @@ class EpisodeService
 
         $course->update([
             'num_of_episodes' => $course->num_of_episodes + 1,
-            'total_of_time' => $course['total_of_time'] + $request['duration'],
+            'total_time' => $course['total_time'] + $request['duration'],
         ]);
         return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_created'), 'code' => 201];
     }
