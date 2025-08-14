@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Coupon;
 
 use App\Models\Coupon;
+use App\Models\Course;
+use App\Rules\DiscountValueCoupon;
 use App\Traits\HandlesFailedValidationTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -28,12 +30,17 @@ class CouponUpdateRequest extends FormRequest
         return [
             'code' => ['required', 'string', 'max:50',
                 function ($attribute, $value, $fail) {
-                    if (!Coupon::isCodeUnique($value, request()->route('id'))) {
+                    if (!Coupon::isCodeUnique($value, request()->route('coupon_id'))) {
                         $fail(__('msg.the') . $attribute . __('msg.already_taken'));
                     }
                 }],
             'discount_type' => 'required|in:fixed,percentage',
-            'discount_value' => 'required|numeric|between:0.00,99999999.99',
+            'discount_value' => [
+                'required',
+                'numeric',
+                'between:0.00,99999999.99',
+                new DiscountValueCoupon(Coupon::query()->find($this->route('coupon_id'))->course->price, $this->input('discount_type'))
+            ],
             'expires_at' => 'nullable|date|after:now',
             'max_uses' => 'nullable|integer|min:1',
         ];

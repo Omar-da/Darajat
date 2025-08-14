@@ -44,9 +44,6 @@ class CourseController extends Controller
         $data = [];
         try {
             $data = $this->courseService->loadMore($request->validated());
-            if ($data['code'] == 404) {
-                return Response::error($data['message'], $data['code']);
-            }
             return Response::successForPaginate($data['data'], $data['meta'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
@@ -233,7 +230,7 @@ class CourseController extends Controller
         $data = [];
         try {
             $data = $this->courseService->updateDraftCourse($request->validated(), $id);
-            if($data['code'] == 404 || $data['code'] == 403) {
+            if($data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -248,7 +245,7 @@ class CourseController extends Controller
         $data = [];
         try {
             $data = $this->courseService->updateApprovedCourse($request->validated(), $id);
-            if($data['code'] == 404 || $data['code'] == 403) {
+            if($data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -263,7 +260,7 @@ class CourseController extends Controller
         $data = [];
         try {
             $data = $this->courseService->destroy($id);
-            if($data['code'] == 404 || $data['code'] == 403) {
+            if($data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success([], $data['message'], $data['code']);
@@ -273,12 +270,12 @@ class CourseController extends Controller
         }
     }
 
-    public function publishCourse($id): JsonResponse
+    public function submitCourse($id): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->courseService->publishCourse($id);
-            if($data['code'] == 404 || $data['code'] == 422) {
+            $data = $this->courseService->submitCourse($id);
+            if($data['code'] == 409 || $data['code'] == 422) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success([], $data['message'], $data['code']);
@@ -293,7 +290,7 @@ class CourseController extends Controller
         $data = [];
         try {
             $data = $this->courseService->evaluation($request->validated(), $id);
-            if($data['code'] == 422) {
+            if($data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);

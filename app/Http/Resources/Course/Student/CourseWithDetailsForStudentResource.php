@@ -19,7 +19,7 @@ class CourseWithDetailsForStudentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'image_url' => asset(Storage::url($this->image_url)),
+            'image_url' => Storage::url($this->image_url),
             'title' => $this->title,
             'category' => $this->topic->category->title,
             'topic' => $this->topic->title,
@@ -43,8 +43,7 @@ class CourseWithDetailsForStudentResource extends JsonResource
                 '1' => $this->calculatePercentageForValueRate(1),
             ],
             'num_of_episodes' => $this->num_of_episodes ? $this->num_of_episodes  : 0,
-            'status' => CourseStatusEnum::from($this->status)->label(),
-            'publishing_date' => $this->publishing_date,
+            'publishing_date' => $this->response_date,
             'has_certificate' =>  $this->has_certificate,
             'total_quizzes' =>  $this->total_quizzes ? $this->total_quizzes : 0,
             'num_of_students_enrolled' => $this->num_of_students_enrolled ? $this->num_of_students_enrolled : 0,

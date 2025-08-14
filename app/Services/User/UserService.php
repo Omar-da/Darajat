@@ -4,6 +4,7 @@ namespace App\Services\User;
 
 use App\Enums\RoleEnum;
 use App\Http\Resources\User\UserResource;
+use App\Models\Speciality;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -15,17 +16,26 @@ class UserService
     {
         $user = User::query()->find(Auth::id());
         $moreDetail = $user->moreDetail;
+
         $user->update([
             'first_name' => $request['first_name'] ?? null,
             'last_name' => $request['last_name'] ?? null,
         ]);
+
+        if(!is_null($request['speciality']) && !is_numeric($request['speciality'])) {
+            $speciality = Speciality::query()->create([
+                'name' => $request['speciality'],
+            ]);
+            $request['speciality'] = $speciality->id;
+        }
+
         $moreDetail->update([
             'country_id' => $request['country_id'] ?? null,
             'job_title_id' => $request['job_title_id'] ?? null,
             'linked_in_url' => $request['linked_in_url'] ?? null,
             'education' => $request['education'] ?? null,
-            'university' => $request['university'] ?? null,
-            'speciality' => $request['speciality'] ?? null,
+            'university_id' => $request['university_id'] ?? null,
+            'speciality_id' => $request['speciality'] ?? null,
             'work_experience' => $request['work_experience'] ?? null,
         ]);
         $syncData = [];

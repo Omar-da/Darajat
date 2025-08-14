@@ -10,10 +10,10 @@
                     Your browser does not support the video tag.
                 </video>
             </div>
-            
+
             <div class="video-actions-container">
                 <div class="video-stats-container">
-                    @if($episode->trashed() || !$episode->published) 
+                    @if($episode->trashed() || !$episode->published)
                        <span class="requested-word">Requested:</span> <span class="date">{{Carbon::parse($episode->publishing_request_date)->format('M d, Y')}}</span>
                     @else
                         <div class="video-like-btn" aria-label="Like this episode">
@@ -21,19 +21,19 @@
                             <span class="video-like-count">{{$episode->likes}}</span>
                         </div>
                         <span class="video-views-count"><i class="fas fa-eye"></i> {{$episode->views}} views</span>
-                        <span class="video-publish-date"><i class="far fa-calendar-alt"></i><span class="published-word">Published:</span> <span class="date">{{Carbon::parse($episode->publishing_date)->format('M d, Y')}}</span></span>        
+                        <span class="video-publish-date"><i class="far fa-calendar-alt"></i><span class="published-word">Published:</span> <span class="date">{{Carbon::parse($episode->response_date)->format('M d, Y')}}</span></span>
                     @endif
                     @if($episode->quiz)
                         <a href="{{route('courses.quiz', ['episode' => $episode->id])}}" class="video-quiz-btn">
                             <i class="fas fa-question-circle"></i> Show Quiz
-                        </a>   
+                        </a>
                     @endif
                 </div>
             </div>
-            
+
             <h1 class="video-title">{{$episode->title}}</h1>
         </div>
-        
+
         <!-- Comments Section -->
         <div class="video-comments-section">
             <h2>Comments <span class="video-comment-count">({{count($episode->comments)}})</span></h2>
@@ -56,7 +56,7 @@
                                         @php
                                             $commentTimestamp = strtotime($comment->comment_date);
                                             $ago = time() - $commentTimestamp;
-    
+
                                             // Time intervals in seconds
                                             $minute = 60;
                                             $hour = 60 * $minute;
@@ -64,7 +64,7 @@
                                             $week = 7 * $day;
                                             $month = 30 * $day; // Approximate (30 days)
                                             $year = 365 * $day; // Approximate (365 days)
-    
+
                                             if ($ago < $minute) {
                                                 $comment_ago = ($ago < 10) ? "Just now" : $ago . " seconds ago";
                                             } elseif ($ago < $hour) {
@@ -90,9 +90,9 @@
                                         <span class="video-comment-date">{{$comment_ago}}</span>
                                     </div>
                                 </div>
-                                
+
                                 <p class="video-comment-text">{{$comment->content}}</p>
-                                
+
                                 <!-- Replies Section with toggle -->
                                 @if(count($comment->replies) > 0)
                                     <details class="video-replies-details">
@@ -118,7 +118,7 @@
                                                                 @php
                                                                     $replyTimestamp = strtotime($reply->reply_date);
                                                                     $ago = time() - $replyTimestamp;
-    
+
                                                                     // Time intervals in seconds
                                                                     $minute = 60;
                                                                     $hour = 60 * $minute;
@@ -126,7 +126,7 @@
                                                                     $week = 7 * $day;
                                                                     $month = 30 * $day; // Approximate (30 days)
                                                                     $year = 365 * $day; // Approximate (365 days)
-    
+
                                                                     if ($ago < $minute) {
                                                                         $reply_ago = ($ago < 10) ? "Just now" : $ago . " seconds ago";
                                                                     } elseif ($ago < $hour) {
@@ -162,7 +162,7 @@
                             </div>
                         @endforeach
                     </div>
-                @else 
+                @else
                     <div class="episode-comments-unavailable">
                         <div class="episode-comments-unavailable-icon">
                             <i class="fas fa-comment-slash"></i>

@@ -9,8 +9,9 @@ use App\Http\Resources\Episode\EpisodeWithDetailsResource;
 use App\Models\Course;
 use App\Models\Episode;
 use App\Traits\BadgeTrait;
+use Illuminate\Support\Facades\Storage;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class EpisodeService
 {
@@ -19,16 +20,9 @@ class EpisodeService
     public function getToTeacher($course_id): array
     {
         $course = Course::query()
-            ->where([
-                'teacher_id' => auth('api')->id(),
-                'id' => $course_id
-            ])
             ->with(['episodes.quiz.questions'])// Eager load relationships
-            ->first();
+            ->find($course_id);
 
-        if (is_null($course)) {
-            return ['message' => __('msg.course_not_found'), 'code' => 404];
-        }
         $episodes = $course->episodes;
         return ['data' => EpisodeTeacherResource::collection($episodes), 'message' => __('msg.episodes_retrieved'), 'code' => 200];
     }
@@ -41,15 +35,10 @@ class EpisodeService
             ->with(['episodes.quiz.questions']) // Eager load relationships
             ->first();
 
-        if(is_null($course)) {
-            if(!$user->followed_courses()->where('course_id', $course_id)->exists()) {
-                return ['message' => 'Unauthorized access!', 'code' => 403];
-            }
-            return ['message' => __('msg.course_not_found'), 'code' => 404];
-        }
         $episodes['episodes'] = EpisodeStudentResource::collection($course->episodes);
         $episodes['progress_percentage'] = $course->pivot->perc_progress . '%';
         $episodes['num_of_completed_quizzes'] = $course->pivot->num_of_completed_quizzes;
+        $episodes['get_certificate'] = (bool)$course->pivot->get_certificate;
         return ['data' => $episodes, 'message' => __('msg.episodes_retrieved'), 'code' => 200];
     }
 
@@ -64,8 +53,8 @@ class EpisodeService
             return ['message' => __('msg.course_not_found'), 'code' => 404];
         }
 
-        if (!($course->status == 'draft' || $course->status == 'rejected')) {
-            return ['message' => __('msg.can_not_add_episode') . $course->status . '!', 'code' => 403];
+        if (!($course->status === CourseStatusEnum::DRAFT || $course->status === CourseStatusEnum::REJECTED)) {
+            return ['message' => __('msg.can_not_add_episode') . $course->status->label() . '!', 'code' => 403];
         }
 
         $request['course_id'] = $course_id;
@@ -74,6 +63,10 @@ class EpisodeService
 
         $request['image_url']->storeAs($episode_path, 'thumbnail.jpg', 'local');
         $request['video_url']->storeAs($episode_path, 'video.mp4', 'local');
+
+        if(request()->hasFile('file_url')) {
+            $request['file_url']->storeAs($episode_path, 'file.' . $request['file_url']->getClientOriginalExtension(), 'local');
+        }
 
         $request['duration'] = FFMpeg::fromDisk('local')->open("$episode_path/video.mp4")->getDurationInSeconds();
 
@@ -85,57 +78,49 @@ class EpisodeService
             'num_of_episodes' => $course->num_of_episodes + 1,
             'total_of_time' => $course['total_of_time'] + $request['duration'],
         ]);
-        return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_created'), 'code' => 201];
+        return ['data' => new EpisodeTeacherResource($episode), 'message' => __('msg.episode_created'), 'code' => 201];
     }
 
     public function update($request, $id): array
     {
         $episode = Episode::query()->find($id);
-        if (is_null($episode) ||
-            !Course::query()
-                ->where([
-                    'teacher_id' => auth('api')->id(),
-                    'id' => $episode->course_id,
-                ])->exists()) {
-            return ['message' => __('msg.episode_not_found'), 'code' => 404];
-        }
 
         $course = $episode->course;
-        if (!($episode->course->status == 'draft' || $episode->course->stauts == 'rejected')) {
-            return ['message' => __('msg.can_not_update_episode') . $episode->course->status . '!', 'code' => 403];
+        if (!($episode->course->status === CourseStatusEnum::DRAFT || $episode->course->stauts === CourseStatusEnum::REJECTED)) {
+            return ['message' => __('msg.can_not_update_episode') . $episode->course->status->label() . '!', 'code' => 403];
         }
 
         $episode_path = "courses/$course->id/episodes/$episode->id";
         $request['image_url']->storeAs($episode_path, 'thumbnail.jpg', 'local');
         $request['video_url']->storeAs($episode_path, 'video.mp4', 'local');
+
+        if(request()->hasFile('file_url')) {
+            $request['file_url']->storeAs($episode_path, 'file.' . $request['file_url']->getClientOriginalExtension(), 'local');
+        } else {
+            $file = collect(Storage::disk('local')->files($episode_path))
+                ->first(fn($f) => str_contains(basename($f), 'file'));
+            if(!is_null($file)) {
+                Storage::disk('local')->delete("$episode_path/file." . pathinfo($file, PATHINFO_EXTENSION));
+            }
+        }
+
         $request['duration'] = FFMpeg::fromDisk('local')->open("$episode_path/video.mp4")->getDurationInSeconds();
         $episode->update($request);
-        return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_updated'), 'code' => 200];
+        return ['data' => new EpisodeTeacherResource($episode), 'message' => __('msg.episode_updated'), 'code' => 200];
     }
 
     public function showToTeacher($id): array
     {
         $user = auth('api')->user();
         $episode = Episode::query()->find($id);
-        if (is_null($episode) ||
-            !Course::query()
-                ->where([
-                    'teacher_id' => $user->id,
-                    'id' => $episode->course_id,
-                ])->exists()) {
-            return ['message' => __('msg.episode_not_found'), 'code' => 404];
-        }
 
-        return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_retrieved'), 'code' => 200];
+        return ['data' => new EpisodeTeacherResource($episode), 'message' => __('msg.episode_retrieved'), 'code' => 200];
     }
 
     public function showToStudent($id): array
     {
         $user = auth('api')->user();
         $episode = Episode::query()->find($id);
-        if (is_null($episode)) {
-            return ['message' => __('msg.episode_not_found'), 'code' => 404];
-        }
 
         return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_retrieved'), 'code' => 200];
     }
@@ -144,20 +129,18 @@ class EpisodeService
     {
         $user = auth('api')->user();
         $episode = Episode::query()->find($id);
-        if (is_null($episode) || !$user->published_courses()->where('id', $episode->course->id)->exists()) {
-            return ['message' => __('msg.episode_not_found'), 'code' => 404];
-        }
 
         $course = $episode->course;
-        if (!($course->status == 'draft' || $course->status == 'rejected')) {
-            return ['message' => __('msg.can_not_delete_episode') . $course->status . '!', 'code' => 403];
+        if ($course->status === CourseStatusEnum::APPROVED) {
+            return ['message' => __('msg.can_not_delete_episode') . $course->status->label() . '!', 'code' => 403];
         }
 
-        $min_episode = Episode::query()->withTrashed()->where('course_id', $course->id)->orderBy('episode_number')->first();
+        $min_episode = Episode::withTrashed()->where('course_id', $course->id)->orderBy('episode_number')->first();
         $episode->update([
             'episode_number' => $min_episode->episode_number - 1,
         ]);
 
+        $episode->quiz()->delete();
         $episode->delete();
         foreach ($course->episodes as $episode) {
             if ($episode->id != $id) {
@@ -171,7 +154,7 @@ class EpisodeService
     }
 
     // Finish an episode when the student has watched it completely.
-    public function finish_episode($id): array
+    public function finishEpisode($id): array
     {
         $user = auth('api')->user();
         $episode = Episode::query()->find($id);
@@ -183,7 +166,7 @@ class EpisodeService
         // Episode has been watched
         $user->episodes()->attach($episode);
         $episode->increment('views');
-        $episode->course->teacher()->statistics()->where('title->en', 'Acquired Views')->first()->pivot->increment('progress');
+        $episode->course->teacher->statistics()->where('title->en', 'Acquired Views')->first()->pivot->increment('progress');
 
         // Update progress in course
         $course = $user->followed_courses()->wherePivot('course_id', $episode->course->id)->first();
@@ -219,11 +202,11 @@ class EpisodeService
             return ['message' => __('msg.must_watch_episode_liked'), 'code' => 403];
         }
 
-        $episode->userLikes()->attach(auth('api')->id());
+        $episode->userLikes()->attach($user->id);
         $episode->increment('likes');
 
-        $user->statistics()->where('title', 'Granted Likes')->increment('progress');
-        $episode->course->teacher()->statistics()->where('title', 'Acquired Likes')->increment('progress');
+        $user->statistics()->where('title->en', 'Granted Likes')->first()->pivot->increment('progress');
+        $episode->course->teacher->statistics()->where('title->en', 'Acquired Likes')->first()->pivot->increment('progress');
 
         return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_liked'), 'code' => 200];
     }
@@ -240,20 +223,27 @@ class EpisodeService
 
         $episode->userLikes()->detach($user->id);
         $episode->decrement('likes');
-        $user->statistics()->where('title', 'Granted Likes')->decrement('progress');
-        $episode->course->teacher()->statistics()->where('title', 'Acquired Likes')->decrement('progress');
+        $user->statistics()->where('title->en', 'Granted Likes')->first()->pivot->decrement('progress');
+        $episode->course->teacher->statistics()->where('title->en', 'Acquired Likes')->first()->pivot->decrement('progress');
         return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_unliked'), 'code' => 200];
     }
 
-    public function downloadFile($id): BinaryFileResponse|array
+    public function downloadFile($episode_id): StreamedResponse|array
     {
-        $episode = Episode::query()->find($id);
+        $episode = Episode::query()->find($episode_id);
 
-        if (is_null($episode->file_url)) {
-            return ['message' => __('msg.episode_does_not_have_file'), 'code' => 404];
+        $directory = "courses/{$episode->course_id}/episodes/{$episode_id}";
+
+        $file = collect(Storage::disk('local')->files($directory))
+            ->first(fn($f) => str_contains(basename($f), 'file'));
+
+        if (!$file) {
+            return ['message' => __('msg.file_not_found'), 'code' => 404];
         }
 
-        return response()->download(storage_path('app/public/' . $episode->file_url),
-            $episode->title . '.' . pathinfo($episode->file_url, PATHINFO_EXTENSION));
+        return Storage::disk('local')->download(
+            $file,
+            $episode->title . '.' . pathinfo($file, PATHINFO_EXTENSION)
+        );
     }
 }

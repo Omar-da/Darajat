@@ -2,10 +2,11 @@
 
 use App\Console\Commands\CheckIsActiveCommand;
 use App\Http\Middleware\CheckOwnerCourse;
+use App\Http\Middleware\CheckSubscribed;
 use App\Http\Middleware\CheckTeacherRole;
 use App\Http\Middleware\CertificateMiddleware;
 use App\Http\Middleware\ProtectEpisodeAccess;
-use App\Http\Middleware\SetLanguage;
+use App\Http\Middleware\Localization;
 use App\Responses\Response;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Console\Scheduling\Schedule;
@@ -33,8 +34,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'is_teacher' => CheckTeacherRole::class,
             'get_certificate' => CertificateMiddleware::class,
             'episode_protection' => ProtectEpisodeAccess::class,
-            'set_language' => SetLanguage::class,
+            'localization' => Localization::class,
             'is_owner' => CheckOwnerCourse::class,
+            'is_subscribed' => CheckSubscribed::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -48,13 +50,16 @@ return Application::configure(basePath: dirname(__DIR__))
             return Response::error([], $message, $code);
         });
         $exceptions->renderable(function (AuthenticationException $e, $request) {
-            $locale = $request->header('Accept-Language', config('app.locale'));
-            if ($locale == 'ar') {
-                $message =  '!يجب تسجيل الدخول أولاً';
-            } else {
-                $message = 'Unauthenticated!';
+            if($request->is('api/*')) {
+                $locale = $request->header('Accept-Language', config('app.locale'));
+                if ($locale == 'ar') {
+                    $message = '!يجب تسجيل الدخول أولاً';
+                } else {
+                    $message = 'Unauthenticated!';
+                }
+                return Response::error($message, 401);
             }
-            return Response::error($message, 401);
+            return null;
         });
     })->withSchedule(function (Schedule $schedule) {
         $schedule->command('active:check')->dailyAt('03:00')->timezone('Asia/Damascus');

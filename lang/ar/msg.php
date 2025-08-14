@@ -31,7 +31,7 @@ return [
     'replies_retrieved' => 'تم استرجاع الردود بنجاح',
     'reply_created' => 'تم إنشاء الرد بنجاح',
     'reply_not_found' => 'الرد غير موجود!',
-    'unauthorized' => 'غير مصرح لك!',
+    'unauthorized' => 'وصول غير مصرّح به!',
     'reply_updated' => 'تم تحديث الرد بنجاح',
     'reply_deleted' => 'تم حذف الرد بنجاح',
     'already_liked_reply' => 'لقد قمت بالإعجاب بهذا الرد مسبقاً!',
@@ -149,5 +149,12 @@ return [
     'badges' => 'تم استرجاع الشارات بنجاح',
     'statistics' => 'تم استرجاع الإحصائيات بنجاح',
     'duplicate_questions' => 'تم العثور على أسئلة مكررة: ',
-    'question_does_not_exist' => 'السؤال المحدد غير موجود في هذا الاختبار!'
+    'question_does_not_exist' => 'السؤال المحدد غير موجود في هذا الاختبار!',
+    'file_not_found' => 'هذه الحلقة لا تحتوي على ملف!',
+    'discount_value_percentage' => 'يجب أن تكون قيمة الخصم أقل من أو يساوي 100 عند استخدام النسبة المئوية!',
+    'discount_value_fixed' => 'يجب أن تكون قيمة الخصم أقل من أو يساوي سعر الدورة عند استخدام مبلغ ثابت!',
+    'is_not_correct' => 'الكود غير صحيح!',
+    'universities_retrieved' => 'تم استرداد الجامعات بنجاح',
+    'specialities_retrieved' => 'تم استرداد التخصصات بنجاح',
+    'badges_retrieved' => 'تم استرداد الشارات بنجاح',
 ];

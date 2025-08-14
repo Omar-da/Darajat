@@ -1,19 +1,19 @@
 <?php
-namespace App\Http\Resources\Course\Student;
+namespace App\Http\Resources\Quiz;
 
-use App\Http\Resources\Question\QuestionStudentResource;
+use App\Http\Resources\Question\QuestionTeacherResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 
-class StudentQuizResource extends JsonResource
+class TeacherQuizResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
             'num_of_questions' => $this->num_of_questions,
-            'questions' => QuestionStudentResource::collection($this->questions)
+            'questions' => QuestionTeacherResource::collection($this->questions)
         ];
     }
 }

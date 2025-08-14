@@ -10,7 +10,7 @@ class CategoryService
     public function index(): array
     {
         $categories = Category::query()->orderBy('title')->get();
-        return ['data' => CategoryResource::collection($categories), 'message' => 'Categories retrieved successfully', 'code' => 200];
+        return ['data' => CategoryResource::collection($categories), 'message' => __('msg.categories_retrieved'), 'code' => 200];
     }
 
     public function search($title): array
@@ -22,11 +22,11 @@ class CategoryService
         if($categories->isEmpty()) {
             return [
                 'data' => [],
-                'message' => "No categories found for '{$title}'.",
+                'message' => __('msg.no_categories_found') . $title,
                 'suggestions' => Category::popular(Category::query())->pluck('title'),
                 'code' => 200
             ];
         }
-        return ['data' => CategoryResource::collection($categories), 'message' => 'Categories retrieved successfully', 'code' => 200];
+        return ['data' => CategoryResource::collection($categories), 'message' => __('msg.categories_retrieved'), 'code' => 200];
     }
 }

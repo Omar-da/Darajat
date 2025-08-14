@@ -24,10 +24,6 @@ class AppServiceProvider extends ServiceProvider
         //
     }
 
-    protected array $policies = [
-        Course::class => CoursePolicy::class,
-    ];
-
     /**
      * Bootstrap any application services.
      */

@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Coupon;
 
 use App\Models\Coupon;
+use App\Models\Course;
+use App\Rules\DiscountValueCoupon;
 use App\Traits\HandlesFailedValidationTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -33,7 +35,12 @@ class CouponStoreRequest extends FormRequest
                     }
                 }],
             'discount_type' => 'required|in:fixed,percentage',
-            'discount_value' => 'required|numeric|between:0.00,99999999.99',
+            'discount_value' => [
+                'required',
+                'numeric',
+                'between:0.00,99999999.99',
+                new DiscountValueCoupon(Course::query()->find($this->route('course_id'))->price, $this->input('discount_type'))
+            ],
             'expires_at' => 'nullable|date|after:now',
             'max_uses' => 'nullable|integer|min:1',
         ];

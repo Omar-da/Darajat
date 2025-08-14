@@ -9,7 +9,7 @@
                 <div class="course-basic-info">
                     <h1 class="course-title">{{ $course->title }}</h1>
                     <p class="course-description">{{ $course->description }}</p>
-                    
+
                     <div class="course-meta-grid">
                         <div class="course-meta-item">
                             <span class="meta-label">Topic:</span>
@@ -33,7 +33,7 @@
                         </div>
                         <div class="course-meta-item">
                             <span class="meta-label">Published:</span>
-                            <span class="meta-value">{{ Carbon::parse($course->publishing_date)->format('M d, Y') }}</span>
+                            <span class="meta-value">{{ Carbon::parse($course->response_date)->format('M d, Y') }}</span>
                         </div>
                         <div class="course-meta-item">
                             <span class="meta-label">Price:</span>
@@ -72,7 +72,7 @@
                     </div>
                     <span class="progress-percentage">{{ $course->pivot->perc_progress }}% Complete</span>
                 </div>
-                
+
                 <div class="progress-details">
                     <div class="progress-stat">
                         <span class="stat-value">{{ $course->pivot->progress }}</span>
@@ -88,7 +88,7 @@
                     </div>
                 </div>
             </div>
-            
+
             @if($course->pivot->num_of_completed_quizes == $total_quizzes)
                 <div class="certificate-badge">
                     <i class="fas fa-certificate"></i>
@@ -105,7 +105,7 @@
         <!-- Quizzes Section -->
         <section class="quizzes-section">
             <h2 class="section-title">Quizzes</h2>
-            
+
             @if(count($quizzes) > 0)
                 <div class="quizzes-list">
                     @foreach($quizzes as $quiz)

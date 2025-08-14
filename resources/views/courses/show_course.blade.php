@@ -6,7 +6,7 @@
             <div class="course-details-image">
                 <img src="{{ Storage::url('courses/' . $course->image_url) }}" alt="{{ $course->title }}">
             </div>
-            
+
             <div class="course-details-info">
                 <div class="course-details-title-container">
                     <h1 class="course-details-title">{{ $course->title }}</h1>
@@ -18,7 +18,7 @@
                         @endif
                     </div>
                 </div>
-                
+
                 <div class="course-details-meta">
                     <div class="course-meta-item">
                         <span class="course-meta-label">Teacher:</span>
@@ -70,7 +70,7 @@
                         </span>
                         <span class="course-meta-value">
                             @if($course->published)
-                                {{ Carbon::parse($course->publishing_date)->format('M d, Y') }}
+                                {{ Carbon::parse($course->response_date)->format('M d, Y') }}
                             @else
                                 {{ Carbon::parse($course->publishing_request_date)->format('M d, Y') }}
                             @endif
@@ -91,18 +91,18 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="course-details-description">
             <h2 class="course-section-title">Description</h2>
             <div class="course-description-content">
                 {{ $course->description }}
             </div>
         </div>
-        
+
         @if($course->episodes->count() > 0)
             <div class="course-episodes-section">
                 <h2 class="course-section-title">Episodes ({{ $course->episodes->count() }})</h2>
-                
+
                 <div class="course-episodes-list">
                     @foreach($course->episodes as $episode)
                         <div @class(['course-episode-item', 'episode-pending' => !$episode->published])>
