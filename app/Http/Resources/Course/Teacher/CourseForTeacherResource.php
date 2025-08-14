@@ -19,12 +19,12 @@ class CourseForTeacherResource extends JsonResource
             'id' => $this->id,
             'image_url' => Storage::url($this->image_url),
             'title' => $this->title,
-            'teacher' => $this->teacher->first_name . ' ' . $this->teacher->last_name,
+            'teacher' => $this->teacher->full_name,
             'price' => $this->price . '$',
             'rate' => $this->rate,
             'language' => $this->language->name,
             'num_of_students_enrolled' => $this->num_of_students_enrolled,
-            'publishing_date' => $this->publishing_date,
+            'response_date' => $this->response_date,
             'publishing_request_date' => $this->publishing_request_date,
             'created_at' => $this->created_at
         ];

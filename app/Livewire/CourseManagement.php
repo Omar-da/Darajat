@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Category;
-use App\Models\Episode;
+use App\Models\Course;
 use Livewire\Component;
 
 class CourseManagement extends Component
@@ -22,7 +22,11 @@ class CourseManagement extends Component
 
     public function render()
     {
-        return view('livewire.course-management')->layout('components.layouts.header', ['title' => 'Course Management']);
+        $deleted_courses = Course::onlyTrashed()->with(['teacher' => function($q) {
+            $q->withTrashed();
+        }])->get();
+
+        return view('livewire.course-management', compact(['deleted_courses']))->layout('components.layouts.header', ['title' => 'Course Management']);
     }
 
     public function changeTab($tab)

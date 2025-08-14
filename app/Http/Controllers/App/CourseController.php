@@ -393,7 +393,7 @@ class CourseController extends Controller
                 'json' => [
                     'groupId' => '01jsxgwpm02gd1j9pq679rx3de',
                     'recipient' => [
-                        'name' => $user->first_name . ' ' . $user->last_name,
+                        'name' => $user->full_name,
                         'email' => 'omaraldalati3@gmail.com',
                     ],
                     'certificate' => [
@@ -402,7 +402,7 @@ class CourseController extends Controller
                     'customAttributes' => [
                         'custom.course_classification' => $course->topic->category->title,
                         'custom.course_name' => $course->title,
-                        'custom.degree' => $course->teacher->first_name . ' ' . $course->teacher->last_name,
+                        'custom.degree' => $course->teacher->full_name,
                     ]
                 ]
             ]);

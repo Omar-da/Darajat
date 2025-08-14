@@ -35,6 +35,7 @@
 .pending-episode-card {
     display: flex;
     background: var(--card-bg);
+    box-shadow: 0 4px 12px rgba(34, 211, 238, 0.066);
     border-radius: 8px;
     overflow: hidden;
     border-left: 4px solid var(--primary);
@@ -43,12 +44,12 @@
 
 .pending-episode-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(34, 211, 238, 0.2);
+    box-shadow: 0 4px 12px rgba(34, 211, 238, 0.442);
 }
 
 /* Media Section */
 .pending-episode-media {
-    width: 250px;
+    flex-basis: 380px;
     flex-shrink: 0;
     position: relative;
 }
@@ -237,4 +238,5 @@
     .pending-episodes-container {
         padding: 0 1rem;
     }
+
 }

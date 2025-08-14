@@ -196,7 +196,7 @@ class EpisodeController extends Controller
 
     public function get_video($episode_id)
     {
-        $episode = Episode::withTrashed()->where('id', $episode_id)->firstOrFail();
+        $episode = where('id', $episode_id)->firstOrFail();
         $course = Course::where('id', $episode->course_id)->firstOrFail();
 
         $videoPath = "courses/$course->id/episodes/$episode_id/video.mp4";
@@ -220,7 +220,7 @@ class EpisodeController extends Controller
 
     public function get_poster($episode_id)
     {
-        $episode = Episode::withTrashed()->where('id', $episode_id)->firstOrFail();
+        $episode = Episode::where('id', $episode_id)->firstOrFail();
         $course = Course::where('id', $episode->course_id)->firstOrFail();
         $thumbnailPath = "courses/$course->id/episodes/$episode_id/thumbnail.jpg";
 

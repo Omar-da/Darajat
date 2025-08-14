@@ -5,7 +5,7 @@
     <div class="category-container">
         <div class="topics-container">
             @foreach($category->topics as $topic)
-                <x-topic-button :href="route('courses.rejected_episodes', ['topic' => $topic->id])" class="topic-tag">
+                <x-topic-button :href="route('courses.rejected_courses', ['cate' => $category->id, 'topic' => $topic->id])" class="topic-tag">
                     {{ $topic->title }}
                 </x-topic-button>
             @endforeach

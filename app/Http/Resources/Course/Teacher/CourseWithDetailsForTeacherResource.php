@@ -27,11 +27,11 @@ class CourseWithDetailsForTeacherResource extends JsonResource
             'what_will_you_learn' => $this->episodes->pluck('title'),
             'teacher' => [
                 'id' => $this->teacher->id,
-                'full_name' => $this->teacher->first_name . ' ' . $this->teacher->last_name,
+                'full_name' => $this->teacher->full_namel,
                 'profile_image_url' => $this->teacher->profile_image_url ? Storage::url("profiles/{$this->teacher->profile_image_url}") : null
             ],
             'difficulty_level' => $this->difficulty_level->label(),
-            'num_of_hours' => $this->total_of_time ? floor($this->total_of_time / 3600) : 0,
+            'num_of_hours' => $this->total_time ? floor($this->total_time / 3600) : 0,
             'price' => $this->price . '$',
             'rate' => [
                 'course_rating' => $this->rate ? $this->rate : 0,
@@ -43,7 +43,7 @@ class CourseWithDetailsForTeacherResource extends JsonResource
             ],
             'num_of_episodes' => $this->num_of_episodes ? $this->num_of_episodes  : 0,
             'status' => CourseStatusEnum::from($this->status)->label(),
-            'publishing_date' => $this->publishing_date,
+            'response_date' => $this->response_date,
             'publishing_request_date' => $this->publishing_request_date,
             'has_certificate' =>  $this->has_certificate,
             'total_quizzes' =>  $this->total_quizzes ? $this->total_quizzes : 0,

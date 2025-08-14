@@ -25,7 +25,7 @@ class ReplyResource extends JsonResource
             'likes' => $this->likes ? $this->likes : 0,
             'replier' => [
                 'id' => $this->user->id,
-                'full_name' => $this->user->first_name. ' ' .$this->user->last_name,
+                'full_name' => $this->user->full_name,
                 'profile_image_url' => $this->user->profile_image_url ? Storage::url("/profiles/{$this->user->profile_image_url}") : null,
             ]
         ];

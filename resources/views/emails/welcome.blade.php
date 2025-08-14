@@ -83,7 +83,7 @@
                             <tr>
                                 <td class="responsive-padding" style="padding:0 35px;">
                                     <h1 style="color:#1e1e2d; font-weight:500; margin:0; font-size:32px; font-family:'Rubik',sans-serif;">
-                                        Welcome to {{ config('app.name') }}, {{ $user->first_name }} {{ $user->last_name
+                                        Welcome to {{ config('app.name') }}, {{ $user->full_name
                                         }}!
                                     </h1>
                                     <span

@@ -21,7 +21,6 @@ return new class extends Migration
             $table->unsignedMediumInteger('duration')->nullable();
             $table->unsignedInteger('views')->default(0);
             $table->unsignedInteger('likes')->default(0);
-            $table->softDeletes();
         });
     }
 

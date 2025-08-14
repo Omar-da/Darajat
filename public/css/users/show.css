@@ -124,6 +124,7 @@
 
 .user-profile-courses-grid {
     display: grid;
+    padding: 5px;
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
     width: 100%;
@@ -568,24 +569,6 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-}
-
-.price {
-    color: var(--dollar);
-    font-weight: 500;
-    font-size: 1.1rem;
-}
-
-.course-date {
-    color: var(--secondary);
-    font-size: 0.8rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.course-date .date {
-    color: var(--neutral);
 }
 
 /* Responsive Adjustments */

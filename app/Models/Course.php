@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CourseStatusEnum;
 use App\Enums\LevelEnum;
 use App\Enums\RoleEnum;
 use App\Traits\TranslationTrait;
@@ -11,7 +12,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use function PHPUnit\Framework\isEmpty;
 
 class Course extends Model
 {
@@ -27,13 +27,13 @@ class Course extends Model
         'description',
         'image_url',
         'difficulty_level',
-        'total_of_time',
+        'total_time',
         'price',
         'rate',
         'num_of_episodes',
         'num_of_students_enrolled',
         'publishing_request_date',
-        'publishing_date',
+        'response_date',
         'status',
         'has_certificate',
     ];
@@ -42,6 +42,7 @@ class Course extends Model
     {
         return [
             'difficulty_level' => LevelEnum::class,
+            'status' => CourseStatusEnum::class,
             'title' => 'array',
             'description' => 'array',
             'has_certificate' => 'array',
@@ -102,6 +103,11 @@ class Course extends Model
     public function calculatePercentageForValueRate($value): string
     {
         return round($this->students()->where('rate', $value)->count() / ($this->students()->count() != 0 ? $this->students()->count() : 1) * 100, 2) . '%';
+    }
+
+    public function hasSubscribers(): bool
+    {
+        return $this->num_of_students_enrolled > 0; 
     }
 
     public function teacher(): BelongsTo
