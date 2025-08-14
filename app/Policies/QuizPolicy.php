@@ -2,13 +2,11 @@
 
 namespace App\Policies;
 
-use App\Enums\CourseStatusEnum;
-use App\Models\Course;
+use App\Models\Quiz;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-
-class CoursePolicy
+class QuizPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -21,7 +19,7 @@ class CoursePolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Course $course): bool
+    public function view(User $user, Quiz $quiz): bool
     {
         return false;
     }
@@ -37,7 +35,7 @@ class CoursePolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Course $course): bool
+    public function update(User $user, Quiz $quiz): bool
     {
         return false;
     }
@@ -45,7 +43,7 @@ class CoursePolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Course $course): bool
+    public function delete(User $user, Quiz $quiz): bool
     {
         return false;
     }
@@ -53,7 +51,7 @@ class CoursePolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Course $course): bool
+    public function restore(User $user, Quiz $quiz): bool
     {
         return false;
     }
@@ -61,22 +59,15 @@ class CoursePolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Course $course): bool
+    public function forceDelete(User $user, Quiz $quiz): bool
     {
         return false;
     }
 
-    public function statusApproved(User $user, Course $course): Response
+    public function haveAccess(User $user, Quiz $quiz): Response
     {
-        return $course->status === CourseStatusEnum::APPROVED
+        return $user->episodes->contains($quiz->episode_id)
             ? Response::allow()
-            : Response::deny(__('msg.course_not_approved'), 403);
-    }
-
-    public function quizAction(User $user, Course $course): Response
-    {
-        return ($course->status === CourseStatusEnum::DRAFT || $course->status === CourseStatusEnum::REJECTED)
-            ? Response::allow()
-            : Response::deny(__('msg.quiz_action'), 403);
+            : Response::deny(__('msg.must_watch_episode'), 403);
     }
 }

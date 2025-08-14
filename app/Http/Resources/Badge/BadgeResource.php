@@ -4,6 +4,7 @@ namespace App\Http\Resources\Badge;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class BadgeResource extends JsonResource
 {
@@ -19,7 +20,7 @@ class BadgeResource extends JsonResource
             'group' => $this->group,
             'description' => $this->description,
             'goal' => $this->goal,
-            'image_url' => asset("build/assets/img/badges/$this->image_url")
+            'image_url' => Storage::url("badges/{$this->image_url}"),
         ];
     }
 }

@@ -33,7 +33,7 @@ class CourseService
                 'has_more_pages' => $courses->hasMorePages(),
                 'next_page' => $courses->hasMorePages() ? $courses->currentPage() + 1 : null,
             ],
-            'message' => 'Courses retrieved successfully',
+            'message' => __('msg.courses_retrieved'),
             'code' => 200
         ];
     }
@@ -72,7 +72,7 @@ class CourseService
                 'has_more_pages' => $courses->hasMorePages(),
                 'next_page' => $courses->hasMorePages() ? $courses->currentPage() + 1 : null,
             ],
-            'message' => 'Courses retrieved successfully',
+            'message' => __('msg.courses_retrieved'),
             'code' => 200
         ];
     }
@@ -81,7 +81,7 @@ class CourseService
     {
         $category = Category::query()->find($category_id);
         if (!$category) {
-            return ['message' => 'Category not found!', 'code' => 404];
+            return ['message' => __('msg.category_not_found'), 'code' => 404];
         }
         $courses = Course::query()->whereHas('topic', function ($query) use ($category_id) {
             $query->where('category_id', $category_id);
@@ -91,13 +91,13 @@ class CourseService
             ->orderBy('num_of_students_enrolled', 'desc')
             ->get();
 
-        return ['data' => CourseForStudentResource::collection($courses), 'message' => 'Courses retrieved successfully', 'code' => 200];
+        return ['data' => CourseForStudentResource::collection($courses), 'message' => __('msg.courses_retrieved'), 'code' => 200];
     }
 
     public function getCoursesForTopic($topic_id): array
     {
         if (!Topic::query()->find($topic_id)) {
-            return ['message' => 'Topic not found!', 'code' => 404];
+            return ['message' => __('msg.topic_not_found'), 'code' => 404];
         }
         $courses = Course::query()
             ->where([
@@ -107,13 +107,13 @@ class CourseService
             ->orderBy('rate', 'desc')
             ->orderBy('num_of_students_enrolled', 'desc')
             ->get();
-        return ['data' => CourseForStudentResource::collection($courses), 'message' => 'Courses retrieved successfully', 'code' => 200];
+        return ['data' => CourseForStudentResource::collection($courses), 'message' => __('msg.courses_retrieved'), 'code' => 200];
     }
 
     public function getCoursesForLanguage($language_id): array
     {
         if (!Language::query()->find($language_id)) {
-            return ['message' => 'Language not found!', 'code' => 404];
+            return ['message' => __('msg.language_not_found'), 'code' => 404];
         }
         $courses = Course::query()
             ->where([
@@ -123,7 +123,7 @@ class CourseService
             ->orderBy('rate', 'desc')
             ->orderBy('num_of_students_enrolled', 'desc')
             ->get();
-        return ['data' => CourseForStudentResource::collection($courses), 'message' => 'Courses retrieved successfully', 'code' => 200];
+        return ['data' => CourseForStudentResource::collection($courses), 'message' => __('msg.courses_retrieved'), 'code' => 200];
     }
 
     public function search($title): array
@@ -137,12 +137,12 @@ class CourseService
         if ($courses->isEmpty()) {
             return [
                 'data' => [],
-                'message' => "No courses found for '{$title}'.",
+                'message' => __('msg.no_courses_found') . $title,
                 'suggestions' => Course::popular(Course::query())->pluck('title'),
                 'code' => 200
             ];
         }
-        return ['data' => CourseForStudentResource::collection($courses), 'message' => 'Courses retrieved successfully', 'code' => 200];
+        return ['data' => CourseForStudentResource::collection($courses), 'message' => __('msg.courses_retrieved'), 'code' => 200];
     }
 
     public function getFreeCourses(): array
@@ -163,7 +163,7 @@ class CourseService
                 'has_more_pages' => $courses->hasMorePages(),
                 'next_page' => $courses->hasMorePages() ? $courses->currentPage() + 1 : null,
             ],
-            'message' => 'Free Courses retrieved successfully',
+            'message' => __('msg.free_courses'),
             'code' => 200
         ];
     }
@@ -184,25 +184,16 @@ class CourseService
                 'has_more_pages' => $courses->hasMorePages(),
                 'next_page' => $courses->hasMorePages() ? $courses->currentPage() + 1 : null,
             ],
-            'message' => 'Paid Courses retrieved successfully',
+            'message' => __('msg.paid_courses'),
             'code' => 200
         ];
-
     }
 
     public function showToTeacher($id): array
     {
-        $course = Course::query()
-            ->where([
-                'teacher_id' => auth('api')->id(),
-                'id' => $id
-            ])->first();
+        $course = Course::query()->find($id);
 
-        if (is_null($course)) {
-            return ['message' => 'Course not found!', 'code' => 404];
-        }
-
-        return ['data' => new CourseWithDetailsForTeacherResource($course), 'message' => 'Course retrieved successfully', 'code' => 200];
+        return ['data' => new CourseWithDetailsForTeacherResource($course), 'message' => __('msg.course_retrieved'), 'code' => 200];
     }
 
     public function showToStudent($id): array
@@ -211,10 +202,10 @@ class CourseService
             ->where('status', CourseStatusEnum::APPROVED)
             ->find($id);
         if (is_null($course)) {
-            return ['message' => 'Course not found!', 'code' => 404];
+            return ['message' => __('msg.course_not_found'), 'code' => 404];
         }
 
-        return ['data' => new CourseWithDetailsForStudentResource($course), 'message' => 'Course retrieved successfully', 'code' => 200];
+        return ['data' => new CourseWithDetailsForStudentResource($course), 'message' => __('msg.course_retrieved'), 'code' => 200];
     }
 
     public function getDraftCoursesToTeacher(): array
@@ -227,7 +218,7 @@ class CourseService
             ->latest('created_at')
             ->get();
 
-        return ['data' => CourseForTeacherResource::collection($courses), 'message' => 'Course retrieved successfully', 'code' => 200];
+        return ['data' => CourseForTeacherResource::collection($courses), 'message' => __('msg.courses_retrieved'), 'code' => 200];
     }
 
     public function getPendingCoursesToTeacher(): array
@@ -240,7 +231,7 @@ class CourseService
             ->latest('publishing_request_date')
             ->get();
 
-        return ['data' => CourseForTeacherResource::collection($courses), 'message' => 'Course retrieved successfully', 'code' => 200];
+        return ['data' => CourseForTeacherResource::collection($courses), 'message' => __('msg.courses_retrieved'), 'code' => 200];
     }
 
     public function getApprovedCoursesToTeacher(): array
@@ -255,7 +246,7 @@ class CourseService
             ->orderBy('students_count', 'desc')
             ->get();
 
-        return ['data' => CourseForTeacherResource::collection($courses), 'message' => 'Course retrieved successfully', 'code' => 200];
+        return ['data' => CourseForTeacherResource::collection($courses), 'message' => __('msg.courses_retrieved'), 'code' => 200];
     }
 
     public function getRejectedCoursesToTeacher(): array
@@ -268,103 +259,75 @@ class CourseService
             ->latest('publishing_request_date')
             ->get();
 
-        return ['data' => CourseForTeacherResource::collection($courses), 'message' => 'Course retrieved successfully', 'code' => 200];
+        return ['data' => CourseForTeacherResource::collection($courses), 'message' => __('msg.courses_retrieved'), 'code' => 200];
     }
 
     public function store($request): array
     {
         $request['teacher_id'] = auth('api')->id();
-        $request['image_url'] = $request['image_url']->store('courses');
+        $request['image_url'] = $request['image_url']->store('img/courses', 'public');
         $course = Course::query()->create($request);
         $course->refresh();
-        return ['data' => new CourseWithDetailsForTeacherResource($course), 'message' => 'Course created successfully', 'code' => 201];
+        return ['data' => new CourseWithDetailsForTeacherResource($course), 'message' => __('msg.courses_created'), 'code' => 201];
     }
 
-    public function updateDraftCourse($request, $id) : array
+    public function updateDraftCourse($request, $id): array
     {
-        $course = Course::query()
-            ->where([
-                'id' => $id,
-                'teacher_id' => auth('api')->id()
-            ])->first();
-        if(is_null($course)) {
-            return ['message' => 'Course not found!', 'code' => 404];
+        $course = Course::query()->find($id);
+
+        if ($course->status !== CourseStatusEnum::DRAFT) {
+            return ['message' => __('msg.can_not_updated_course') . $course->status->label() . __('msg.status'), 'code' => 403];
         }
 
-        if($course->status !== 'draft') {
-            return ['message' => 'You can\'t edit this course in '. $course->status .' status!', 'code' => 403];
-        }
-
-        Storage::disk('public')->delete($course->image_url);
-        $request['image_url'] = $request['image_url']->store('courses');
+        Storage::disk('public')->delete("img/courses/{$course->image_url}");
+        $request['image_url'] = $request['image_url']->store('img/courses', 'public');
         $course->update($request);
 
-        return ['data' => new CourseForTeacherResource($course), 'message' => 'Course updated successfully', 'code' => 200];
+        return ['data' => new CourseForTeacherResource($course), 'message' => __('msg.course_updated'), 'code' => 200];
     }
 
-    public function updateApprovedCourse($request, $id) : array
+    public function updateApprovedCourse($request, $id): array
     {
-        $course = Course::query()
-            ->where([
-                'id' => $id,
-                'teacher_id' => auth('api')->id()
-            ])->first();
-        if(is_null($course)) {
-            return ['message' => 'Course not found!', 'code' => 404];
-        }
+        $course = Course::query()->find($id);
 
-        if($course->status !== 'approved') {
-            return ['message' => 'You can\'t edit this course in '. $course->status .' status!', 'code' => 403];
+        if ($course->status !== CourseStatusEnum::APPROVED) {
+            return ['message' => __('msg.can_not_updated_course') . $course->status->label() . __('msg.status'), 'code' => 403];
         }
 
         $course->price = $request['price'];
         $course->save();
 
-        return ['data' => new CourseForTeacherResource($course), 'message' => 'Course updated successfully', 'code' => 200];
+        return ['data' => new CourseForTeacherResource($course), 'message' => __('msg.course_updated'), 'code' => 200];
     }
 
     public function destroy($id): array
     {
-        $course = Course::query()
-            ->where([
-                'id' => $id,
-                'teacher_id' => auth('api')->id()
-            ])->first();
-        if(is_null($course)) {
-            return ['message' => 'Course not found!', 'code' => 404];
+        $course = Course::query()->find($id);
+
+        if ($course->num_of_students_enrolled > 0) {
+            return ['message' => __('msg.can_not_delete_course') . $course->status->label() . __('msg.enrolled_students'), 'code' => 403];
         }
 
-        if($course->num_of_students_enrolled > 0) {
-            return ['message' => 'You can\'t delete this course in current '. $course->status .' status when it has enrolled students!', 'code' => 403];
-        } else if($course->status === 'pending') {
-            return ['message' => 'You can\'t delete this course in current pending status!', 'code' => 403];
-        }
-
+        $course->episodes()->delete();
         $course->delete();
 
-        return ['message' => 'Course deleted successfully', 'code' => 200];
+        return ['message' => __('msg.course_deleted'), 'code' => 200];
     }
 
-    public function publishCourse($id): array
+    public function submitCourse($id): array
     {
-        $course = Course::query()->where([
-            'teacher_id' => auth('api')->id(),
-            'id' => $id
-        ])->first();
-        if (is_null($course)) {
-            return ['message' => 'Course not found!', 'code' => 404];
-        }
+        $course = Course::query()->find($id);
 
         if ($course->num_of_episodes == 0) {
-            return ['message' => 'Please add at least one episode before submitting the course for review', 'code' => 422];
+            return ['message' => __('msg.add_one_episode'), 'code' => 422];
         }
 
-        if ($course->status == 'pending') {
-            return ['message' => 'Course already submitted for review!', 'code' => 422];
-        } else if ($course->status == 'approved') {
-            return ['message' => 'Course already published!', 'code' => 422];
-        } else if ($course->status === 'rejected') {
-            return ['message' => 'This course was rejected and cannot be resubmitted without modifications.', 'code' => 409];
+        if ($course->status === CourseStatusEnum::PENDING) {
+            return ['message' => __('msg.course_already_submitted'), 'code' => 422];
+        } else if ($course->status === CourseStatusEnum::APPROVED) {
+            return ['message' => __('msg.course_already_published'), 'code' => 422];
+        } else if ($course->status === CourseStatusEnum::REJECTED) {
+            return ['message' => __('msg.course_rejected'), 'code' => 409];
         }
 
         $course->update([
@@ -372,41 +335,38 @@ class CourseService
             'publishing_request_date' => now()
         ]);
 
-        return ['message' => 'Course submitted successfully', 'code' => 200];
+        return ['message' => __('msg.course_submitted'), 'code' => 200];
     }
 
     public function evaluation($request, $id): array
     {
+        $user = auth('api')->user();
         $course = Course::query()->where('status', CourseStatusEnum::APPROVED)->find($id);
 
-        $student_id = auth('api')->id();
-        if ($course->students()->where('student_id', $student_id)->whereNot('rate', 0)->exists()) {
-            return ['message' => 'You have already evaluated this course!', 'code' => 422];
-        }
-
-//        $course->students()->updateExistingPivot($student_id, ['rate' => $request['rate']]);
+        //        $course->students()->updateExistingPivot($student_id, ['rate' => $request['rate']]);
         $course->students()->sync(
             [
-                auth('api')->id() => ['rate' => $request['rate']]
-            ], false);
+                $user->id => ['rate' => $request['rate']]
+            ],
+            false
+        );
         $course->rate = round($course->students()->pluck('rate')->avg(), 2);
         $course->save();
 
-        return ['data' => new CourseWithDetailsForStudentResource($course), 'message' => 'Course evaluated successfully', 'code' => 200];
+        return ['data' => new CourseWithDetailsForStudentResource($course), 'message' => __('msg.course_evaluated'), 'code' => 200];
     }
 
     public function getCoursesForTopicForTeacherWithArrangement($topic_id): array
     {
         $topic = Topic::query()->find($topic_id);
-        if(is_null($topic)) {
-            return ['message' => 'Topic not found!', 'code' => 404];
+        if (is_null($topic)) {
+            return ['message' => __('msg.topic_not_found'), 'code' => 404];
         }
 
         $courses = $topic->courses()->where('status', CourseStatusEnum::APPROVED)
-                                    ->orderBy('num_of_students_enrolled', 'desc')
-                                    ->get();
-        return ['data' => CourseWithArrangementForTeacherResource::collection($courses), 'message' => 'Course retrieved successfully', 'code' => 200];
-
+            ->orderBy('num_of_students_enrolled', 'desc')
+            ->get();
+        return ['data' => CourseWithArrangementForTeacherResource::collection($courses), 'message' => __('msg.courses_retrieved'), 'code' => 200];
     }
 
     public function getFollowedCoursesForStudent(): array

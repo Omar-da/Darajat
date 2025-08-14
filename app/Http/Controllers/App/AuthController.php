@@ -28,7 +28,7 @@ class AuthController extends Controller
              }
              return Response::success($data['user'], $data['message'], $data['code']);
          } catch (Throwable $th) {
-             $message  = $th->getMessage();
+             $message = $th->getMessage();
              return Response::error($message);
          }
      }

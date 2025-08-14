@@ -17,7 +17,7 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         $languages = [];
-        if($this->moreDetail) {
+        if ($this->moreDetail) {
             foreach ($this->moreDetail->languages as $language) {
                 $languages[] = [
                     'id' => $language->id,
@@ -28,7 +28,7 @@ class UserResource extends JsonResource
         }
 
         $skills = [];
-        if($this->moreDetail) {
+        if ($this->moreDetail) {
             foreach ($this->moreDetail->skills as $skill) {
                 $skills[] = [
                     'id' => $skill->id,
@@ -37,10 +37,11 @@ class UserResource extends JsonResource
             }
         }
 
+
         return [
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
-            'profile_image_url' => $this->profile_image_url ? Storage::url("profiles/{$this->profile_image_url}") : null,
+            'profile_image_url' => $this->profile_image_url ? Storage::url($this->profile_image_url) : null,
             'email' => $this->email,
             'otp_code' => $this->otp_code,
             'role' => $this->role->label(),
@@ -48,11 +49,11 @@ class UserResource extends JsonResource
             'languages' => $languages,
             'job_title' => $this->moreDetail ? ($this->moreDetail->jobTitle['title'] ?? null) : null,
             'linked_in_url' => $this->moreDetail ? $this->moreDetail->linked_in_url : null,
-            'education' =>  $this->moreDetail ? $this->moreDetail->education->label() : null,
-            'university' =>  $this->moreDetail ? $this->moreDetail->university: null,
-            'speciality' =>  $this->moreDetail ? $this->moreDetail->speciality: null,
-            'work_experience' =>  $this->moreDetail ? $this->moreDetail->work_experience : null,
-            'skills' =>  $skills,
+            'education' => $this->moreDetail ? $this->moreDetail->education->label() : null,
+            'university' => $this->moreDetail ? $this->moreDetail->university : null,
+            'speciality' => $this->moreDetail ? $this->moreDetail->speciality : null,
+            'work_experience' => $this->moreDetail ? $this->moreDetail->work_experience : null,
+            'skills' => $skills,
         ];
     }
 }

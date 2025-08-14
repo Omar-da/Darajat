@@ -11,7 +11,7 @@
                     Your browser does not support the video tag.
                 </video>
             </div>
-            
+
             <div class="video-actions-container">
                 <div class="video-stats-container">
                     @if($episode->course->status === CourseStatusEnum::APPROVED) 
@@ -24,14 +24,14 @@
                     @if($episode->quiz)
                         <a href="{{route('courses.quiz', ['episode' => $episode->id])}}" class="video-quiz-btn">
                             <i class="fas fa-question-circle"></i> Show Quiz
-                        </a>   
+                        </a>
                     @endif
                 </div>
             </div>
-            
+
             <h1 class="video-title">{{$episode->title}}</h1>
         </div>
-        
+
         <!-- Comments Section -->
         <div class="video-comments-section">
             <h2>Comments <span class="video-comment-count">({{count($episode->comments)}})</span></h2>
@@ -54,7 +54,7 @@
                                         @php
                                             $commentTimestamp = strtotime($comment->comment_date);
                                             $ago = time() - $commentTimestamp;
-    
+
                                             // Time intervals in seconds
                                             $minute = 60;
                                             $hour = 60 * $minute;
@@ -62,7 +62,7 @@
                                             $week = 7 * $day;
                                             $month = 30 * $day; // Approximate (30 days)
                                             $year = 365 * $day; // Approximate (365 days)
-    
+
                                             if ($ago < $minute) {
                                                 $comment_ago = ($ago < 10) ? "Just now" : $ago . " seconds ago";
                                             } elseif ($ago < $hour) {
@@ -88,9 +88,9 @@
                                         <span class="video-comment-date">{{$comment_ago}}</span>
                                     </div>
                                 </div>
-                                
+
                                 <p class="video-comment-text">{{$comment->content}}</p>
-                                
+
                                 <!-- Replies Section with toggle -->
                                 @if(count($comment->replies) > 0)
                                     <details class="video-replies-details">
@@ -116,7 +116,7 @@
                                                                 @php
                                                                     $replyTimestamp = strtotime($reply->reply_date);
                                                                     $ago = time() - $replyTimestamp;
-    
+
                                                                     // Time intervals in seconds
                                                                     $minute = 60;
                                                                     $hour = 60 * $minute;
@@ -124,7 +124,7 @@
                                                                     $week = 7 * $day;
                                                                     $month = 30 * $day; // Approximate (30 days)
                                                                     $year = 365 * $day; // Approximate (365 days)
-    
+
                                                                     if ($ago < $minute) {
                                                                         $reply_ago = ($ago < 10) ? "Just now" : $ago . " seconds ago";
                                                                     } elseif ($ago < $hour) {
@@ -160,7 +160,7 @@
                             </div>
                         @endforeach
                     </div>
-                @else 
+                @else
                     <div class="episode-comments-unavailable">
                         <div class="episode-comments-unavailable-icon">
                             <i class="fas fa-comment-slash"></i>

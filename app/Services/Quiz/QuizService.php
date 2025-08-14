@@ -2,8 +2,8 @@
 
 namespace App\Services\Quiz;
 
-use App\Http\Resources\Quiz\QuizTeacherResource;
 use App\Http\Resources\Quiz\ResultResource;
+use App\Http\Resources\Quiz\TeacherQuizResource;
 use App\Models\Episode;
 use App\Models\Question;
 use App\Models\Quiz;
@@ -35,7 +35,7 @@ class QuizService
         $quiz->questions()->createMany($request['questions']);
         $quiz->episode->course->increment('total_quizzes');
 
-        return ['data' => new QuizTeacherResource($quiz), 'message' => __('msg.quiz_created'), 'code' => 201];
+        return ['data' => new TeacherQuizResource($quiz), 'message' => __('msg.quiz_created'), 'code' => 201];
     }
 
     public function processAnswer($request): array
@@ -138,7 +138,7 @@ class QuizService
         ]);
         $quiz->questions()->createMany($request['questions']);
 
-        return ['data' => new QuizTeacherResource($quiz), 'message' => __('msg.quiz_updated'), 'code' => 201];
+        return ['data' => new TeacherQuizResource($quiz), 'message' => __('msg.quiz_updated'), 'code' => 201];
     }
 
     public function destroy($id): array
