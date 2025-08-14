@@ -4,6 +4,7 @@ namespace App\Services\User;
 
 use App\Http\Resources\User\UserResource;
 use App\Mail\SendOTP;
+use App\Mail\WelcomeUser;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 
@@ -51,6 +52,7 @@ class OTPService
         $user->otp_locked_until = null;
         $user->markEmailAsVerified();
         $user->save();
+        Mail::to($user)->send(new WelcomeUser($user));
         $token['token'] = $user->createToken('Personal Access Token')->accessToken;
         return ['token' => $token, 'message' => __('msg.email_verified'), 'code' => 200];
     }

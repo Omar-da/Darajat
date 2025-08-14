@@ -18,8 +18,8 @@ class MoreDetail extends Model
         'country_id',
         'linked_in_url',
         'education',
-        'university',
-        'speciality',
+        'university_id',
+        'speciality_id',
         'work_experience',
         'is_banned',
     ];
@@ -30,38 +30,8 @@ class MoreDetail extends Model
     {
         return [
             'education' => EducationEnum::class,
-            'university' => 'array',
-            'speciality' => 'array',
             'work_experience' => 'array',
         ];
-    }
-
-    public function setUniversityAttribute($value): void
-    {
-        $lang = $this->detectLanguage($value);
-        $translatedContent = $this->translateContent($value, $lang);
-        $this->attributes['university'] = json_encode($translatedContent, JSON_UNESCAPED_UNICODE);
-    }
-
-    public function getUniversityAttribute($value)
-    {
-        $university = json_decode($value, true);
-        $lang = app()->getLocale();
-        return $university[$lang] ?? $university['en'] ?? null;
-    }
-
-    public function setSpecialityAttribute($value): void
-    {
-        $lang = $this->detectLanguage($value);
-        $translatedContent = $this->translateContent($value, $lang);
-        $this->attributes['speciality'] = json_encode($translatedContent, JSON_UNESCAPED_UNICODE);
-    }
-
-    public function getSpecialityAttribute($value)
-    {
-        $speciality = json_decode($value, true);
-        $lang = app()->getLocale();
-        return $speciality[$lang] ?? $speciality['en'] ?? null;
     }
 
     public function setWorkExperienceAttribute($value): void

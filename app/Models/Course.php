@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CourseStatusEnum;
 use App\Enums\LevelEnum;
 use App\Enums\RoleEnum;
 use App\Traits\TranslationTrait;
@@ -33,7 +34,7 @@ class Course extends Model
         'num_of_episodes',
         'num_of_students_enrolled',
         'publishing_request_date',
-        'publishing_date',
+        'response_date',
         'status',
         'has_certificate',
     ];
@@ -42,6 +43,7 @@ class Course extends Model
     {
         return [
             'difficulty_level' => LevelEnum::class,
+            'status' => CourseStatusEnum::class,
             'title' => 'array',
             'description' => 'array',
             'has_certificate' => 'array',

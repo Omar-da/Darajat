@@ -24,7 +24,7 @@ class CourseForTeacherResource extends JsonResource
             'rate' => $this->rate,
             'language' => $this->language->name,
             'num_of_students_enrolled' => $this->num_of_students_enrolled,
-            'publishing_date' => $this->publishing_date,
+            'response_date' => $this->response_date,
             'publishing_request_date' => $this->publishing_request_date,
             'created_at' => $this->created_at
         ];

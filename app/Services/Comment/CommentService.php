@@ -13,7 +13,7 @@ class CommentService
     {
         $episode = Episode::query()->find($episode_id);
         if(is_null($episode)) {
-            return ['message' => 'Episode not found!', 'code' => 404];
+            return ['message' => __('msg.episode_not_found'), 'code' => 404];
         }
         $comments = $episode->comments()->latest('comment_date')->paginate(15);
         return [
@@ -23,7 +23,7 @@ class CommentService
                 'has_more_pages' => $comments->hasMorePages(),
                 'next_page' => $comments->hasMorePages() ? $comments->currentPage() + 1 : null,
             ],
-            'message' => 'Comments retrieved successfully',
+            'message' => __('msg.comments_retrieved'),
             'code' => 200
         ];
     }
@@ -33,7 +33,7 @@ class CommentService
     {
         $episode = Episode::query()->find($episode_id);
         if(is_null($episode)) {
-            return ['message' => 'Episode not found!', 'code' => 404];
+            return ['message' => __('msg.episode_not_found'), 'code' => 404];
         }
         $comments = $episode->comments()->latest('comment_date')->paginate(15, '*', 'page', $request['page']);
         return [
@@ -43,7 +43,7 @@ class CommentService
                 'has_more_pages' => $comments->hasMorePages(),
                 'next_page' => $comments->hasMorePages() ? $comments->currentPage() + 1 : null,
             ],
-            'message' => 'Comments retrieved successfully',
+            'message' => __('msg.comments_retrieved'),
             'code' => 200
         ];
     }
@@ -52,28 +52,28 @@ class CommentService
     public function getMyComments($episode_id): array
     {
         if(is_null(Episode::query()->find($episode_id))) {
-            return ['message' => 'Episode not found!', 'code' => 404];
+            return ['message' => __('msg.episode_not_found'), 'code' => 404];
         }
         $comments = Comment::query()
             ->where([
                 'episode_id' => $episode_id,
                 'user_id' => auth('api')->id()
             ])->latest('comment_date')->get();
-        return ['data' => CommentResource::collection($comments), 'message' => 'Comments retrieved successfully', 'code' => 200];
+        return ['data' => CommentResource::collection($comments), 'message' => __('msg.comments_retrieved'), 'code' => 200];
     }
 
     // Add comment for specific episode.
     public function store($request, $episode_id): array
     {
         if(is_null(Episode::query()->find($episode_id))) {
-            return ['message' => 'Episode not found!', 'code' => 404];
+            return ['message' => __('msg.episode_not_found'), 'code' => 404];
         }
         $comment = Comment::query()->create([
             'episode_id' => $episode_id,
             'user_id' => auth('api')->id(),
             'content' => $request['content']
         ]);
-        return ['data' => new CommentResource($comment), 'message' => 'Comment created successfully', 'code' => 201];
+        return ['data' => new CommentResource($comment), 'message' => __('msg.comment_created'), 'code' => 201];
     }
 
     // Update specific comment.
@@ -86,29 +86,29 @@ class CommentService
             ])->first();
         if(is_null($comment)) {
             if(!Comment::query()->find($id)) {
-                return ['message' => 'Comment not found!', 'code' => 404];
+                return ['message' => __('msg.comment_not_found'), 'code' => 404];
             } else {
-                return ['message' => 'Unauthorized!', 'code' => 401];
+                return ['message' => __('msg.unauthorized'), 'code' => 401];
             }
         }
 
         $comment->update([
             'content' => $request['content']
         ]);
-        return ['data' => new CommentResource($comment), 'message' => 'Comment updated successfully', 'code' => 200];
+        return ['data' => new CommentResource($comment), 'message' => __('msg.comment_updated'), 'code' => 200];
     }
 
     public function destroyForTeacher($id): array
     {
         $comment = Comment::query()->find($id);
         if(is_null($comment)) {
-                return ['message' => 'Comment not found!', 'code' => 404];
+            return ['message' => __('msg.comment_not_found'), 'code' => 404];
         }
         if(!$comment->episode->course->where('teacher_id', auth('api')->id())->exists()) {
-            return ['message' => 'Unauthorized!', 'code' => 401];
+            return ['message' => __('msg.unauthorized'), 'code' => 401];
         }
         $comment->delete();
-        return ['message' => 'Comment deleted successfully', 'code' => 200];
+        return ['message' => __('msg.comment_deleted'), 'code' => 200];
     }
 
     // Delete specific comment.
@@ -121,13 +121,13 @@ class CommentService
             ])->first();
         if(is_null($comment)) {
             if(!Comment::query()->find($id)) {
-                return ['message' => 'Comment not found!', 'code' => 404];
+                return ['message' => __('msg.comment_not_found'), 'code' => 404];
             } else {
-                return ['message' => 'Unauthorized!', 'code' => 401];
+                return ['message' => __('msg.unauthorized'), 'code' => 401];
             }
         }
         $comment->delete();
-        return ['message' => 'Comment deleted successfully', 'code' => 200];
+        return ['message' => __('msg.comment_deleted'), 'code' => 200];
     }
 
     // Add Like to specific comment.
@@ -135,15 +135,15 @@ class CommentService
     {
         $comment = Comment::query()->find($id);
         if(is_null($comment)) {
-            return ['message' => 'Comment not found!', 'code' => 404];
+            return ['message' => __('msg.comment_not_found'), 'code' => 404];
         }
         if($comment->userLikes()->where('user_id', auth('api')->id())->exists()) {
-            return ['message' => 'You\'ve already liked this comment!', 'code' => 401];
+            return ['message' => __('msg.already_liked_comment'), 'code' => 401];
         }
         $comment->userLikes()->attach(auth('api')->id());
         $comment->increment('likes');
 
-        return ['data' => new CommentResource($comment), 'message' => 'Comment liked successfully', 'code' => 200];
+        return ['data' => new CommentResource($comment), 'message' => __('msg.comment_liked'), 'code' => 200];
     }
 
     // Remove Like from specific comment.
@@ -151,14 +151,14 @@ class CommentService
     {
         $comment = Comment::query()->find($id);
         if(is_null($comment)) {
-            return ['message' => 'Comment not found!', 'code' => 404];
+            return ['message' => __('msg.comment_not_found'), 'code' => 404];
         }
         if(!$comment->userLikes()->where('user_id', auth('api')->id())->exists()) {
-            return ['message' => 'You don\'t have a like for this comment!', 'code' => 404];
+            return ['message' => __('msg.do_not_have_like_comment'), 'code' => 404];
         }
         $comment->userLikes()->detach(auth('api')->id());
         $comment->decrement('likes');
 
-        return ['data' => new CommentResource($comment), 'message' => 'Comment unliked successfully', 'code' => 200];
+        return ['data' => new CommentResource($comment), 'message' => __('msg.comment_unliked'), 'code' => 200];
     }
 }

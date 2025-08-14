@@ -53,7 +53,7 @@ class CheckOwnerCourse
         }
 
         if($course->teacher_id != auth('api')->id()) {
-            return Response::error('Unauthorized access!', 403);
+            return Response::error(__('msg.unauthorized'), 403);
         }
 
         return $next($request);

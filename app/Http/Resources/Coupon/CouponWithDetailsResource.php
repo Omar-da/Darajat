@@ -17,7 +17,7 @@ class CouponWithDetailsResource extends JsonResource
         return [
             'id' => $this->id,
             'code' => $this->code,
-            'discount_type' => $this->discount_type,
+            'discount_type' => $this->discount_type->label(),
             'discount_value' => $this->discount_value . '$',
             'expires_at' => $this->expires_at,
             'max_uses' => $this->max_uses,

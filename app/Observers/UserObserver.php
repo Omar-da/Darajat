@@ -17,7 +17,6 @@ class UserObserver
     {
         foreach(Statistic::all() as $statistic)
             $user->statistics()->attach($statistic, ['progress' => 0]);
-        Mail::to($user)->send(new WelcomeUser($user));
     }
 
     /**

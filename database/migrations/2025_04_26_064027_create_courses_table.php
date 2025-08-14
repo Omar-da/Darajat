@@ -32,7 +32,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('num_of_episodes')->default(0);
             $table->unsignedInteger('num_of_students_enrolled')->default(0);
             $table->timestamp('publishing_request_date')->nullable();
-            $table->datetime('publishing_date')->nullable();
+            $table->datetime('response_date')->nullable();
             $table->enum('status', CourseStatusEnum::values())->default(CourseStatusEnum::DRAFT);
             $table->boolean('has_certificate')->default(false);
             $table->unsignedSmallInteger('total_quizzes')->default(0);
