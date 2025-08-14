@@ -31,7 +31,7 @@ return [
     'replies_retrieved' => 'Replies retrieved successfully',
     'reply_created' => 'Reply created successfully',
     'reply_not_found' => 'Reply not found!',
-    'unauthorized' => 'Unauthorized!',
+    'unauthorized' => 'Unauthorized access!',
     'reply_updated' => 'Reply updated successfully',
     'reply_deleted' => 'Reply deleted successfully',
     'already_liked_reply' => 'You\'ve already liked this reply!',
@@ -150,5 +150,12 @@ return [
     'badges' => 'Badges retrieved successfully',
     'statistics' => 'Statistics retrieved successfully',
     'duplicate_questions' => 'Duplicate questions found: ',
-    'question_does_not_exist' => 'The selected question does not exist in this quiz!'
+    'question_does_not_exist' => 'The selected question does not exist in this quiz!',
+    'file_not_found' => "This episode doesn't have a file!",
+    'discount_value_percentage' => 'The discount value must be less than or equal 100 when using percentage!',
+    'discount_value_fixed' => 'The discount value must be less than or equal the course price when using fixed amount!',
+    'is_not_correct' => 'The code is not correct!',
+    'universities_retrieved' => 'Universities retrieved successfully',
+    'specialities_retrieved' => 'Specialities retrieved successfully',
+    'badges_retrieved' => 'Badges retrieved successfully',
 ];

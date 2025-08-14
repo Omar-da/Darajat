@@ -14,7 +14,7 @@
                         </a>
                     </div>
                     <p class="course-description">{{ $course->description }}</p>
-                    
+
                     <div class="course-meta-grid">
                         <div class="course-meta-item">
                             <span class="meta-label">Topic:</span>
@@ -77,7 +77,7 @@
                     </div>
                     <span class="progress-percentage">{{ $course->pivot->perc_progress }}% Complete</span>
                 </div>
-                
+
                 <div class="progress-details">
                     <div class="progress-stat">
                         <span class="stat-value">{{ $course->pivot->progress }}</span>
@@ -119,7 +119,7 @@
         <!-- Quizzes Section -->
         <section class="quizzes-section">
             <h2 class="section-title">Quizzes</h2>
-            
+
             @if(count($quizzes) > 0)
                 <div class="quizzes-list">
                     @foreach($quizzes as $quiz)

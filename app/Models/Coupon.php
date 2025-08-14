@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\DiscountTypeEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Coupon extends Model
 {
@@ -21,6 +21,9 @@ class Coupon extends Model
         'use_count',
     ];
 
+    protected $casts = [
+        'discount_type' => DiscountTypeEnum::class,
+    ];
 
     public function course(): BelongsTo
     {

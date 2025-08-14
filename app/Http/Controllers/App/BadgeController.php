@@ -19,6 +19,6 @@ class BadgeController extends Controller
             'bronze' => BadgeResource::collection($bronzeBadges),
             'silver' => BadgeResource::collection($silverBadges),
             'gold' => BadgeResource::collection($goldBadges)],
-            'Badges retrieved successfully');
+            __('msg.badges_retrieved'));
     }
 }

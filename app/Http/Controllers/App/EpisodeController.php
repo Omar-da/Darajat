@@ -11,6 +11,7 @@ use App\Services\Episode\EpisodeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
 class EpisodeController extends Controller
@@ -27,9 +28,6 @@ class EpisodeController extends Controller
         $data = [];
         try {
             $data = $this->episodeService->getToTeacher($course_id);
-            if ($data['code'] == 404) {
-                return Response::error($data['message'], $data['code']);
-            }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
@@ -42,9 +40,6 @@ class EpisodeController extends Controller
         $data = [];
         try {
             $data = $this->episodeService->getToStudent($course_id);
-            if ($data['code'] == 404 || $data['code'] == 403) {
-                return Response::error($data['message'], $data['code']);
-            }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
@@ -72,7 +67,7 @@ class EpisodeController extends Controller
         $data = [];
         try {
             $data = $this->episodeService->update($request->validated(), $id);
-            if ($data['code'] == 403 || $data['code'] == 404) {
+            if ($data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -87,9 +82,6 @@ class EpisodeController extends Controller
         $data = [];
         try {
             $data = $this->episodeService->showToTeacher($id);
-            if ($data['code'] == 404) {
-                return Response::error($data['message'], $data['code']);
-            }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
@@ -102,9 +94,6 @@ class EpisodeController extends Controller
         $data = [];
         try {
             $data = $this->episodeService->showToStudent($id);
-            if ($data['code'] == 403 || $data['code'] == 404) {
-                return Response::error($data['message'], $data['code']);
-            }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
@@ -117,7 +106,7 @@ class EpisodeController extends Controller
         $data = [];
         try {
             $data = $this->episodeService->destroy($id);
-            if ($data['code'] == 403 || $data['code'] == 404) {
+            if ($data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success([], $data['message'], $data['code']);
@@ -133,7 +122,7 @@ class EpisodeController extends Controller
         $data = [];
         try {
             $data = $this->episodeService->addLikeToEpisode($id);
-            if ($data['code'] == 404 || $data['code'] == 409 || $data['code'] == 403) {
+            if ($data['code'] == 409 || $data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -159,11 +148,11 @@ class EpisodeController extends Controller
         }
     }
 
-    public function finish_episode($id): JsonResponse
+    public function finishEpisode($id): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->episodeService->finish_episode($id);
+            $data = $this->episodeService->finishEpisode($id);
             if ($data['code'] == 409) {
                 return Response::error($data['message'], $data['code']);
             }
@@ -174,12 +163,12 @@ class EpisodeController extends Controller
         }
     }
 
-    public function downloadFile($id): BinaryFileResponse|JsonResponse
+    public function downloadFile($id): BinaryFileResponse|JsonResponse|StreamedResponse
     {
         $data = [];
         try {
             $data = $this->episodeService->downloadFile($id);
-            if($data instanceof BinaryFileResponse) {
+            if($data instanceof StreamedResponse) {
                 return $data;
             }
 

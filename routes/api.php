@@ -17,13 +17,15 @@ use App\Http\Controllers\App\QuizController;
 use App\Http\Controllers\App\ReplyController;
 use App\Http\Controllers\App\ResetPasswordController;
 use App\Http\Controllers\App\SkillController;
+use App\Http\Controllers\App\SpecialityController;
 use App\Http\Controllers\App\StatisticController;
 use App\Http\Controllers\App\TopicController;
+use App\Http\Controllers\App\UniversityController;
 use App\Http\Controllers\App\UserController;
 use Illuminate\Support\Facades\Route;
 
 // auth
-Route::controller(AuthController::class)->middleware('set_language')->prefix('users')->group(function () {
+Route::controller(AuthController::class)->middleware('localization')->prefix('users')->group(function () {
     Route::post('register', 'register');
     Route::post('login', 'login');
     Route::middleware('auth:api')->group(function () {
@@ -32,7 +34,7 @@ Route::controller(AuthController::class)->middleware('set_language')->prefix('us
 });
 
 // profile
-Route::controller(UserController::class)->middleware('set_language')->prefix('users')->group(function () {
+Route::controller(UserController::class)->middleware('localization')->prefix('users')->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::post('update-profile', 'updateProfile');
         Route::post('update-profile-image', 'updateProfileImage');
@@ -47,22 +49,22 @@ Route::controller(UserController::class)->middleware('set_language')->prefix('us
 
 
 // reset password
-Route::controller(ResetPasswordController::class)->middleware('set_language')->prefix('users/password')->group(function () {
+Route::controller(ResetPasswordController::class)->middleware('localization')->prefix('users/password')->group(function () {
     Route::post('email', 'forgotPassword');
     Route::post('code-check', 'checkCode');
     Route::post('reset', 'resetPassword');
 });
 
 // otp
-Route::controller(OTPController::class)->middleware('set_language')->prefix('users/otp')->group(function () {
+Route::controller(OTPController::class)->middleware('localization')->prefix('users/otp')->group(function () {
     Route::post('resend', 'resendOtp')->middleware('throttle:resend-otp');
     Route::post('verify', 'verifyOtp');
 });
 
 // quizzes
-Route::controller(QuizController::class)->middleware(['auth:api', 'set_language'])->prefix('quizzes')->group(function () {
+Route::controller(QuizController::class)->middleware(['auth:api', 'localization'])->prefix('quizzes')->group(function () {
     Route::middleware('is_owner')->group(function () {
-        Route::post('{episode_id}', 'store');
+        Route::post('create/{episode_id}', 'store');
         Route::put('{quiz_id}', 'update');
         Route::delete('{quiz_id}', 'destroy');
     });
@@ -71,19 +73,19 @@ Route::controller(QuizController::class)->middleware(['auth:api', 'set_language'
 });
 
 // categories
-Route::controller(CategoryController::class)->middleware('set_language')->prefix('categories')->group(function () {
+Route::controller(CategoryController::class)->middleware('localization')->prefix('categories')->group(function () {
     Route::get('', 'index');
     Route::get('search/{title}', 'search');
 });
 
 // topics
-Route::controller(TopicController::class)->middleware('set_language')->prefix('topics')->group(function () {
+Route::controller(TopicController::class)->middleware('localization')->prefix('topics')->group(function () {
     Route::get('{category_id}', 'index');
     Route::get('search/{title}', 'search');
 });
 
 // courses
-Route::controller(CourseController::class)->middleware('set_language')->prefix('courses')->group(function () {
+Route::controller(CourseController::class)->middleware('localization')->prefix('courses')->group(function () {
     Route::get('', 'index');
     Route::post('load-more', 'loadMore');
     Route::get('category/{category_id}', 'getCoursesForCategory');
@@ -106,16 +108,16 @@ Route::controller(CourseController::class)->middleware('set_language')->prefix('
             Route::patch('update-approved/{course_id}', 'updateApprovedCourse');
             Route::delete('{course_id}', 'destroy');
             Route::get('teacher/{course_id}', 'showToTeacher');
-            Route::post('publish/{course_id}', 'publishCourse');
+            Route::post('submit/{course_id}', 'submitCourse');
         });
-        Route::get('with-arrangement/{topic_id}', 'getCoursesForTopicForTeacherWithArrangement');
-        Route::post('evaluation/{course_id}', 'evaluation')->middleware('isSubscribed');
+        Route::get('with-arrangement/{topic_id}', 'getCoursesForTopicForTeacherWithArrangement')->middleware('is_teacher');;
+        Route::patch('evaluation/{course_id}', 'evaluation')->middleware('is_subscribed');
         Route::get('followed', 'getFollowedCoursesForStudent');
     });
 });
 
 // coupons
-Route::controller(CouponController::class)->middleware(['auth:api', 'set_language'])->prefix('coupons')->group(function () {
+Route::controller(CouponController::class)->middleware(['auth:api', 'localization'])->prefix('coupons')->group(function () {
     Route::middleware('is_owner')->group(function () {
         Route::get('{course_id}', 'index');
         Route::post('{course_id}', 'store');
@@ -128,14 +130,14 @@ Route::controller(CouponController::class)->middleware(['auth:api', 'set_languag
 
 
 // episodes
-Route::controller(EpisodeController::class)->middleware(['auth:api', 'set_language'])->prefix('episodes')->group(function () {
+Route::controller(EpisodeController::class)->middleware(['auth:api', 'localization'])->prefix('episodes')->group(function () {
     Route::middleware('episode_protection')->group(function () {
+        Route::get('show/student/{episode_id}', 'showToStudent');
         Route::post('add-like/{episode_id}', 'addLikeToEpisode');
         Route::delete('remove-like/{episode_id}', 'removeLikeFromEpisode');
-        Route::post('finish/{episode_id}', 'finish_episode');
+        Route::post('finish/{episode_id}', 'finishEpisode');
         Route::get('get_video/{episode_id}', 'get_video')->name('get_video');
         Route::get('get_poster/{episode_id}', 'get_poster')->name('get_poster');
-        Route::get('show/student/{episode_id}', 'showToStudent');
         Route::get('download-file/{episode_id}', 'downloadFile');
     });
     Route::middleware('is_owner')->group(function () {
@@ -143,13 +145,13 @@ Route::controller(EpisodeController::class)->middleware(['auth:api', 'set_langua
         Route::post('{course_id}', 'store');
         Route::put('update/{episode_id}', 'update');
         Route::get('show/teacher/{episode_id}', 'showToTeacher');
-        Route::delete('{id}', 'destroy');
+        Route::delete('{episode_id}', 'destroy');
     });
-    Route::get('student/{course_id}', 'getToStudent');
+    Route::get('student/{course_id}', 'getToStudent')->middleware('is_subscribed');
 });
 
 // comments
-Route::controller(CommentController::class)->middleware(['auth:api', 'set_language'])->prefix('comments')->group(function () {
+Route::controller(CommentController::class)->middleware(['auth:api', 'localization'])->prefix('comments')->group(function () {
     Route::middleware('episode_protection')->group(function () {
         Route::get('{episode_id}', 'index');
         Route::post('load-more/{episode_id}', 'loadMore');
@@ -164,7 +166,7 @@ Route::controller(CommentController::class)->middleware(['auth:api', 'set_langua
 });
 
 // replies
-Route::controller(ReplyController::class)->middleware(['auth:api', 'set_language'])->prefix('replies')->group(function () {
+Route::controller(ReplyController::class)->middleware(['auth:api', 'localization'])->prefix('replies')->group(function () {
     Route::get('{comment_id}', 'index');
     Route::post('{comment_id}', 'store');
     Route::put('{id}', 'update');
@@ -174,22 +176,29 @@ Route::controller(ReplyController::class)->middleware(['auth:api', 'set_language
     Route::delete('remove-like/{id}', 'removeLikeFromReply');
 });
 
+
 // badges
-Route::get('badges/get-my-badges', [BadgeController::class, 'index'])->middleware(['set_language', 'auth:api']);
+Route::get('specialities', [SpecialityController::class, 'index'])->middleware(['localization', 'auth:api']);
+
+// universities
+Route::get('universities', [UniversityController::class, 'index'])->middleware(['localization', 'auth:api']);
+
+// badges
+Route::get('badges/get-my-badges', [BadgeController::class, 'index'])->middleware(['localization', 'auth:api']);
 
 // statistics
-Route::get('statistics/get-my-statistics', [StatisticController::class, 'index'])->middleware(['set_language', 'auth:api']);
+Route::get('statistics/get-my-statistics', [StatisticController::class, 'index'])->middleware(['localization', 'auth:api']);
 
 // constant values
-Route::get('countries', [CountryController::class, 'index'])->middleware('set_language');
+Route::get('countries', [CountryController::class, 'index'])->middleware('localization');
 
-Route::get('languages', [LanguageController::class, 'index'])->middleware('set_language');
+Route::get('languages', [LanguageController::class, 'index'])->middleware('localization');
 
-Route::get('skills', [SkillController::class, 'index'])->middleware('set_language');
+Route::get('skills', [SkillController::class, 'index'])->middleware('localization');
 
-Route::get('job_titles', [JobTitleController::class, 'index'])->middleware('set_language');
+Route::get('job_titles', [JobTitleController::class, 'index'])->middleware('localization');
 
-Route::controller(EnumController::class)->middleware('set_language')->group(function () {
+Route::controller(EnumController::class)->middleware('localization')->group(function () {
     Route::get('levels', 'levels');
     Route::get('educations', 'educations');
 });

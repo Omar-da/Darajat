@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignIdFor(Course::class)->constrained()->cascadeOnDelete();
             $table->unique(['course_id', 'student_id']);
             $table->unsignedSmallInteger('progress')->default(0);
-            $table->double('perc_progress')->default(0);
+            $table->decimal('perc_progress', 10, 2)->default(0);
             $table->unsignedSmallInteger('num_of_completed_quizzes')->default(0);
             $table->timestamp('purchase_date')->useCurrent();
             $table->tinyInteger('rate')->nullable();

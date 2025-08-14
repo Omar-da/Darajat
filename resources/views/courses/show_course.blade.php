@@ -7,7 +7,7 @@
             <div class="student-badge-container">
                 <img class="course-details-image" src="{{ Storage::url('courses/' . $course->image_url) }}" alt="{{ $course->title }}">
             </div>
-            
+
             <div class="course-details-info">
                 <div class="course-details-title-container">
                     <h1 class="course-details-title">{{ $course->title }}</h1>
@@ -23,7 +23,7 @@
                         @endif
                     </div>
                 </div>
-                
+
                 <div class="course-details-meta">
                     <div class="course-meta-item">
                         <span class="course-meta-label">Teacher:</span>

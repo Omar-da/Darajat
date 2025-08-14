@@ -19,10 +19,7 @@ class Episode extends Model
         'course_id',
         'title',
         'episode_number',
-        'video_url',
         'duration',
-        'image_url',
-        'file_url',
         'views',
         'likes'
     ];
