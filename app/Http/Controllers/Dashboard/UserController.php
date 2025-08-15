@@ -67,10 +67,9 @@ class UserController extends Controller
             ->with('episode:id,title,course_id')
             ->get();
 
-        $total_quizzes = $course->episodes()->whereHas('quiz')->count();
         $rating = $course->pivot->rate ?? 0;
 
-        return view('users.followed_course', compact(['course', 'quizzes', 'total_quizzes', 'rating']));
+        return view('users.followed_course', compact(['course', 'quizzes', 'rating']));
     }
 
     public function show_teacher($teacher_id)

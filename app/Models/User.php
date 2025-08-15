@@ -60,6 +60,11 @@ class User extends Authenticatable
         $this->attributes['last_name'] = ucfirst(strtolower($value));
     }
 
+    public function getFullNameAttribute(): string
+    {
+        return trim("{$this->first_name} {$this->last_name}");
+    }
+
     public function moreDetail(): HasOne
     {
         return $this->hasOne(MoreDetail::class);
@@ -72,7 +77,7 @@ class User extends Authenticatable
 
     public function adminCourses(): HasMany
     {
-        return $this->hasMany(Episode::class);
+        return $this->hasMany(Course::class);
     }
 
     public function published_courses(): HasMany
@@ -82,7 +87,7 @@ class User extends Authenticatable
 
     public function followed_courses(): BelongsToMany
     {
-        return $this->belongsToMany(Course::class, 'course_user', 'student_id')->withPivot(['perc_progress', 'progress', 'num_of_completed_quizzes', 'purchase_date','rate', 'episodes_completed', 'quizzes_completed', 'get_certificate']);
+        return $this->belongsToMany(Course::class, 'course_user', 'student_id')->withPivot(['perc_progress', 'progress', 'num_of_completed_quizzes', 'purchase_date','rate', 'is_episodes_completed', 'is_quizzes_completed', 'get_certificate']);
     }
 
     public function statistics(): BelongsToMany

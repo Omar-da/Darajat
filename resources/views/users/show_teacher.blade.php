@@ -5,7 +5,7 @@
         <header class="user-profile-header">
             <img src="{{$user->profile_image_url ? Storage::url("profiles/$user->profile_image_url") : asset('img/icons/anonymous_icon.png')}}" alt="User Avatar" class="user-profile-avatar">
             <div class="user-profile-userinfo">
-                <h1>{{$user->first_name}} {{$user->last_name}}</h1>
+                <h1>{{$user->full_name}}</h1>
                 <p class="user-profile-tagline">{{$user->moreDetail->jobTitle->title}} | {{$user->moreDetail->country->name}}</p>
                 
                 <div class="user-profile-stats">
@@ -140,36 +140,7 @@
             <section class="user-profile-section  user-profile-published_courses-section">
                 <h2 class="user-profile-section-title">Published Courses</h2>
                 @if(!$user->published_courses->isEmpty())
-                    <div class="courses-grid">
-                        @foreach ($user->published_courses as $course)
-                            <a href="{{route('courses.show_course', ['course' => $course->id])}}">
-                                <div class="course-card">
-                                    <div class="course-image">
-                                        <img src="{{Storage::url("courses/$course->image_url")}}" alt="Course Image">
-                                    </div>
-                                    <div class="course-details">
-                                        <h3 class="course-title">{{$course->title}}</h3>
-                                        <span class="course-teacher">By  <span class="teacher-name">{{$course->teacher->first_name}} {{$course->teacher->last_name}}</span></span>
-                                        <div class="course-meta">
-                                            <span class="meta-item"><i class="fas fa-clock"></i> {{$course->num_of_hours}}h</span>
-                                            <span class="meta-item"><i class="fas fa-video"></i> {{$course->num_of_episodes}} Episodes</span>
-                                            <span class="meta-item"><i class="fas fa-signal"></i> {{$course->difficulty_level}}</span>
-                                            <div class="course-date">
-                                                <i class="fas fa-calendar-alt"></i> Published at : <span class="date">{{Carbon::parse($course->publishing_date)->format('M d, Y')}}</span>
-                                            </div>    
-                                        </div>
-                                        <div class="price">
-                                            @if($course->price == 0)
-                                            <span><i class="fas fa-dollar-sign"></i> FREE</span>
-                                            @else
-                                            <span><i class="fas fa-dollar-sign"></i></i> {{$course->price}}</span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        @endforeach
-                    </div>
+                    <x-index :courses="$user->published_courses"></x-index>
                 @else
                     <div class="user-profile-empty">
                         <div class="user-profile-empty-icon">

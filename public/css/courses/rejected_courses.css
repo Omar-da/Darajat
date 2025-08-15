@@ -6,13 +6,6 @@
     padding: 0 1.5rem;
 }
 
-.episode-reject-page-title {
-    color: var(--error);
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-    text-align: center;
-}
-
 .episode-reject-list {
     display: flex;
     flex-direction: column;

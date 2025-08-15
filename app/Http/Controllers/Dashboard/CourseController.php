@@ -18,7 +18,7 @@ class CourseController extends Controller
             $q->withTrashed();
         }])->get();
 
-        return view('courses.active_courses',['cate' => $cate->title, 'topic' => $topic->title, 'courses' => $courses]);
+        return view('courses.active_courses',['cate' => $cate, 'topic' => $topic, 'courses' => $courses]);
     }
 
     public function show_course(Course $course)
@@ -37,15 +37,17 @@ class CourseController extends Controller
 
     public function show_episode($episode_id)
     {
-        $episode = Episode::withTrashed()->with(['comments' => function($q) {
+        $episode = Episode::with(['comments' => function($q) {
         $q->with(['replies' => function($q) {
             $q->with(['user' => function($q) {
                 $q->withTrashed(); // Only users with trashed
             }]);
         }, 'user' => function($q) {
-            $q->withTrashed(); // Only users with trashed
-        }]);
-    }])->find($episode_id);
+                $q->withTrashed(); // Only users with trashed
+            }]);
+        }, 'course' => function($q) {
+                $q->withTrashed();
+            }])->find($episode_id);
 
         return view('courses.video', compact('episode'));
     }

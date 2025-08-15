@@ -21,7 +21,7 @@
         <main>
             <!-- Platform Name -->
         <div class="brand">
-            <span class="gradient-text"><img src="{{asset('img/icons/Darajat.png')}}" alt="logo"></span>
+            <span class="gradient-text"><img src="{{asset('img/icons/DarajatTrans.png')}}" alt="logo"></span>
         </div>
             {{ $slot}}
         </main>
