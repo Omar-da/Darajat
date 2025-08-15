@@ -11,8 +11,6 @@ use Illuminate\Http\JsonResponse;
 use App\Models\Course;
 use App\Models\Payment;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
 use Throwable;
@@ -269,6 +267,34 @@ class CourseController extends Controller
             return Response::error($message);
         }
     }
+
+    public function restore($id): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->courseService->restore($id);
+            if($data['code'] == 403 || $data['code'] == 404) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success([], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
+    public function getDeletedCoursesToTeacher(): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->courseService->getDeletedCoursesToTeacher();
+            return Response::success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
 
     public function submitCourse($id): JsonResponse
     {

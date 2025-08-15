@@ -102,6 +102,7 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
         Route::get('pending', 'getPendingCoursesToTeacher');
         Route::get('approved', 'getApprovedCoursesToTeacher');
         Route::get('rejected', 'getRejectedCoursesToTeacher');
+        Route::get('deleted', 'getDeletedCoursesToTeacher');
         Route::post('', 'store')->middleware('is_teacher');
         Route::middleware('is_owner')->group(function () {
             Route::put('update-draft/{course_id}', 'updateDraftCourse');
@@ -110,6 +111,7 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
             Route::get('teacher/{course_id}', 'showToTeacher');
             Route::post('submit/{course_id}', 'submitCourse');
         });
+        Route::patch('restore/{course_id}', 'restore');
         Route::get('with-arrangement/{topic_id}', 'getCoursesForTopicForTeacherWithArrangement')->middleware('is_teacher');;
         Route::patch('evaluation/{course_id}', 'evaluation')->middleware('is_subscribed');
         Route::get('followed', 'getFollowedCoursesForStudent');
