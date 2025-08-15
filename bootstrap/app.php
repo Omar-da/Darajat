@@ -49,18 +49,15 @@ return Application::configure(basePath: dirname(__DIR__))
             }
             return Response::error([], $message, $code);
         });
-        $exceptions->renderable(function (AuthenticationException $e, $request) {
-            if($request->is('api/*')) {
-                $locale = $request->header('Accept-Language', config('app.locale'));
-                if ($locale == 'ar') {
-                    $message = '!يجب تسجيل الدخول أولاً';
-                } else {
-                    $message = 'Unauthenticated!';
-                }
-                return Response::error($message, 401);
-            }
-            return null;
-        });
+        // $exceptions->renderable(function (AuthenticationException $e, $request) {
+        //     $locale = $request->header('Accept-Language', config('app.locale'));
+        //     if ($locale == 'ar') {
+        //         $message =  '!يجب تسجيل الدخول أولاً';
+        //     } else {
+        //         $message = 'Unauthenticated!';
+        //     }
+        //     return Response::error($message, 401);
+        // });
     })->withSchedule(function (Schedule $schedule) {
         $schedule->command('active:check')->dailyAt('03:00')->timezone('Asia/Damascus');
     })->create();

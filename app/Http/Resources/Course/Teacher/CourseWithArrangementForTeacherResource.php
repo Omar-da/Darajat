@@ -19,7 +19,7 @@ class CourseWithArrangementForTeacherResource extends JsonResource
             'id' => $this->id,
             'image_url' => Storage::url($this->image_url),
             'title' => $this->title,
-            'teacher' => $this->teacher->first_name . ' ' . $this->teacher->last_name,
+            'teacher' => $this->teacher->full_name,
             'price' => $this->price . '$',
             'rate' => $this->rate,
             'language' => $this->language->name,

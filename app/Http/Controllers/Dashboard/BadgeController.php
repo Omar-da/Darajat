@@ -21,7 +21,7 @@ class BadgeController extends Controller
 
     public function show(Badge $badge)
     {
-        $admin_name = $badge->admin->first_name .' ' . $badge->admin->last_name;
+        $admin_name = $badge->admin->full_name;
         return view('badges.show', compact(['badge', 'admin_name']));
     }
 

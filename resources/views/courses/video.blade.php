@@ -1,4 +1,5 @@
 @use('Carbon\Carbon')
+@use('App\Enums\CourseStatusEnum')
 
 <x-layouts.header :title="$episode->title" :with-footer="true">
     <div class="video-episode-container">
@@ -13,15 +14,12 @@
 
             <div class="video-actions-container">
                 <div class="video-stats-container">
-                    @if($episode->trashed() || !$episode->published)
-                       <span class="requested-word">Requested:</span> <span class="date">{{Carbon::parse($episode->publishing_request_date)->format('M d, Y')}}</span>
-                    @else
+                    @if($episode->course->status === CourseStatusEnum::APPROVED) 
                         <div class="video-like-btn" aria-label="Like this episode">
                             <i class="far fa-thumbs-up"></i>
                             <span class="video-like-count">{{$episode->likes}}</span>
                         </div>
                         <span class="video-views-count"><i class="fas fa-eye"></i> {{$episode->views}} views</span>
-                        <span class="video-publish-date"><i class="far fa-calendar-alt"></i><span class="published-word">Published:</span> <span class="date">{{Carbon::parse($episode->response_date)->format('M d, Y')}}</span></span>
                     @endif
                     @if($episode->quiz)
                         <a href="{{route('courses.quiz', ['episode' => $episode->id])}}" class="video-quiz-btn">
@@ -38,7 +36,7 @@
         <div class="video-comments-section">
             <h2>Comments <span class="video-comment-count">({{count($episode->comments)}})</span></h2>
             <div class="video-commnts-internal-container">
-                @if(!$episode->trashed() && $episode->published)
+                @if($episode->course->hasSubscribers() && $episode->comments->count() > 0)
                     <div class="video-comments-list">
                         @foreach ($episode->comments as $comment)
                             <div class="video-comment-item">
@@ -49,7 +47,7 @@
                                         @else
                                             <img src="{{asset('img/icons/anonymous_icon.png')}}" alt="User Image" class="video-user-avatar">
                                         @endif
-                                        <span class="video-username">{{$comment->user->first_name}} {{$comment->user->last_name}}</span>
+                                        <span class="video-username">{{$comment->user->full_name}}</span>
                                     </div>
                                     <div class="video-comment-meta">
                                         <span class="video-comment-like"><i class="far fa-thumbs-up"></i> {{$comment->likes}}</span>
@@ -111,7 +109,7 @@
                                                                 @else
                                                                     <img src="{{asset('img/icons/anonymous_icon.png')}}" alt="User Image" class="video-user-avatar">
                                                                 @endif
-                                                                <span class="video-username">{{$reply->user->first_name}} {{$reply->user->last_name}}</span>
+                                                                <span class="video-username">{{$reply->user->full_name}}</span>
                                                             </div>
                                                             <div class="video-comment-meta">
                                                                 <span class="video-comment-like"><i class="far fa-thumbs-up"></i> {{$reply->likes}}</span>
@@ -168,10 +166,10 @@
                             <i class="fas fa-comment-slash"></i>
                         </div>
                         <div class="episode-comments-unavailable-message">
-                            @if(!$episode->published)
+                            @if(!$episode->course->hasSubscribers())
                             Comments will be available once the episode is published
                             @else
-                            No comments yet. Be the first to comment!
+                            No comments yet
                             @endif
                         </div>
                     </div>

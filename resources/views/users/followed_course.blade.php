@@ -5,9 +5,14 @@
         <!-- Course Header Section -->
         <section class="course-header">
             <div class="course-hero">
-                <img src="{{ Storage::url("courses/$course->image_url") }}" alt="Course image" class="course-hero-image">
+                <img src="{{ Storage::url("courses/$course->image_url") }}" alt="Course image" class="course-details-image">
                 <div class="course-basic-info">
-                    <h1 class="course-title">{{ $course->title }}</h1>
+                    <div class="course-title-container">
+                        <h1 class="course-title">{{ $course->title }}</h1> 
+                        <a href="{{ route('courses.show_course', ['course' => $course->id])}}" class="arrow-container" >
+                            <div class="arrow"></div>
+                        </a>
+                    </div>
                     <p class="course-description">{{ $course->description }}</p>
 
                     <div class="course-meta-grid">
@@ -17,7 +22,7 @@
                         </div>
                         <div class="course-meta-item">
                             <span class="meta-label">Teacher:</span>
-                            <span class="meta-value">{{ $course->teacher->first_name }} {{ $course->teacher->last_name }}</span>
+                            <span class="meta-value">{{ $course->teacher->full_name }}</span>
                         </div>
                         <div class="course-meta-item">
                             <span class="meta-label">Difficulty:</span>
@@ -25,15 +30,11 @@
                         </div>
                         <div class="course-meta-item">
                             <span class="meta-label">Duration:</span>
-                            <span class="meta-value">{{ $course->num_of_hours }} hours</span>
+                            <span class="meta-value">{{ $course->total_time }} hours</span>
                         </div>
                         <div class="course-meta-item">
                             <span class="meta-label">Episodes:</span>
                             <span class="meta-value">{{ $course->num_of_episodes }}</span>
-                        </div>
-                        <div class="course-meta-item">
-                            <span class="meta-label">Published:</span>
-                            <span class="meta-value">{{ Carbon::parse($course->response_date)->format('M d, Y') }}</span>
                         </div>
                         <div class="course-meta-item">
                             <span class="meta-label">Price:</span>
@@ -44,6 +45,10 @@
                                     ${{ number_format($course->price, 2) }}
                                 @endif
                             </span>
+                        </div>
+                        <div class="course-meta-item">
+                            <span class="meta-label">Subscribe At:</span>
+                            <span class="meta-value">{{ Carbon::parse($course->pivot->purchase_date)->format('M d, Y') }}</span>
                         </div>
                         <div class="course-meta-item">
                             <span class="meta-label">User Feedback:</span>
@@ -83,21 +88,30 @@
                         <span class="stat-label">Quizzes Passed</span>
                     </div>
                     <div class="progress-stat">
-                        <span class="stat-value">{{ $total_quizzes }}</span>
+                        <span class="stat-value">{{ $course->total_quizzes }}</span>
                         <span class="stat-label">Total Quizzes</span>
                     </div>
                 </div>
             </div>
-
-            @if($course->pivot->num_of_completed_quizes == $total_quizzes)
-                <div class="certificate-badge">
-                    <i class="fas fa-certificate"></i>
-                    <span>Certificate Earned</span>
+            @if(!$course->has_certificate)
+                <div class="certificate-pending">
+                    <i class="fas fa-times-circle"></i>
+                    <span>This course doesn't offer a certificate</span>
                 </div>
-            @else
+            @elseif($course->pivot->is_episodes_completed)
+                <div class="certificate-pending">
+                    <i class="fas fa-hourglass-half"></i>
+                    <span>User hasn't complete all episodes yet to earn certificate</span>
+                </div>
+            @elseif($course->pivot->is_quizzes_completed)
                 <div class="certificate-pending">
                     <i class="fas fa-hourglass-half"></i>
                     <span>User hasn't complete all quizzes yet to earn certificate</span>
+                </div>
+            @else
+                <div class="certificate-badge">
+                    <i class="fas fa-certificate"></i>
+                    <span>Certificate Earned</span>
                 </div>
             @endif
         </section>

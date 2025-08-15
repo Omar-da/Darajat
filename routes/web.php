@@ -13,7 +13,7 @@ use App\Livewire\EditBadge;
 use App\Livewire\EditProfile;
 use App\Livewire\LoginForm;
 use App\Livewire\RegisterForm;
-use App\Livewire\RejectedEpisodes;
+use App\Livewire\RejectedCourses;
 use App\Livewire\UserManagement;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -38,15 +38,15 @@ Route::prefix('dashboard')->group(function () {
 
         // courses
         Route::prefix('courses')->name('courses.')->controller(CourseController::class)->group(function(){
-            Route::get('cates_and_topics',              CourseManagement::class)-> name('cates_and_topics');
-            Route::get('active_courses/{cate}/{topic}', 'active_courses')->        name('active_courses');
-            Route::get('show_course/{course}',          'show_course')->           name('show_course');
-            Route::get('show_episode/{episode_id}',     'show_episode')->          name('show_episode');
-            Route::get('like/{episode}',                'like')->                  name('like');
-            Route::get('quiz/{episode}',                'quiz')->                  name('quiz')->withTrashed();
-            Route::get('rejected_episodes/{topic}',     RejectedEpisodes::class)-> name('rejected_episodes');
-            Route::post('approve/{episode}',            'approve')->               name('approve');
-            Route::post('reject/{episode}',             'reject')->                name('reject');
+            Route::get('cates_and_topics',               CourseManagement::class)-> name('cates_and_topics');
+            Route::get('active_courses/{cate}/{topic}',  'active_courses')->        name('active_courses');
+            Route::get('rejected_courses/{cate}/{topic}',RejectedCourses::class)->  name('rejected_courses');
+            Route::get('show_course/{course}',           'show_course')->           name('show_course')->withTrashed();
+            Route::get('show_episode/{episode_id}',      'show_episode')->          name('show_episode')->withTrashed();
+            Route::get('like/{episode}',                 'like')->                  name('like');
+            Route::get('quiz/{episode}',                 'quiz')->                  name('quiz')->withTrashed();
+            Route::post('approve/{episode}',             'approve')->               name('approve');
+            Route::post('reject/{episode}',              'reject')->                name('reject');
             // get videos
             Route::middleware('episode_protection')->controller(EpisodeController::class)->group(function () {
                 Route::get('/get_video/{episode_id}', 'get_video')->name('get_video');
