@@ -157,4 +157,5 @@ return [
     'universities_retrieved' => 'تم استرداد الجامعات بنجاح',
     'specialities_retrieved' => 'تم استرداد التخصصات بنجاح',
     'badges_retrieved' => 'تم استرداد الشارات بنجاح',
+    'course_restored' => 'تمت استعادة الدورة بنجاح',
 ];

@@ -140,8 +140,8 @@ class EpisodeService
             'episode_number' => $min_episode->episode_number - 1,
         ]);
 
-        $episode->quiz()->delete();
-        $episode->delete();
+//        $episode->quiz()->delete();
+        $episode->forceDelete();
         foreach ($course->episodes as $episode) {
             if ($episode->id != $id) {
                 $episode->update([
