@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\FCM;
+namespace App\Services\Firebase;
 
 use Illuminate\Support\Facades\Notification;
 use Kreait\Firebase\Factory;

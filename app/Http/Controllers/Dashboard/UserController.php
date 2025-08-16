@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Enums\RoleEnum;
 use App\Enums\TypeEnum;
 use App\Models\Course;
 use App\Http\Controllers\App\Controller;

@@ -159,9 +159,11 @@ class EpisodeService
         $user = auth('api')->user();
         $episode = Episode::query()->find($id);
 
-        if ($user->episodes()->where('episode_id', $id)->exists()) {
+        if($episode->course->teacher_id == auth('api')->id())
+            return ['message' => __('msg.teacher_watched_his_course'), 'code' => 409];
+
+        if ($user->episodes()->where('episode_id', $id)->exists())
             return ['message' => __('msg.episode_watched_before'), 'code' => 409];
-        }
 
         // Episode has been watched
         $user->episodes()->attach($episode);
@@ -170,7 +172,7 @@ class EpisodeService
 
         // Update progress in course
         $course = $user->followed_courses()->wherePivot('course_id', $episode->course->id)->first();
-        $progress = $course->pivot->increment('progress');
+        $course->pivot->increment('progress');
         $course->pivot->update(['perc_progress' => ($course->pivot->progress * 100) / $episode->course->episodes->count()]);
 
         // Update activity of user
@@ -189,43 +191,30 @@ class EpisodeService
     }
 
     // Add Like to specific episode.
-    public function addLikeToEpisode($id): array
+    public function like($id): array
     {
         $user = auth('api')->user();
         $episode = Episode::query()->find($id);
 
-        if ($episode->userLikes()->where('user_id', auth('api')->id())->exists()) {
-            return ['message' => __('msg.already_liked_episode'), 'code' => 409];
+        if($episode->course->teacher_id == auth('api')->id())
+            return ['message' => __('msg.teacher_watched_his_course'), 'code' => 409];
+
+        if (!$episode->userLikes()->where('user_id', auth('api')->id())->exists())
+        {
+            $episode->userLikes()->attach($user->id);
+            $episode->increment('likes');
+            $user->statistics()->where('title->en', 'Granted Likes')->first()->pivot->increment('progress');
+            $episode->course->teacher->statistics()->where('title->en', 'Acquired Likes')->first()->pivot->increment('progress');
         }
-
-        if (!$user->episodes()->where('episode_id', $episode->id)->exists()) {
-            return ['message' => __('msg.must_watch_episode_liked'), 'code' => 403];
+        else
+        {
+            $episode->userLikes()->detach($user->id);
+            $episode->decrement('likes');
+            $user->statistics()->where('title->en', 'Granted Likes')->first()->pivot->decrement('progress');
+            $episode->course->teacher->statistics()->where('title->en', 'Acquired Likes')->first()->pivot->decrement('progress');
         }
-
-        $episode->userLikes()->attach($user->id);
-        $episode->increment('likes');
-
-        $user->statistics()->where('title->en', 'Granted Likes')->first()->pivot->increment('progress');
-        $episode->course->teacher->statistics()->where('title->en', 'Acquired Likes')->first()->pivot->increment('progress');
 
         return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_liked'), 'code' => 200];
-    }
-
-    // Remove Like from specific episode.
-    public function removeLikeFromEpisode($id): array
-    {
-        $user = auth('api')->user();
-        $episode = Episode::query()->find($id);
-
-        if (!$episode->userLikes()->where('user_id', $user->id)->exists()) {
-            return ['message' => __('msg.do_not_have_like_episode'), 'code' => 404];
-        }
-
-        $episode->userLikes()->detach($user->id);
-        $episode->decrement('likes');
-        $user->statistics()->where('title->en', 'Granted Likes')->first()->pivot->decrement('progress');
-        $episode->course->teacher->statistics()->where('title->en', 'Acquired Likes')->first()->pivot->decrement('progress');
-        return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_unliked'), 'code' => 200];
     }
 
     public function downloadFile($episode_id): StreamedResponse|array

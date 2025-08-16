@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Enums\RoleEnum;
 use App\Models\User;
-use App\Services\FCM\FcmService;
+use App\Services\Firebase\FCMService;
 use Illuminate\Console\Command;
 
 class CheckIsActiveCommand extends Command
@@ -13,7 +13,7 @@ class CheckIsActiveCommand extends Command
 
     protected $description = 'check if user is active daily';
 
-    public function __construct(public FcmService $fcmService)    // Injection the fcm service
+    public function __construct(public FCMService $fcmService)    // Injection the fcm service
     {
         parent::__construct();
     }
