@@ -32,12 +32,12 @@ Route::middleware('localization')->group(function() {
         Route::post('register', 'register');
         Route::post('login', 'login');
         Route::post('login/google', 'loginWithGoogle');
-        Route::get('logout', 'logout')->middleware('auth:regular_or_socialite');
+        Route::get('logout', 'logout')->middleware('regular_or_socialite');
     });
 
     // profile
     Route::controller(UserController::class)->prefix('users')->group(function () {
-        Route::middleware('auth:regular_or_socialite')->group(function () {
+        Route::middleware('regular_or_socialite')->group(function () {
             Route::post('update-profile', 'updateProfile');
             Route::post('update-profile-image', 'updateProfileImage');
             Route::post('change-password', 'changePassword');
@@ -64,7 +64,7 @@ Route::middleware('localization')->group(function() {
     });
 
     // quizzes
-    Route::controller(QuizController::class)->middleware('auth:regular_or_socialite')->prefix('quizzes')->group(function () {
+    Route::controller(QuizController::class)->middleware('regular_or_socialite')->prefix('quizzes')->group(function () {
         Route::middleware('is_owner')->group(function () {
             Route::post('create/{episode_id}', 'store');
             Route::put('{quiz_id}', 'update');
@@ -121,7 +121,7 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
 });
 
     // coupons
-    Route::controller(CouponController::class)->middleware('auth:regular_or_socialite')->prefix('coupons')->group(function () {
+    Route::controller(CouponController::class)->middleware('regular_or_socialite')->prefix('coupons')->group(function () {
         Route::middleware('is_owner')->group(function () {
             Route::get('{course_id}', 'index');
             Route::post('{course_id}', 'store');
@@ -134,7 +134,7 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
 
 
     // episodes
-    Route::controller(EpisodeController::class)->middleware('auth:regular_or_socialite')->prefix('episodes')->group(function () {
+    Route::controller(EpisodeController::class)->middleware('regular_or_socialite')->prefix('episodes')->group(function () {
         Route::middleware('episode_protection')->group(function () {
             Route::get('show/student/{episode_id}', 'showToStudent');
             Route::post('like/{episode_id}', 'like');
@@ -154,7 +154,7 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
     });
 
     // comments
-    Route::controller(CommentController::class)->middleware('auth:regular_or_socialite')->prefix('comments')->group(function () {
+    Route::controller(CommentController::class)->middleware('regular_or_socialite')->prefix('comments')->group(function () {
         Route::middleware('episode_protection')->group(function () {
             Route::get('{episode_id}', 'index');
             Route::post('load-more/{episode_id}', 'loadMore');
@@ -167,7 +167,7 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
     });
 
     // replies
-    Route::controller(ReplyController::class)->middleware('auth:regular_or_socialite')->prefix('replies')->group(function () {
+    Route::controller(ReplyController::class)->middleware('regular_or_socialite')->prefix('replies')->group(function () {
         Route::get('{comment_id}', 'index');
         Route::post('{comment_id}', 'store');
         Route::put('{id}', 'update');
@@ -175,7 +175,7 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
         Route::post('like/{id}', 'like');
     });
 
-    Route::controller(ReplyController::class)->middleware('auth:regular_or_socialite')->group(function () {
+    Route::controller(ReplyController::class)->middleware('regular_or_socialite')->group(function () {
 
         // badges
         Route::get('specialities', [SpecialityController::class, 'index']);

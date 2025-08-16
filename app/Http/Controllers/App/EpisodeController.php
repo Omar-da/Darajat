@@ -16,7 +16,7 @@ use Throwable;
 
 class EpisodeController extends Controller
 {
-    private Episod  eService $episodeService;
+    private EpisodeService $episodeService;
 
     public function __construct(EpisodeService $episodeService)
     {
