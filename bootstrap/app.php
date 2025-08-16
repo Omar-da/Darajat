@@ -38,7 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'localization' => Localization::class,
             'is_owner' => CheckOwnerCourse::class,
             'is_subscribed' => CheckSubscribed::class,
-            'auth:regular_or_socialite' => AuthMiddleware::class
+            'regular_or_socialite' => AuthMiddleware::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

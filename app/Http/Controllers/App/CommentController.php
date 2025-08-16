@@ -98,7 +98,6 @@ class CommentController extends Controller
         }
     }
 
-
     // Delete a specific comment by the comment's owner.
     public function destroyForStudent($id): JsonResponse
     {
