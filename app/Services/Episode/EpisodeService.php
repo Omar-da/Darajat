@@ -199,22 +199,23 @@ class EpisodeService
         if($episode->course->teacher_id == auth('api')->id())
             return ['message' => __('msg.teacher_watched_his_course'), 'code' => 409];
 
-        if (!$episode->userLikes()->where('user_id', auth('api')->id())->exists())
-        {
-            $episode->userLikes()->attach($user->id);
-            $episode->increment('likes');
-            $user->statistics()->where('title->en', 'Granted Likes')->first()->pivot->increment('progress');
-            $episode->course->teacher->statistics()->where('title->en', 'Acquired Likes')->first()->pivot->increment('progress');
-        }
-        else
+        if ($episode->userLikes()->where('user_id', auth('api')->id())->exists())
         {
             $episode->userLikes()->detach($user->id);
             $episode->decrement('likes');
             $user->statistics()->where('title->en', 'Granted Likes')->first()->pivot->decrement('progress');
             $episode->course->teacher->statistics()->where('title->en', 'Acquired Likes')->first()->pivot->decrement('progress');
+            return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_unliked'), 'code' => 200];
+        }
+        else
+        {
+            $episode->userLikes()->attach($user->id);
+            $episode->increment('likes');
+            $user->statistics()->where('title->en', 'Granted Likes')->first()->pivot->increment('progress');
+            $episode->course->teacher->statistics()->where('title->en', 'Acquired Likes')->first()->pivot->increment('progress');
+            return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_liked'), 'code' => 200];
         }
 
-        return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_liked'), 'code' => 200];
     }
 
     public function downloadFile($episode_id): StreamedResponse|array

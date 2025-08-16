@@ -22,7 +22,7 @@ return new class extends Migration
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->string('stripe_connect_id')->nullable();
             $table->foreignIdFor(JobTitle::class)->nullable()->constrained()->nullOnDelete();
-            $table->foreignIdFor(Country::class)->constrained();
+            $table->foreignIdFor(Country::class)->nullable()->constrained();
             $table->string('linked_in_url', )->nullable();
             $table->enum('education', EducationEnum::values())->default(EducationEnum::NONE);
             $table->foreignIdFor(University::class)->nullable()->constrained();

@@ -164,8 +164,7 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
         Route::put('{id}', 'update');
         Route::delete('teacher/{id}', 'destroyForTeacher');
         Route::delete('student/{id}', 'destroyForStudent');
-        Route::post('add-like/{id}', 'addLikeToComment');
-        Route::delete('remove-like/{id}', 'removeLikeFromComment');
+        Route::post('like/{id}', 'like');
     });
 
     // replies
@@ -175,22 +174,24 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
         Route::put('{id}', 'update');
         Route::delete('teacher/{id}', 'destroyForTeacher');
         Route::delete('student/{id}', 'destroyForStudent');
-        Route::post('add-like/{id}', 'addLikeToReply');
-        Route::delete('remove-like/{id}', 'removeLikeFromReply');
+        Route::post('like/{id}', 'like');
     });
 
+    Route::controller(ReplyController::class)->middleware('auth:regular_or_socialite')->group(function () {
 
-    // badges
-    Route::get('specialities', [SpecialityController::class, 'index'])->middleware('auth:regular_or_socialite');
+        // badges
+        Route::get('specialities', [SpecialityController::class, 'index']);
 
-    // universities
-    Route::get('universities', [UniversityController::class, 'index'])->middleware('auth:regular_or_socialite');
+        // universities
+        Route::get('universities', [UniversityController::class, 'index']);
 
-    // badges
-    Route::get('badges/get-my-badges', [BadgeController::class, 'index'])->middleware('auth:regular_or_socialite');
+        // badges
+        Route::get('badges/get-my-badges', [BadgeController::class, 'index']);
 
-    // statistics
-    Route::get('statistics/get-my-statistics', [StatisticController::class, 'index'])->middleware('auth:regular_or_socialite');
+        // statistics
+        Route::get('statistics/get-my-statistics', [StatisticController::class, 'index']);
+
+    });
 
     // constant values
     Route::get('countries', [CountryController::class, 'index']);

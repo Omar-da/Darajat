@@ -16,7 +16,7 @@ use Throwable;
 
 class EpisodeController extends Controller
 {
-    private EpisodeService $episodeService;
+    private Episod  eService $episodeService;
 
     public function __construct(EpisodeService $episodeService)
     {
@@ -117,28 +117,12 @@ class EpisodeController extends Controller
     }
 
     // Add Like to specific episode.
-    public function addLikeToEpisode($id): JsonResponse
+    public function like($id): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->episodeService->addLikeToEpisode($id);
+            $data = $this->episodeService->like($id);
             if ($data['code'] == 409 || $data['code'] == 403) {
-                return Response::error($data['message'], $data['code']);
-            }
-            return Response::success($data['data'], $data['message'], $data['code']);
-        } catch (Throwable $th) {
-            $message = $th->getMessage();
-            return Response::error($message);
-        }
-    }
-
-    // Remove Like from specific episode.
-    public function removeLikeFromEpisode($id): JsonResponse
-    {
-        $data = [];
-        try {
-            $data = $this->episodeService->removeLikeFromEpisode($id);
-            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -194,17 +178,17 @@ class EpisodeController extends Controller
             abort(404, 'Video file not found');
         }
 
-        return Storage::disk('local')->response(
-            $videoPath,
-            'episode-video.mp4',
-            [
+        $video_url = Storage::disk('local')->temporaryUrl($videoPath, now()->addMinutes(30));
+
+        return response()->json([
+            'video_url' => $video_url
+        ], headers: [
                 'Content-Type' => 'video/mp4',
                 'Content-Length' => Storage::disk('local')->size($videoPath),
                 'Content-Disposition' => 'inline',  // Prevents "Save As" dialog
                 'Cache-Control' => 'no-store',      // Disables browser caching
                 'Accept-Ranges' => 'none'
-            ]
-        );
+            ]);
     }
 
     public function get_poster($episode_id)
@@ -213,15 +197,15 @@ class EpisodeController extends Controller
         $course = Course::where('id', $episode->course_id)->firstOrFail();
         $thumbnailPath = "courses/$course->id/episodes/$episode_id/thumbnail.jpg";
 
+        $video_url = Storage::disk('local')->temporaryUrl($thumbnailPath, now()->addMinutes(30));
 
-        return response()->file(
-            Storage::disk('local')->path($thumbnailPath),
-            [
+        return response()->json([
+            'thumbnailPath' => $thumbnailPath
+        ], headers: [
                 'Content-Type' => 'image/jpeg',
                 'Content-Disposition' => 'inline',    // Prevents "Save As" dialog
                 'Cache-Control' => 'no-store',        // No caching
                 'X-Content-Type-Options' => 'nosniff' // Blocks MIME-type sniffing
-            ]
-        );
+            ]);
     }
 }

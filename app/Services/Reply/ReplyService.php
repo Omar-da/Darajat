@@ -87,38 +87,32 @@ class ReplyService
     }
 
     // Add Like to specific reply.
-    public function addLikeToReply($id): array
+    public function like($id): array
     {
         $reply = Reply::query()->find($id);
-        if(is_null($reply)) {
-            return ['message' => __('msg.reply_not_found'), 'code' => 404];
-        }
-        if($reply->userlikes()->where('user_id', auth('api')->id())->exists()) {
-            return ['message' => __('msg.already_liked_reply'), 'code' => 401];
-        }
-        $reply->userLikes()->attach(auth('api')->id());
-        $reply->update([
-            'likes' => $reply->likes + 1
-        ]);
-        $reply->userlikes()->count();
-        return ['data' => new ReplyResource($reply), 'message' => __('msg.reply_liked'), 'code' => 200];
-    }
 
-    // Remove Like from specific reply.
-    public function removeLikeFromReply($id): array
-    {
-        $reply = Reply::query()->find($id);
         if(is_null($reply)) {
             return ['message' => __('msg.reply_not_found'), 'code' => 404];
         }
-        if(!$reply->userlikes()->where('user_id', auth('api')->id())->exists()) {
-            return ['message' => __('msg.do_not_have_like'), 'code' => 404];
+
+        if($reply->userlikes()->where('user_id', auth('api')->id())->exists())
+        {
+            $reply->userLikes()->detach(auth('api')->id());
+            $reply->update([
+                'likes' => $reply->likes - 1
+            ]);
+            
+            return ['message' => __('msg.reply_unliked'), 'code' => 200];
         }
-        $reply->userLikes()->detach(auth('api')->id());
-        $reply->update([
-            'likes' => $reply->likes - 1
-        ]);
-        return ['data' => new ReplyResource($reply), 'message' => __('msg.reply_unliked'), 'code' => 200];
+        else
+        {
+            $reply->userLikes()->attach(auth('api')->id());
+            $reply->update([
+                'likes' => $reply->likes + 1
+            ]);
+
+            return ['data' => new ReplyResource($reply), 'message' => __('msg.reply_liked'), 'code' => 200];
+        }
     }
 
 }
