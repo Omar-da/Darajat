@@ -158,4 +158,5 @@ return [
     'universities_retrieved' => 'Universities retrieved successfully',
     'specialities_retrieved' => 'Specialities retrieved successfully',
     'badges_retrieved' => 'Badges retrieved successfully',
+    'course_restored' => 'Course restored successfully',
 ];

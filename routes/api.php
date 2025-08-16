@@ -41,10 +41,10 @@ Route::middleware('localization')->group(function() {
             Route::post('update-profile', 'updateProfile');
             Route::post('update-profile-image', 'updateProfileImage');
             Route::post('change-password', 'changePassword');
+            Route::post('promote-student-to-teacher', 'promoteStudentToTeacher');
+            Route::get('stripe-callback', 'stripeCallback')->name('users.stripe_callback');
             Route::delete('delete', 'destroy');
             Route::post('store-fcm-token', 'storeFCMToken');    
-            Route::get('stripe-callback', 'stripeCallback')->name('users.stripe_callback');
-            Route::post('promote-student-to-teacher', 'promoteStudentToTeacher');
         });
         Route::get('show-profile/{id}', 'showProfile');
     });
@@ -86,37 +86,39 @@ Route::middleware('localization')->group(function() {
         Route::get('search/{title}', 'search');
     });
 
-    // courses
-    Route::controller(CourseController::class)->prefix('courses')->group(function () {
-        Route::get('', 'index');
-        Route::post('load-more', 'loadMore');
-        Route::get('category/{category_id}', 'getCoursesForCategory');
-        Route::get('topic/{topic_id}', 'getCoursesForTopic');
-        Route::get('language/{language_id}', 'getCoursesForLanguage');
-        Route::get('search/{title}', 'search');
-        Route::post('payment-process/{course}', 'paymentProcess')->name('courses.payment_process');
-        Route::post('get-certificate/{course}', 'getCertificate')->name('courses.get_certificate')->middleware('get_certificate');
-        Route::get('free', 'getFreeCourses');
-        Route::get('paid', 'getPaidCourses');
-        Route::get('student/{id}', 'showToStudent');
-        Route::middleware('auth:regular_or_socialite')->group(function () {
-            Route::get('draft', 'getDraftCoursesToTeacher');
-            Route::get('pending', 'getPendingCoursesToTeacher');
-            Route::get('approved', 'getApprovedCoursesToTeacher');
-            Route::get('rejected', 'getRejectedCoursesToTeacher');
-            Route::post('', 'store')->middleware('is_teacher');
-            Route::middleware('is_owner')->group(function () {
-                Route::put('update-draft/{course_id}', 'updateDraftCourse');
-                Route::patch('update-approved/{course_id}', 'updateApprovedCourse');
-                Route::delete('{course_id}', 'destroy');
-                Route::get('teacher/{course_id}', 'showToTeacher');
-                Route::post('submit/{course_id}', 'submitCourse');
-            });
-            Route::get('with-arrangement/{topic_id}', 'getCoursesForTopicForTeacherWithArrangement')->middleware('is_teacher');;
-            Route::patch('evaluation/{course_id}', 'evaluation')->middleware('is_subscribed');
-            Route::get('followed', 'getFollowedCoursesForStudent');
+// courses
+Route::controller(CourseController::class)->middleware('localization')->prefix('courses')->group(function () {
+    Route::get('', 'index');
+    Route::post('load-more', 'loadMore');
+    Route::get('category/{category_id}', 'getCoursesForCategory');
+    Route::get('topic/{topic_id}', 'getCoursesForTopic');
+    Route::get('language/{language_id}', 'getCoursesForLanguage');
+    Route::get('search/{title}', 'search');
+    Route::post('payment-process/{course}', 'paymentProcess')->name('courses.payment_process');
+    Route::post('get-certificate/{course}', 'getCertificate')->name('courses.get_certificate')->middleware('get_certificate');
+    Route::get('free', 'getFreeCourses');
+    Route::get('paid', 'getPaidCourses');
+    Route::get('student/{id}', 'showToStudent');
+    Route::middleware('auth:api')->group(function () {
+        Route::get('draft', 'getDraftCoursesToTeacher');
+        Route::get('pending', 'getPendingCoursesToTeacher');
+        Route::get('approved', 'getApprovedCoursesToTeacher');
+        Route::get('rejected', 'getRejectedCoursesToTeacher');
+        Route::get('deleted', 'getDeletedCoursesToTeacher');
+        Route::post('', 'store')->middleware('is_teacher');
+        Route::middleware('is_owner')->group(function () {
+            Route::put('update-draft/{course_id}', 'updateDraftCourse');
+            Route::patch('update-approved/{course_id}', 'updateApprovedCourse');
+            Route::delete('{course_id}', 'destroy');
+            Route::get('teacher/{course_id}', 'showToTeacher');
+            Route::post('submit/{course_id}', 'submitCourse');
         });
+        Route::patch('restore/{course_id}', 'restore');
+        Route::get('with-arrangement/{topic_id}', 'getCoursesForTopicForTeacherWithArrangement')->middleware('is_teacher');;
+        Route::patch('evaluation/{course_id}', 'evaluation')->middleware('is_subscribed');
+        Route::get('followed', 'getFollowedCoursesForStudent');
     });
+});
 
     // coupons
     Route::controller(CouponController::class)->middleware('auth:regular_or_socialite')->prefix('coupons')->group(function () {

@@ -185,7 +185,7 @@ class EpisodeController extends Controller
 
     public function get_video($episode_id)
     {
-        $episode = where('id', $episode_id)->firstOrFail();
+        $episode = Episode::where('id', $episode_id)->firstOrFail();
         $course = Course::where('id', $episode->course_id)->firstOrFail();
 
         $videoPath = "courses/$course->id/episodes/$episode_id/video.mp4";
