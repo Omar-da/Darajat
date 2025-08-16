@@ -65,21 +65,6 @@ class ReplyController extends Controller
         }
     }
 
-    // Delete a specific reply by the course teacher.
-    public function destroyForTeacher($id): JsonResponse
-    {
-        $data = [];
-        try {
-            $data = $this->replyService->destroyForTeacher($id);
-            if($data['code'] == 404 || $data['code'] == 401) {
-                return Response::error($data['message'], $data['code']);
-            }
-            return Response::success([], $data['message'], $data['code']);
-        } catch (Throwable $th) {
-            $message  = $th->getMessage();
-            return Response::error($message);
-        }
-    }
 
     // Delete a specific reply by the reply's owner.
     public function destroyForStudent($id): JsonResponse

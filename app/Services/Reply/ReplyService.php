@@ -54,19 +54,6 @@ class ReplyService
         return ['data' => new ReplyResource($reply), 'message' => __('msg.reply_updated'), 'code' => 200];
     }
 
-    public function destroyForTeacher($id): array
-    {
-        $reply = Reply::query()->find($id);
-        if(is_null($reply)) {
-            return ['message' => __('msg.reply_not_found'), 'code' => 404];
-        }
-        if(!$reply->comment->episode->course->where('teacher_id', auth('api')->id())->exists()) {
-            return ['message' => __('msg.unauthorized'), 'code' => 401];
-        }
-        $reply->delete();
-        return ['message' => __('msg.reply_deleted'), 'code' => 200];
-    }
-
     // Delete specific reply.
     public function destroyForStudent($id): array
     {

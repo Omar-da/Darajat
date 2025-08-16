@@ -98,18 +98,6 @@ class CommentService
         return ['data' => new CommentResource($comment), 'message' => __('msg.comment_updated'), 'code' => 200];
     }
 
-    public function destroyForTeacher($id): array
-    {
-        $comment = Comment::query()->find($id);
-        if(is_null($comment)) {
-            return ['message' => __('msg.comment_not_found'), 'code' => 404];
-        }
-        if(!$comment->episode->course->where('teacher_id', auth('api')->id())->exists()) {
-            return ['message' => __('msg.unauthorized'), 'code' => 401];
-        }
-        $comment->delete();
-        return ['message' => __('msg.comment_deleted'), 'code' => 200];
-    }
 
     // Delete specific comment.
     public function destroyForStudent($id): array

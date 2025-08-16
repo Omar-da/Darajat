@@ -16,12 +16,12 @@ use Throwable;
 class AuthController extends Controller
 {
     private AuthService $authService;
-    protected $firebase;
+    // protected FirebaseOAuth $firebase;
 
-    public function __construct(AuthService $authService, FirebaseOAuth $firebase)
+    public function __construct(AuthService $authService)
     {
         $this->authService = $authService;
-        $this->firebase = $firebase;
+        // $this->firebase = $firebase;
     }
 
     public function register(RegisterRequest $request): JsonResponse
