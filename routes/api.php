@@ -139,7 +139,8 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
             Route::get('show/student/{episode_id}', 'showToStudent');
             Route::post('like/{episode_id}', 'like');
             Route::post('finish/{episode_id}', 'finishEpisode');
-            Route::get('get_video/{episode_id}', 'get_video')->name('get_video');
+            Route::get('get_url_of_video/{episode_id}', 'get_url_or_video')->name('get_video');
+            Route::get('video/{token}/stream', 'streamVideo')->name('stream_video');
             Route::get('get_poster/{episode_id}', 'get_poster')->name('get_poster');
             Route::get('download-file/{episode_id}', 'downloadFile');
         });
