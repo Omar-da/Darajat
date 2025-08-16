@@ -162,7 +162,6 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
         });
         Route::post('{episode_id}', 'store');
         Route::put('{id}', 'update');
-        Route::delete('teacher/{id}', 'destroyForTeacher');
         Route::delete('student/{id}', 'destroyForStudent');
         Route::post('like/{id}', 'like');
     });
@@ -172,7 +171,6 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
         Route::get('{comment_id}', 'index');
         Route::post('{comment_id}', 'store');
         Route::put('{id}', 'update');
-        Route::delete('teacher/{id}', 'destroyForTeacher');
         Route::delete('student/{id}', 'destroyForStudent');
         Route::post('like/{id}', 'like');
     });

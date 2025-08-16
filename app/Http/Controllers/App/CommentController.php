@@ -98,21 +98,6 @@ class CommentController extends Controller
         }
     }
 
-    // Delete a specific comment by the course teacher.
-    public function destroyForTeacher($id): JsonResponse
-    {
-        $data = [];
-        try {
-            $data = $this->commentService->destroyForTeacher($id);
-            if($data['code'] == 404 || $data['code'] == 401) {
-                return Response::error($data['message'], $data['code']);
-            }
-            return Response::success([], $data['message'], $data['code']);
-        } catch (Throwable $th) {
-            $message  = $th->getMessage();
-            return Response::error($message);
-        }
-    }
 
     // Delete a specific comment by the comment's owner.
     public function destroyForStudent($id): JsonResponse
