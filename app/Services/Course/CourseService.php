@@ -9,6 +9,7 @@ use App\Http\Resources\Course\Student\EnrolledCourseForStudentResource;
 use App\Http\Resources\Course\Teacher\CourseForTeacherResource;
 use App\Http\Resources\Course\Teacher\CourseWithArrangementForTeacherResource;
 use App\Http\Resources\Course\Teacher\CourseWithDetailsForTeacherResource;
+use App\Http\Resources\Course\Teacher\DeletedCourseForTeacherResource;
 use App\Models\Category;
 use App\Models\Course;
 use App\Models\Language;
@@ -308,10 +309,40 @@ class CourseService
             return ['message' => __('msg.can_not_delete_course') . $course->status->label() . __('msg.enrolled_students'), 'code' => 403];
         }
 
-        $course->episodes()->delete();
-        $course->delete();
+        if($course->status === CourseStatusEnum::DRAFT) {
+            $course->forceDelete();
+        } else {
+            $course->delete();
+        }
 
         return ['message' => __('msg.course_deleted'), 'code' => 200];
+    }
+
+    public function restore($id): array
+    {
+        $course = Course::onlyTrashed()->find($id);
+
+        if(is_null($course)) {
+            return ['message' => __('msg.course_not_found'), 'code' => 404];
+        }
+
+        if(auth('api')->id() != $course->teacher_id) {
+            return ['message' => __('msg.unauthorized'), 'code' => 403];
+        }
+
+        $course->update([
+            'status' => CourseStatusEnum::DRAFT,
+        ]);
+        $course->restore();
+
+        return ['message' => __('msg.course_restored'), 'code' => 200];
+    }
+
+    public function getDeletedCoursesToTeacher(): array
+    {
+        $courses = Course::onlyTrashed()->where('teacher_id', auth('api')->id())->get();
+
+        return ['data' => DeletedCourseForTeacherResource::collection($courses), 'message' => __('msg.course_retrieved'), 'code' => 200];
     }
 
     public function submitCourse($id): array

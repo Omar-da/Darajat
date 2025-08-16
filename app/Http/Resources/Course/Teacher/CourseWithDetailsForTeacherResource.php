@@ -42,7 +42,7 @@ class CourseWithDetailsForTeacherResource extends JsonResource
                 '1' => $this->calculatePercentageForValueRate(1),
             ],
             'num_of_episodes' => $this->num_of_episodes ? $this->num_of_episodes  : 0,
-            'status' => CourseStatusEnum::from($this->status)->label(),
+            'status' => $this->status->label(),
             'response_date' => $this->response_date,
             'publishing_request_date' => $this->publishing_request_date,
             'has_certificate' =>  $this->has_certificate,
