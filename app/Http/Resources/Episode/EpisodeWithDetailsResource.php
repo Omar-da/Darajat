@@ -29,7 +29,7 @@ class EpisodeWithDetailsResource extends JsonResource
             'is_watched' => (bool)$this->students()->whereUserId(auth()->id())->exists(),
             'is_liked' => (bool)$this->userLikes()->whereUserId(auth()->id())->exists(),
             'has_quiz' => !is_null($this->quiz),
-            'is_quiz_completed' => auth('api')->user()->episodes->contains($this->id) && (bool)auth('api')->user()->episodes()->find($this->id)->pivot->pass_quiz,
+            'is_quiz_completed' => auth('api')->user()->episodes->contains($this->id) && (bool)auth('api')->user()->episodes->find($this->id)->pivot->pass_quiz,
             'has_file' => !is_null($file),
         ];
     }

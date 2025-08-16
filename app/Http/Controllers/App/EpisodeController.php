@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Str;
 use Throwable;
 
 class EpisodeController extends Controller
@@ -167,7 +168,7 @@ class EpisodeController extends Controller
         }
     }
 
-    public function get_video($episode_id)
+    public function get_url_of_video($episode_id)
     {
         $episode = Episode::where('id', $episode_id)->firstOrFail();
         $course = Course::where('id', $episode->course_id)->firstOrFail();
@@ -178,18 +179,62 @@ class EpisodeController extends Controller
             abort(404, 'Video file not found');
         }
 
-        $video_url = Storage::disk('local')->temporaryUrl($videoPath, now()->addMinutes(30));
 
+        $token = Str::random(40);
+        $expiresAt = now()->addMinutes(60); // 1 hour expiration
+        
+        // Store the access details in cache
+        cache()->put("video_token:{$token}", [
+            'episode_id' => $episode_id,
+            'user_id' => auth()->id(),
+            'path' => $videoPath
+        ], $expiresAt);
+        
         return response()->json([
-            'video_url' => $video_url
-        ], headers: [
-                'Content-Type' => 'video/mp4',
-                'Content-Length' => Storage::disk('local')->size($videoPath),
-                'Content-Disposition' => 'inline',  // Prevents "Save As" dialog
-                'Cache-Control' => 'no-store',      // Disables browser caching
-                'Accept-Ranges' => 'none'
-            ]);
+            'data' => [
+                'url' => route('stream_video', ['token' => $token]),
+                'expires_at' => $expiresAt->toIso8601String(),
+                'token' => $token // Only include if needed for client-side tracking
+            ]
+        ]);
     }
+
+    public function streamVideo($token)
+    {
+        $cacheKey = "video_token:{$token}";
+        $accessData = cache()->get($cacheKey);
+        
+        if (!$accessData) {
+            return response()->json([
+                'error' => 'Invalid or expired token'
+            ], 410); // 410 Gone status
+        }
+        
+        // Optional: Verify the user still has access
+        if ($accessData['user_id'] != auth()->id()) {
+            return response()->json([
+                'error' => 'Access denied'
+            ], 403);
+        }
+        
+        if (!Storage::exists($accessData['path'])) {
+            return response()->json([
+                'error' => 'Video not found'
+            ], 404);
+        }
+        
+        cache()->forget($cacheKey);
+        
+        // Return the file response
+        return Storage::response($accessData['path'], null, [
+            'Content-Type' => 'video/mp4',
+            'Accept-Ranges' => 'bytes',
+            // 'Content-Disposition' => 'inline',    // Prevents "Save As" dialog
+            // 'Cache-Control' => 'no-store',        // No caching
+
+        ]);
+    }
+
 
     public function get_poster($episode_id)
     {
