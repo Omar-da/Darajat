@@ -26,12 +26,15 @@ class AuthService
             'last_name' => $request['last_name'],
             'email' => $request['email'],
             'password' => Hash::make($request['password']),
-            'role' => 'student'
         ]);
-        if(!$user) {
+        
+        if(!$user)
+        {
             $message = __('msg.registration_failed');
             $code = 422;
-        } else {
+        } 
+        else 
+        {
             $this->otpService->sendOTP($user);
             $moreDetail = MoreDetail::query()->create([
                 'user_id' => $user->id,

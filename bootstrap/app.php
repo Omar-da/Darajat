@@ -5,6 +5,7 @@ use App\Http\Middleware\CheckOwnerCourse;
 use App\Http\Middleware\CheckSubscribed;
 use App\Http\Middleware\CheckTeacherRole;
 use App\Http\Middleware\CertificateMiddleware;
+use App\Http\Middleware\AuthMiddleware;
 use App\Http\Middleware\ProtectEpisodeAccess;
 use App\Http\Middleware\Localization;
 use App\Responses\Response;
@@ -37,6 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'localization' => Localization::class,
             'is_owner' => CheckOwnerCourse::class,
             'is_subscribed' => CheckSubscribed::class,
+            'auth:regular_or_socialite' => AuthMiddleware::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
