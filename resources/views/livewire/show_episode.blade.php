@@ -1,0 +1,179 @@
+@use('Carbon\Carbon')
+@use('App\Enums\CourseStatusEnum')
+<div class="video-episode-container">
+    <!-- Video Player Section -->
+    <div class="video-main-section">
+        <div class="video-player-wrapper">
+            <video class="video-player" controls controlsList="nodownload" oncontextmenu="return false;" poster="{{ route('courses.get_poster', $episode->id) }}">
+                <source src="{{ route('courses.get_video', ['episode_id' => $episode->id]) }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        <div class="video-actions-container">
+            <div class="video-stats-container">
+                @if($episode->course->status === CourseStatusEnum::APPROVED) 
+                    <div class="video-like-btn" aria-label="Like this episode">
+                        <i class="far fa-thumbs-up"></i>
+                        <span class="video-like-count">{{$episode->likes}}</span>
+                    </div>
+                    <span class="video-views-count"><i class="fas fa-eye"></i> {{$episode->views}} views</span>
+                @endif
+                @if($episode->quiz)
+                    <a href="{{route('courses.quiz', ['episode' => $episode->id])}}" class="video-quiz-btn">
+                        <i class="fas fa-question-circle"></i> Show Quiz
+                    </a>
+                @endif
+            </div>
+        </div>
+
+        <h1 class="video-title">{{$episode->title}}</h1>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="video-comments-section">
+        <h2>Comments <span class="video-comment-count">({{count($episode->comments)}})</span></h2>
+        <div class="video-commnts-internal-container">
+            @if($episode->course->hasSubscribers() && $episode->comments->count() > 0)
+                <div class="video-comments-list">
+                    @foreach ($episode->comments as $comment)
+                        <div class="video-comment-item">
+                            <div class="video-comment-header">
+                                <div class="video-comment-user">
+                                    @if($comment->user->profile_image_url)
+                                        <img src="{{Storage::url('profiles/' . $comment->user->profile_image_url)}}" alt="User Image" class="video-user-avatar">
+                                    @else
+                                        <img src="{{asset('img/icons/anonymous_icon.png')}}" alt="User Image" class="video-user-avatar">
+                                    @endif
+                                    <span class="video-username">{{$comment->user->full_name}}</span>
+                                </div>
+                                <div class="video-comment-meta">
+                                <span class="video-comment-like"><i class="far fa-thumbs-up"></i> {{$comment->likes}}</span>
+                                    @php
+                                        $commentTimestamp = strtotime($comment->comment_date);
+                                        $ago = time() - $commentTimestamp;
+
+                                        // Time intervals in seconds
+                                        $minute = 60;
+                                        $hour = 60 * $minute;
+                                        $day = 24 * $hour;
+                                        $week = 7 * $day;
+                                        $month = 30 * $day; // Approximate (30 days)
+                                        $year = 365 * $day; // Approximate (365 days)
+
+                                        if ($ago < $minute) {
+                                            $comment_ago = ($ago < 10) ? "Just now" : $ago . " seconds ago";
+                                        } elseif ($ago < $hour) {
+                                            $minutes = floor($ago / $minute);
+                                            $comment_ago = $minutes == 1 ? "1 minute ago" : "$minutes minutes ago";
+                                        } elseif ($ago < $day) {
+                                            $hours = floor($ago / $hour);
+                                            $comment_ago = $hours == 1 ? "1 hour ago" : "$hours hours ago";
+                                        } elseif ($ago < $week) {
+                                            $days = floor($ago / $day);
+                                            $comment_ago = $days == 1 ? "1 day ago" : "$days days ago";
+                                        } elseif ($ago < $month) {
+                                            $weeks = floor($ago / $week);
+                                            $comment_ago = $weeks == 1 ? "1 week ago" : "$weeks weeks ago";
+                                        } elseif ($ago < $year) {
+                                            $months = floor($ago / $month);
+                                            $comment_ago = $months == 1 ? "1 month ago" : "$months months ago";
+                                        } else {
+                                            $years = floor($ago / $year);
+                                            $comment_ago = $years == 1 ? "1 year ago" : "$years years ago";
+                                        }
+                                    @endphp
+                                    <span class="video-comment-date">{{$comment_ago}}</span>
+                                    <a wire:click="destroy_comment({{$comment->id}})" class="fas fa-trash-alt delete-icon" style="background-color: transparent"></a>                                      
+                                </div>
+                            </div>
+
+                            <p class="video-comment-text">{{$comment->content}}</p>
+
+                            <!-- Replies Section with toggle -->
+                            @if(count($comment->replies) > 0)
+                                <details class="video-replies-details">
+                                    <summary class="video-replies-toggle">
+                                        <span class="video-replies-count">{{count($comment->replies)}}</span> replies
+                                        <i class="fas fa-chevron-down"></i>
+                                    </summary>
+                                    <div class="video-replies-container">
+                                        <div class="video-replies-list">
+                                            @foreach ($comment->replies as $reply)
+                                                <div class="video-reply-item">
+                                                    <div class="video-comment-header">
+                                                        <div class="video-comment-user">
+                                                            @if($reply->user->profile_image_url)
+                                                                <img src="{{Storage::url('profiles/' . $reply->user->profile_image_url)}}" alt="User Image" class="video-user-avatar">
+                                                            @else
+                                                                <img src="{{asset('img/icons/anonymous_icon.png')}}" alt="User Image" class="video-user-avatar">
+                                                            @endif
+                                                            <span class="video-username">{{$reply->user->full_name}}</span>
+                                                        </div>
+                                                        <div class="video-comment-meta">
+                                                            <span class="video-comment-like"><i class="far fa-thumbs-up"></i> {{$reply->likes}}</span>
+                                                            @php
+                                                                $replyTimestamp = strtotime($reply->reply_date);
+                                                                $ago = time() - $replyTimestamp;
+
+                                                                // Time intervals in seconds
+                                                                $minute = 60;
+                                                                $hour = 60 * $minute;
+                                                                $day = 24 * $hour;
+                                                                $week = 7 * $day;
+                                                                $month = 30 * $day; // Approximate (30 days)
+                                                                $year = 365 * $day; // Approximate (365 days)
+
+                                                                if ($ago < $minute) {
+                                                                    $reply_ago = ($ago < 10) ? "Just now" : $ago . " seconds ago";
+                                                                } elseif ($ago < $hour) {
+                                                                    $minutes = floor($ago / $minute);
+                                                                    $reply_ago = $minutes == 1 ? "1 minute ago" : "$minutes minutes ago";
+                                                                } elseif ($ago < $day) {
+                                                                    $hours = floor($ago / $hour);
+                                                                    $reply_ago = $hours == 1 ? "1 hour ago" : "$hours hours ago";
+                                                                } elseif ($ago < $week) {
+                                                                    $days = floor($ago / $day);
+                                                                    $reply_ago = $days == 1 ? "1 day ago" : "$days days ago";
+                                                                } elseif ($ago < $month) {
+                                                                    $weeks = floor($ago / $week);
+                                                                    $reply_ago = $weeks == 1 ? "1 week ago" : "$weeks weeks ago";
+                                                                } elseif ($ago < $year) {
+                                                                    $months = floor($ago / $month);
+                                                                    $reply_ago = $months == 1 ? "1 month ago" : "$months months ago";
+                                                                } else {
+                                                                    $years = floor($ago / $year);
+                                                                    $reply_ago = $years == 1 ? "1 year ago" : "$years years ago";
+                                                                }
+                                                            @endphp
+                                                            <span class="video-comment-date">{{$reply_ago}}</span>
+                                                            <a wire:click="destroy_reply({{$reply->id}})" class="fas fa-trash-alt delete-icon" style="background-color: transparent"></a>                                      
+                                                        </div>
+                                                    </div>
+                                                    <p class="video-comment-text">{{$reply->content}}</p>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </details>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="episode-comments-unavailable">
+                    <div class="episode-comments-unavailable-icon">
+                        <i class="fas fa-comment-slash"></i>
+                    </div>
+                    <div class="episode-comments-unavailable-message">
+                        @if(!$episode->course->hasSubscribers())
+                        Comments will be available once the episode is published
+                        @else
+                        No comments yet
+                        @endif
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
+</div>

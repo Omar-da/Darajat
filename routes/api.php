@@ -99,7 +99,7 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
     Route::get('free', 'getFreeCourses');
     Route::get('paid', 'getPaidCourses');
     Route::get('student/{id}', 'showToStudent');
-    Route::middleware('auth:api')->group(function () {
+    Route::middleware('regular_or_socialite')->group(function () {
         Route::get('draft', 'getDraftCoursesToTeacher');
         Route::get('pending', 'getPendingCoursesToTeacher');
         Route::get('approved', 'getApprovedCoursesToTeacher');
@@ -107,9 +107,11 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
         Route::get('deleted', 'getDeletedCoursesToTeacher');
         Route::post('', 'store')->middleware('is_teacher');
         Route::middleware('is_owner')->group(function () {
-            Route::put('update-draft/{course_id}', 'updateDraftCourse');
             Route::patch('update-approved/{course_id}', 'updateApprovedCourse');
-            Route::delete('{course_id}', 'destroy');
+            Route::patch('update-rejected/{course_id}', 'updateRejectedCourse');
+            Route::patch('update-appending/{course_id}', 'updateAppendingCourse');
+            Route::put('update-draft/{course_id}', 'updateDraftCourse');
+            Route::delete('delete/{course_id}', 'destroy');
             Route::get('teacher/{course_id}', 'showToTeacher');
             Route::post('submit/{course_id}', 'submitCourse');
         });
@@ -139,7 +141,7 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
             Route::get('show/student/{episode_id}', 'showToStudent');
             Route::post('like/{episode_id}', 'like');
             Route::post('finish/{episode_id}', 'finishEpisode');
-            Route::get('get_url_of_video/{episode_id}', 'get_url_or_video')->name('get_video');
+            Route::get('get_url_of_video/{episode_id}', 'get_url_of_video')->name('get_video');
             Route::get('video/{token}/stream', 'streamVideo')->name('stream_video');
             Route::get('get_poster/{episode_id}', 'get_poster')->name('get_poster');
             Route::get('download-file/{episode_id}', 'downloadFile');

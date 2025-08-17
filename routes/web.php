@@ -14,6 +14,7 @@ use App\Livewire\EditProfile;
 use App\Livewire\LoginForm;
 use App\Livewire\RegisterForm;
 use App\Livewire\RejectedCourses;
+use App\Livewire\ShowEpisode;
 use App\Livewire\UserManagement;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -42,8 +43,9 @@ Route::prefix('dashboard')->group(function () {
             Route::get('active_courses/{cate}/{topic}',  'active_courses')->        name('active_courses');
             Route::get('rejected_courses/{cate}/{topic}',RejectedCourses::class)->  name('rejected_courses');
             Route::get('show_course/{course}',           'show_course')->           name('show_course')->withTrashed();
-            Route::get('show_episode/{episode_id}',      'show_episode')->          name('show_episode')->withTrashed();
+            Route::get('show_episode/{episode_id}',      ShowEpisode::class)->          name('show_episode')->withTrashed();
             Route::get('like/{episode}',                 'like')->                  name('like');
+            Route::delete('comments/delete/{comment}',   'destroy_comment')->       name('destroy_comment');
             Route::get('quiz/{episode}',                 'quiz')->                  name('quiz')->withTrashed();
             Route::post('approve/{episode}',             'approve')->               name('approve');
             Route::post('reject/{episode}',              'reject')->                name('reject');

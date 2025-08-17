@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Enums\CourseStatusEnum;
 use App\Http\Controllers\App\Controller;
 use App\Models\Category;
+use App\Models\Comment;
 use App\Models\Course;
 use App\Models\Episode;
 use App\Models\Quiz;
@@ -35,23 +36,6 @@ class CourseController extends Controller
         return view('courses.show_course', compact('course'));
     }
 
-    public function show_episode($episode_id)
-    {
-        $episode = Episode::with(['comments' => function($q) {
-        $q->with(['replies' => function($q) {
-            $q->with(['user' => function($q) {
-                $q->withTrashed(); // Only users with trashed
-            }]);
-        }, 'user' => function($q) {
-                $q->withTrashed(); // Only users with trashed
-            }]);
-        }, 'course' => function($q) {
-                $q->withTrashed();
-            }])->find($episode_id);
-
-        return view('courses.video', compact('episode'));
-    }
-
     public function quiz(Episode $episode)
     {
 
@@ -71,4 +55,5 @@ class CourseController extends Controller
         return view('courses.rejected_courses', compact(['cate', 'topic', 'rejected_episodes']));
     }
 
+    
 }
