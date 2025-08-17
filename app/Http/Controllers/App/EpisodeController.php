@@ -168,9 +168,9 @@ class EpisodeController extends Controller
         }
     }
 
-    public function get_url_of_video($episode_id)
+    public function get_video($episode_id)
     {
-        $episode = Episode::where('id', $episode_id)->firstOrFail();
+        $episode = Episode::withTrashed()->where('id', $episode_id)->firstOrFail();
         $course = Course::where('id', $episode->course_id)->firstOrFail();
 
         $videoPath = "courses/$course->id/episodes/$episode_id/video.mp4";
@@ -179,83 +179,38 @@ class EpisodeController extends Controller
             abort(404, 'Video file not found');
         }
 
-
-        $token = Str::random(40);
-        $expiresAt = now()->addMinutes(60); // 1 hour expiration
-        
-        // Store the access details in cache
-        cache()->put("video_token:{$token}", [
-            'episode_id' => $episode_id,
-            'user_id' => auth()->id(),
-            'path' => $videoPath
-        ], $expiresAt);
-        
-        return response()->json([
-            'data' => [
-                'url' => route('stream_video', ['token' => $token]),
-                'expires_at' => $expiresAt->toIso8601String(),
-                'token' => $token // Only include if needed for client-side tracking
+        return Storage::disk('local')->response(
+            $videoPath,
+            'episode-video.mp4',
+            [
+                'Content-Type' => 'video/mp4',
+                'Content-Disposition' => 'inline; filename="protected_video.mp4"',
+                'X-Content-Type-Options' => 'nosniff',
+                'Content-Security-Policy' => "default-src 'self'",
+                'Referrer-Policy' => 'no-referrer',
+                'Permissions-Policy' => 'autoplay=()',
+                'Cache-Control' => 'private, no-store, max-age=0, must-revalidate',
+                'Accept-Ranges' => 'none', // Disable byte-range requests
+                'X-Accel-Buffering' => 'no' // Disable buffering for some servers      // No caching
             ]
-        ]);
+        );
     }
-
-    public function streamVideo($token)
-    {
-        $cacheKey = "video_token:{$token}";
-        $accessData = cache()->get($cacheKey);
-        
-        if (!$accessData) {
-            return response()->json([
-                'error' => 'Invalid or expired token'
-            ], 410); // 410 Gone status
-        }
-        
-        // Optional: Verify the user still has access
-        if ($accessData['user_id'] != auth()->id()) {
-            return response()->json([
-                'error' => 'Access denied'
-            ], 403);
-        }
-        
-        if (!Storage::exists($accessData['path'])) {
-            return response()->json([
-                'error' => 'Video not found'
-            ], 404);
-        }
-        
-        cache()->forget($cacheKey);
-        
-        // Return the file response
-        return Storage::response($accessData['path'], null, [
-            'Content-Type' => 'video/mp4',
-            'Content-Disposition' => 'inline; filename="protected_video.mp4"',
-            'X-Content-Type-Options' => 'nosniff',
-            'Content-Security-Policy' => "default-src 'self'",
-            'Referrer-Policy' => 'no-referrer',
-            'Permissions-Policy' => 'autoplay=()',
-            'Cache-Control' => 'private, no-store, max-age=0, must-revalidate',
-            'Accept-Ranges' => 'none', // Disable byte-range requests
-            'X-Accel-Buffering' => 'no' // Disable buffering for some servers      // No caching
-
-        ]);
-    }
-
 
     public function get_poster($episode_id)
     {
-        $episode = Episode::where('id', $episode_id)->firstOrFail();
+        $episode = Episode::withTrashed()->where('id', $episode_id)->firstOrFail();
         $course = Course::where('id', $episode->course_id)->firstOrFail();
         $thumbnailPath = "courses/$course->id/episodes/$episode_id/thumbnail.jpg";
 
-        $video_url = Storage::disk('local')->temporaryUrl($thumbnailPath, now()->addMinutes(30));
 
-        return response()->json([
-            'thumbnailPath' => $thumbnailPath
-        ], headers: [
+        return response()->file(
+            Storage::disk('local')->path($thumbnailPath),
+            [
                 'Content-Type' => 'image/jpeg',
                 'Content-Disposition' => 'inline',    // Prevents "Save As" dialog
                 'Cache-Control' => 'no-store',        // No caching
                 'X-Content-Type-Options' => 'nosniff' // Blocks MIME-type sniffing
-            ]);
+            ]
+        );
     }
 }
