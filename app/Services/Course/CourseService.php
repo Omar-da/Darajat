@@ -272,6 +272,20 @@ class CourseService
         return ['data' => new CourseWithDetailsForTeacherResource($course), 'message' => __('msg.courses_created'), 'code' => 201];
     }
 
+    public function updateApprovedCourse($request, $id): array
+    {
+        $course = Course::query()->find($id);
+
+        if ($course->status !== CourseStatusEnum::APPROVED) {
+            return ['message' => __('msg.can_not_updated_course') . $course->status->label() . __('msg.status'), 'code' => 403];
+        }
+
+        $course->price = $request['price'];
+        $course->save();
+
+        return ['data' => new CourseForTeacherResource($course), 'message' => __('msg.course_updated'), 'code' => 200];
+    }
+
     public function updateDraftCourse($request, $id): array
     {
         $course = Course::query()->find($id);
@@ -287,33 +301,30 @@ class CourseService
         return ['data' => new CourseForTeacherResource($course), 'message' => __('msg.course_updated'), 'code' => 200];
     }
 
-    public function updateApprovedCourse($request, $id): array
+    public function updateRejectedCourse()
     {
-        $course = Course::query()->find($id);
+        
+    }
 
-        if ($course->status !== CourseStatusEnum::APPROVED) {
-            return ['message' => __('msg.can_not_updated_course') . $course->status->label() . __('msg.status'), 'code' => 403];
-        }
-
-        $course->price = $request['price'];
-        $course->save();
-
-        return ['data' => new CourseForTeacherResource($course), 'message' => __('msg.course_updated'), 'code' => 200];
+    public function updateAppendingCourse()
+    {
+        
     }
 
     public function destroy($id): array
     {
         $course = Course::query()->find($id);
+        
+        if(is_null($course)) 
+            return ['message' => __('msg.course_not_found'), 'code' => 404];
+        
+        if(auth('api')->id() != $course->teacher_id) 
+            return ['message' => __('msg.unauthorized'), 'code' => 403];
 
-        if ($course->num_of_students_enrolled > 0) {
-            return ['message' => __('msg.can_not_delete_course') . $course->status->label() . __('msg.enrolled_students'), 'code' => 403];
-        }
+        if ($course->status !== CourseStatusEnum::APPROVED || $course->num_of_students_enrolled > 0)
+            return ['message' => __('msg.can_not_delete_course'), 'code' => 403];
 
-        if($course->status === CourseStatusEnum::DRAFT) {
-            $course->forceDelete();
-        } else {
             $course->delete();
-        }
 
         return ['message' => __('msg.course_deleted'), 'code' => 200];
     }
@@ -331,8 +342,9 @@ class CourseService
         }
 
         $course->update([
-            'status' => CourseStatusEnum::DRAFT,
+            'status' => CourseStatusEnum::PENDING,
         ]);
+
         $course->restore();
 
         return ['message' => __('msg.course_restored'), 'code' => 200];

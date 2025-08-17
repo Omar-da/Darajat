@@ -228,9 +228,14 @@ class EpisodeController extends Controller
         // Return the file response
         return Storage::response($accessData['path'], null, [
             'Content-Type' => 'video/mp4',
-            'Accept-Ranges' => 'bytes',
-            // 'Content-Disposition' => 'inline',    // Prevents "Save As" dialog
-            // 'Cache-Control' => 'no-store',        // No caching
+            'Content-Disposition' => 'inline; filename="protected_video.mp4"',
+            'X-Content-Type-Options' => 'nosniff',
+            'Content-Security-Policy' => "default-src 'self'",
+            'Referrer-Policy' => 'no-referrer',
+            'Permissions-Policy' => 'autoplay=()',
+            'Cache-Control' => 'private, no-store, max-age=0, must-revalidate',
+            'Accept-Ranges' => 'none', // Disable byte-range requests
+            'X-Accel-Buffering' => 'no' // Disable buffering for some servers      // No caching
 
         ]);
     }
