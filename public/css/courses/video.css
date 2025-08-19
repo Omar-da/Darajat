@@ -52,6 +52,16 @@
     align-items: center;
 }
 
+.delete-icon {
+  color: #bc0000f6;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.delete-icon:hover {
+  color: var(--delete-hover);
+  transform: scale(1.1);
+}
+
 .video-like-btn {
     padding: 8px 18px;
     border-radius: 20px;

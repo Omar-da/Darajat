@@ -98,21 +98,9 @@ class CommentService
         return ['data' => new CommentResource($comment), 'message' => __('msg.comment_updated'), 'code' => 200];
     }
 
-    public function destroyForTeacher($id): array
-    {
-        $comment = Comment::query()->find($id);
-        if(is_null($comment)) {
-            return ['message' => __('msg.comment_not_found'), 'code' => 404];
-        }
-        if(!$comment->episode->course->where('teacher_id', auth('api')->id())->exists()) {
-            return ['message' => __('msg.unauthorized'), 'code' => 401];
-        }
-        $comment->delete();
-        return ['message' => __('msg.comment_deleted'), 'code' => 200];
-    }
 
     // Delete specific comment.
-    public function destroyForStudent($id): array
+    public function destroy($id): array
     {
         $comment = Comment::query()
             ->where([
@@ -131,34 +119,26 @@ class CommentService
     }
 
     // Add Like to specific comment.
-    public function addLikeToComment($id): array
+    public function like($id): array
     {
         $comment = Comment::query()->find($id);
         if(is_null($comment)) {
             return ['message' => __('msg.comment_not_found'), 'code' => 404];
         }
+
         if($comment->userLikes()->where('user_id', auth('api')->id())->exists()) {
-            return ['message' => __('msg.already_liked_comment'), 'code' => 401];
+            $comment->userLikes()->detach(auth('api')->id());
+            $comment->decrement('likes');
+            return ['data' => new CommentResource($comment), 'message' => __('msg.comment_unliked'), 'code' => 200];
         }
-        $comment->userLikes()->attach(auth('api')->id());
-        $comment->increment('likes');
+        else
+        {
+            $comment->userLikes()->attach(auth('api')->id());
+            $comment->increment('likes');
+            return ['data' => new CommentResource($comment), 'message' => __('msg.comment_liked'), 'code' => 200];
+        }
 
-        return ['data' => new CommentResource($comment), 'message' => __('msg.comment_liked'), 'code' => 200];
     }
 
-    // Remove Like from specific comment.
-    public function removeLikeFromComment($id): array
-    {
-        $comment = Comment::query()->find($id);
-        if(is_null($comment)) {
-            return ['message' => __('msg.comment_not_found'), 'code' => 404];
-        }
-        if(!$comment->userLikes()->where('user_id', auth('api')->id())->exists()) {
-            return ['message' => __('msg.do_not_have_like_comment'), 'code' => 404];
-        }
-        $comment->userLikes()->detach(auth('api')->id());
-        $comment->decrement('likes');
 
-        return ['data' => new CommentResource($comment), 'message' => __('msg.comment_unliked'), 'code' => 200];
-    }
 }

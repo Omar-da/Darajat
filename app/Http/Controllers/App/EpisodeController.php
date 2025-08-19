@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Str;
 use Throwable;
 
 class EpisodeController extends Controller
@@ -117,28 +118,12 @@ class EpisodeController extends Controller
     }
 
     // Add Like to specific episode.
-    public function addLikeToEpisode($id): JsonResponse
+    public function like($id): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->episodeService->addLikeToEpisode($id);
+            $data = $this->episodeService->like($id);
             if ($data['code'] == 409 || $data['code'] == 403) {
-                return Response::error($data['message'], $data['code']);
-            }
-            return Response::success($data['data'], $data['message'], $data['code']);
-        } catch (Throwable $th) {
-            $message = $th->getMessage();
-            return Response::error($message);
-        }
-    }
-
-    // Remove Like from specific episode.
-    public function removeLikeFromEpisode($id): JsonResponse
-    {
-        $data = [];
-        try {
-            $data = $this->episodeService->removeLikeFromEpisode($id);
-            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -185,7 +170,7 @@ class EpisodeController extends Controller
 
     public function get_video($episode_id)
     {
-        $episode = Episode::where('id', $episode_id)->firstOrFail();
+        $episode = Episode::withTrashed()->where('id', $episode_id)->firstOrFail();
         $course = Course::where('id', $episode->course_id)->firstOrFail();
 
         $videoPath = "courses/$course->id/episodes/$episode_id/video.mp4";
@@ -199,17 +184,21 @@ class EpisodeController extends Controller
             'episode-video.mp4',
             [
                 'Content-Type' => 'video/mp4',
-                'Content-Length' => Storage::disk('local')->size($videoPath),
-                'Content-Disposition' => 'inline',  // Prevents "Save As" dialog
-                'Cache-Control' => 'no-store',      // Disables browser caching
-                'Accept-Ranges' => 'none'
+                'Content-Disposition' => 'inline; filename="protected_video.mp4"',
+                'X-Content-Type-Options' => 'nosniff',
+                'Content-Security-Policy' => "default-src 'self'",
+                'Referrer-Policy' => 'no-referrer',
+                'Permissions-Policy' => 'autoplay=()',
+                'Cache-Control' => 'private, no-store, max-age=0, must-revalidate',
+                'Accept-Ranges' => 'none', // Disable byte-range requests
+                'X-Accel-Buffering' => 'no' // Disable buffering for some servers      // No caching
             ]
         );
     }
 
     public function get_poster($episode_id)
     {
-        $episode = Episode::where('id', $episode_id)->firstOrFail();
+        $episode = Episode::withTrashed()->where('id', $episode_id)->firstOrFail();
         $course = Course::where('id', $episode->course_id)->firstOrFail();
         $thumbnailPath = "courses/$course->id/episodes/$episode_id/thumbnail.jpg";
 
@@ -222,6 +211,25 @@ class EpisodeController extends Controller
                 'Cache-Control' => 'no-store',        // No caching
                 'X-Content-Type-Options' => 'nosniff' // Blocks MIME-type sniffing
             ]
+        );
+    }
+
+    public function getFile($episode_id): StreamedResponse|JsonResponse
+    {
+        $episode = Episode::query()->find($episode_id);
+
+        $directory = "courses/{$episode->course_id}/episodes/{$episode_id}";
+
+        $file = collect(Storage::disk('local')->files($directory))
+            ->first(fn($f) => str_contains(basename($f), 'file'));
+
+        if (!$file) {
+            return Response::error(__('msg.file_not_found'), 404);
+        }
+
+        return Storage::disk('local')->response(
+            $file,
+            $episode->title . '.' . pathinfo($file, PATHINFO_EXTENSION)
         );
     }
 }
