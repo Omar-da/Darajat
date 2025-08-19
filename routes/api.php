@@ -107,7 +107,7 @@ Route::controller(CourseController::class)->middleware('localization')->prefix('
         Route::middleware('is_owner')->group(function () {
             Route::put('update-draft/{course_id}', 'updateDraftCourse');
             Route::patch('update-approved/{course_id}', 'updateApprovedCourse');
-            Route::delete('{course_id}', 'destroy');
+            Route::delete('delete/{course_id}', 'destroy');
             Route::get('teacher/{course_id}', 'showToTeacher');
             Route::post('submit/{course_id}', 'submitCourse');
         });
@@ -147,7 +147,7 @@ Route::controller(EpisodeController::class)->middleware(['auth:api', 'localizati
         Route::post('{course_id}', 'store');
         Route::put('update/{episode_id}', 'update');
         Route::get('show/teacher/{episode_id}', 'showToTeacher');
-        Route::delete('{episode_id}', 'destroy');
+        Route::delete('delete/{episode_id}', 'destroy');
     });
     Route::get('student/{course_id}', 'getToStudent')->middleware('is_subscribed');
 });
