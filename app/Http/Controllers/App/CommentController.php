@@ -99,11 +99,11 @@ class CommentController extends Controller
     }
 
     // Delete a specific comment by the comment's owner.
-    public function destroyForStudent($id): JsonResponse
+    public function destroy($id): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->commentService->destroyForStudent($id);
+            $data = $this->commentService->destroy($id);
             if($data['code'] == 404 || $data['code'] == 401) {
                 return Response::error($data['message'], $data['code']);
             }

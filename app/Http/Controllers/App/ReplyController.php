@@ -67,11 +67,11 @@ class ReplyController extends Controller
 
 
     // Delete a specific reply by the reply's owner.
-    public function destroyForStudent($id): JsonResponse
+    public function destroy($id): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->replyService->destroyForStudent($id);
+            $data = $this->replyService->destroy($id);
             if($data['code'] == 404 || $data['code'] == 401) {
                 return Response::error($data['message'], $data['code']);
             }

@@ -72,11 +72,4 @@ class CoursePolicy
             ? Response::allow()
             : Response::deny(__('msg.course_not_approved'), 403);
     }
-
-    public function quizAction(User $user, Course $course): Response
-    {
-        return ($course->status === CourseStatusEnum::DRAFT || $course->status === CourseStatusEnum::REJECTED)
-            ? Response::allow()
-            : Response::deny(__('msg.quiz_action'), 403);
-    }
 }

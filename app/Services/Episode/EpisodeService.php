@@ -44,32 +44,23 @@ class EpisodeService
 
     public function store($request, $course_id): array
     {
-        $course = Course::query()
-            ->where([
-                'teacher_id' => auth('api')->id(),
-                'id' => $course_id
-            ])->first();
-        if (is_null($course)) {
-            return ['message' => __('msg.course_not_found'), 'code' => 404];
-        }
-
-        if (!($course->status === CourseStatusEnum::DRAFT || $course->status === CourseStatusEnum::REJECTED)) {
+        $course = Course::findOrFail($course_id);
+        if ($course->status !== CourseStatusEnum::DRAFT)
             return ['message' => __('msg.can_not_add_episode') . $course->status->label() . '!', 'code' => 403];
-        }
 
-        $request['course_id'] = $course_id;
+        // Create episode
+        $request['course_id'] = $course->id;
         $episode = Episode::query()->create($request);
-        $episode_path = "courses/$course->id/episodes/$episode->id";
 
+        // Video, thumbnail and file
+        $episode_path = "courses/$course->id/episodes/$episode->id";
         $request['image_url']->storeAs($episode_path, 'thumbnail.jpg', 'local');
         $request['video_url']->storeAs($episode_path, 'video.mp4', 'local');
-
-        if(request()->hasFile('file_url')) {
+        if(request()->hasFile('file_url'))
             $request['file_url']->storeAs($episode_path, 'file.' . $request['file_url']->getClientOriginalExtension(), 'local');
-        }
-
+        
+        // Duration
         $request['duration'] = FFMpeg::fromDisk('local')->open("$episode_path/video.mp4")->getDurationInSeconds();
-
         $episode->update([
             'duration' => $request['duration']
         ]);
@@ -78,40 +69,47 @@ class EpisodeService
             'num_of_episodes' => $course->num_of_episodes + 1,
             'total_time' => $course['total_time'] + $request['duration'],
         ]);
+
         return ['data' => new EpisodeTeacherResource($episode), 'message' => __('msg.episode_created'), 'code' => 201];
     }
 
     public function update($request, $id): array
     {
         $episode = Episode::query()->find($id);
-
         $course = $episode->course;
-        if (!($episode->course->status === CourseStatusEnum::DRAFT || $episode->course->stauts === CourseStatusEnum::REJECTED)) {
-            return ['message' => __('msg.can_not_update_episode') . $episode->course->status->label() . '!', 'code' => 403];
-        }
 
+        if ($episode->course->status !== CourseStatusEnum::DRAFT)
+            return ['message' => __('msg.can_not_update_episode') . $episode->course->status->label() . '!', 'code' => 403];
+
+        // Video, thumbnail and file
         $episode_path = "courses/$course->id/episodes/$episode->id";
         $request['image_url']->storeAs($episode_path, 'thumbnail.jpg', 'local');
         $request['video_url']->storeAs($episode_path, 'video.mp4', 'local');
-
-        if(request()->hasFile('file_url')) {
+        if(request()->hasFile('file_url'))
             $request['file_url']->storeAs($episode_path, 'file.' . $request['file_url']->getClientOriginalExtension(), 'local');
-        } else {
+        else
+        {
             $file = collect(Storage::disk('local')->files($episode_path))
                 ->first(fn($f) => str_contains(basename($f), 'file'));
-            if(!is_null($file)) {
+            if(!is_null($file))
                 Storage::disk('local')->delete("$episode_path/file." . pathinfo($file, PATHINFO_EXTENSION));
-            }
         }
 
         $request['duration'] = FFMpeg::fromDisk('local')->open("$episode_path/video.mp4")->getDurationInSeconds();
+
+        $course->update([
+            'total_time' => $course['total_time'] - $episode->duration
+        ]);
         $episode->update($request);
+        $course->update([
+            'total_time' => $course['total_time'] + $episode->duration
+        ]);
+
         return ['data' => new EpisodeTeacherResource($episode), 'message' => __('msg.episode_updated'), 'code' => 200];
     }
 
     public function showToTeacher($id): array
     {
-        $user = auth('api')->user();
         $episode = Episode::query()->find($id);
 
         return ['data' => new EpisodeTeacherResource($episode), 'message' => __('msg.episode_retrieved'), 'code' => 200];
@@ -119,7 +117,6 @@ class EpisodeService
 
     public function showToStudent($id): array
     {
-        $user = auth('api')->user();
         $episode = Episode::query()->find($id);
 
         return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_retrieved'), 'code' => 200];
@@ -127,28 +124,34 @@ class EpisodeService
 
     public function destroy($id): array
     {
-        $user = auth('api')->user();
-        $episode = Episode::query()->find($id);
-
+        $episode = Episode::findOrFail($id);
         $course = $episode->course;
-        if ($course->status === CourseStatusEnum::APPROVED) {
+
+        if ($course->status !== CourseStatusEnum::DRAFT)
             return ['message' => __('msg.can_not_delete_episode') . $course->status->label() . '!', 'code' => 403];
-        }
 
-        $min_episode = Episode::withTrashed()->where('course_id', $course->id)->orderBy('episode_number')->first();
-        $episode->update([
-            'episode_number' => $min_episode->episode_number - 1,
+        // Update numbers of episodes
+        foreach ($course->draft_episodes as $episode_from_course)
+            if ($episode_from_course->episode_number > $episode->episode_number)
+                $episode_from_course->decrement('episode_number');
+
+        // Video, Thumbnail and File
+        $episode_path = "courses/$course->id/episodes/$episode->id";
+        Storage::disk('local')->delete("$episode_path/video_copy.mp4");
+        Storage::disk('local')->delete("$episode_path/thumbnail_copy.jpg");
+        $file = collect(Storage::disk('local')->files($episode_path))
+            ->first(fn($f) => str_contains(basename($f), 'file_copy'));
+        $extention = pathinfo($file, PATHINFO_EXTENSION);
+        Storage::disk('local')->delete("$episode_path/file_copy.$extention");
+
+
+        if($episode->quiz->exists())
+            $course->decrement('total_quizzes');
+        $course->decrement('num_of_episodes');
+        $course->update([
+            'total_time' => $course->total_time - $episode->duration
         ]);
-
-//        $episode->quiz()->delete();
-        $episode->forceDelete();
-        foreach ($course->episodes as $episode) {
-            if ($episode->id != $id) {
-                $episode->update([
-                    'episode_number' => $episode->episode_number - 1
-                ]);
-            }
-        }
+        $episode->delete();
 
         return ['message' => __('msg.episode_deleted'), 'code' => 200];
     }
