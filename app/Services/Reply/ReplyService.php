@@ -55,7 +55,7 @@ class ReplyService
     }
 
     // Delete specific reply.
-    public function destroyForStudent($id): array
+    public function destroy($id): array
     {
         $reply = Reply::query()
             ->where([

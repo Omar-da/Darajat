@@ -2,6 +2,7 @@
 
 namespace App\Services\Quiz;
 
+use App\Enums\CourseStatusEnum;
 use App\Http\Resources\Quiz\ResultResource;
 use App\Http\Resources\Quiz\TeacherQuizResource;
 use App\Models\Episode;
@@ -16,18 +17,15 @@ class QuizService
 
     public function store($episode_id, $request): array
     {
-        $episode = Episode::query()->find($episode_id);
+        $episode = Episode::findOrFail($episode_id);
 
-        if(is_null($episode)){
-            return ['message' => __('msg.episode_not_found'), 'code' => 404];
-        }
-
-        if(!is_null($episode->quiz)) {
+        if($episode->quiz->exists()) 
             return ['message' => __('msg.quiz_already_exists'), 'code' => 409];
-        }
 
-        Gate::authorize('quizAction', $episode->course);
-        $quiz = Quiz::query()->create([
+        if($episode->course->status !== CourseStatusEnum::DRAFT)
+            return ['message' => __('msg.quiz_action'), 'code' => 403];
+
+        $quiz = Quiz::create([
             'episode_id' => $episode_id,
             'num_of_questions' => $request['num_of_questions'],
         ]);
@@ -124,13 +122,10 @@ class QuizService
 
     public function update($quiz_id, $request): array
     {
-        $user = auth('api')->user();
-        $quiz = Quiz::query()->find($quiz_id);
-        if (is_null($quiz)) {
-            return ['message' => __('msg.quiz_not_found'), 'code' => 404];
-        }
+        $quiz = Quiz::findOrFail($quiz_id);
 
-        Gate::authorize('quizAction', $quiz->episode->course);
+        if($quiz->episode->course->status !== CourseStatusEnum::DRAFT)
+            return ['message' => __('msg.quiz_action'), 'code' => 403];
 
         $quiz->questions()->delete();
         $quiz->update([
@@ -143,15 +138,14 @@ class QuizService
 
     public function destroy($id): array
     {
-        $quiz = Quiz::query()->find($id);
-        if (is_null($quiz)) {
-            return ['message' => __('msg.quiz_not_found'), 'code' => 404];
-        }
+        $quiz = Quiz::findOrFail($id);
 
-        Gate::authorize('quizAction', $quiz->episode->course);
+        if($quiz->episode->course->status !== CourseStatusEnum::DRAFT)
+            return ['message' => __('msg.quiz_action'), 'code' => 403];
 
+        $quiz->episode->course->decrement('total_quizzes');
         $quiz->delete();
-
+        
         return ['message' => __('msg.quiz_deleted'), 'code' => 200];
     }
 }

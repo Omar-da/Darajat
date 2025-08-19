@@ -100,7 +100,7 @@ class CommentService
 
 
     // Delete specific comment.
-    public function destroyForStudent($id): array
+    public function destroy($id): array
     {
         $comment = Comment::query()
             ->where([
