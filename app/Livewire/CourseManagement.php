@@ -17,7 +17,6 @@ class CourseManagement extends Component
     public function mount()
     {
         $this->categories = Category::with('topics')->get();
-
     }
 
     public function render()

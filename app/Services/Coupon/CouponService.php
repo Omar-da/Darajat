@@ -22,7 +22,7 @@ class CouponService
         return ['data' => CouponResource::collection($coupons), 'message' => __('msg.coupons_retrieved'), 'code' => 200];
     }
 
-    public function store($request, $course_id) : array
+    public function store($request, $course_id): array
     {
         $course = Course::query()->find($course_id);
 
@@ -40,7 +40,7 @@ class CouponService
         return ['data' => new CouponWithDetailsResource($coupon), 'message' => __('msg.coupon_created'), 'code' => 201];
     }
 
-    public function update($request, $id) : array
+    public function update($request, $id): array
     {
         $coupon = Coupon::query()->find($id);
 
@@ -62,7 +62,7 @@ class CouponService
         return ['data' => new CouponWithDetailsResource($coupon), 'message' => __('msg.coupon_retrieved'), 'code' => 200];
     }
 
-    public function destroy($id) : array
+    public function destroy($id): array
     {
         $coupon = Coupon::query()->find($id);
 
@@ -71,7 +71,7 @@ class CouponService
         return ['message' => __('msg.coupon_deleted'), 'code' => 200];
     }
 
-    public function applyCoupon($id, $request) : array
+    public function applyCoupon($id, $request): array
     {
         // Fetch authenticated user.
         $user = auth('api')->user();
@@ -80,29 +80,26 @@ class CouponService
         $course = Course::query()->find($id);
 
         // Check the course is existing.
-        if(is_null($course))
-        {
+        if (is_null($course)) {
             return ['message' => __('msg.course_not_found'), 'code' => 404];
         }
 
-        if($course->status !== CourseStatusEnum::APPROVED) {
+        if ($course->status !== CourseStatusEnum::APPROVED || $user->id == $course->teacher_id) {
             return ['message' => __('msg.unauthorized'), 'code' => 403];
         }
 
-        if($user->followed_courses()->where('course_id', $course->id)->exists())
-        {
+        if ($user->followed_courses()->where('course_id', $course->id)->exists()) {
             return ['message' => __('msg.already_subscribed'), 'code' => 409];
         }
 
         // Make query for get a specific coupon from the course.
         $coupon = $course->coupons()->where('code', $request['code'])->first();
 
-        if(is_null($coupon)) {
+        if (is_null($coupon)) {
             return ['message' => __('msg.is_not_correct'), 'code' => 409];
         }
         // Check the coupon is not expired and fully using.
-        if(!$coupon->isValid())
-        {
+        if (!$coupon->isValid()) {
             return ['message' => __('msg.coupon_exp_fully'), 'code' => 400];
         }
 

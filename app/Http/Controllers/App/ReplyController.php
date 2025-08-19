@@ -65,28 +65,13 @@ class ReplyController extends Controller
         }
     }
 
-    // Delete a specific reply by the course teacher.
-    public function destroyForTeacher($id): JsonResponse
-    {
-        $data = [];
-        try {
-            $data = $this->replyService->destroyForTeacher($id);
-            if($data['code'] == 404 || $data['code'] == 401) {
-                return Response::error($data['message'], $data['code']);
-            }
-            return Response::success([], $data['message'], $data['code']);
-        } catch (Throwable $th) {
-            $message  = $th->getMessage();
-            return Response::error($message);
-        }
-    }
 
     // Delete a specific reply by the reply's owner.
-    public function destroyForStudent($id): JsonResponse
+    public function destroy($id): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->replyService->destroyForStudent($id);
+            $data = $this->replyService->destroy($id);
             if($data['code'] == 404 || $data['code'] == 401) {
                 return Response::error($data['message'], $data['code']);
             }
@@ -98,28 +83,12 @@ class ReplyController extends Controller
     }
 
     // Add Like to specific reply.
-    public function addLikeToReply($id): JsonResponse
+    public function like($id): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->replyService->addLikeToReply($id);
+            $data = $this->replyService->like($id);
             if($data['code'] == 404 || $data['code'] == 401) {
-                return Response::error($data['message'], $data['code']);
-            }
-            return Response::success($data['data'], $data['message'], $data['code']);
-        } catch (Throwable $th) {
-            $message  = $th->getMessage();
-            return Response::error($message);
-        }
-    }
-
-    // Remove Like from specific reply.
-    public function removeLikeFromReply($id): JsonResponse
-    {
-        $data = [];
-        try {
-            $data = $this->replyService->removeLikeFromReply($id);
-            if($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);

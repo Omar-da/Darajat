@@ -5,6 +5,7 @@ use App\Http\Middleware\CheckOwnerCourse;
 use App\Http\Middleware\CheckSubscribed;
 use App\Http\Middleware\CheckTeacherRole;
 use App\Http\Middleware\CertificateMiddleware;
+use App\Http\Middleware\AuthMiddleware;
 use App\Http\Middleware\ProtectEpisodeAccess;
 use App\Http\Middleware\Localization;
 use App\Responses\Response;
@@ -21,9 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
         CheckIsActiveCommand::class
     ])
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
@@ -37,6 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'localization' => Localization::class,
             'is_owner' => CheckOwnerCourse::class,
             'is_subscribed' => CheckSubscribed::class,
+            'regular_or_socialite' => AuthMiddleware::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -44,20 +46,23 @@ return Application::configure(basePath: dirname(__DIR__))
             $message = 'Too many attempts. Please try again later.';
             $code = 429;
             if (isset($e->getHeaders()['Retry-After'])) {
-                $retryAfterSeconds = (int) $e->getHeaders()['Retry-After'];
+                $retryAfterSeconds = (int)$e->getHeaders()['Retry-After'];
                 $message = 'Too many attempts. Please wait ' . $retryAfterSeconds . ' seconds before trying again.';
             }
             return Response::error([], $message, $code);
         });
-        // $exceptions->renderable(function (AuthenticationException $e, $request) {
-        //     $locale = $request->header('Accept-Language', config('app.locale'));
-        //     if ($locale == 'ar') {
-        //         $message =  '!يجب تسجيل الدخول أولاً';
-        //     } else {
-        //         $message = 'Unauthenticated!';
-        //     }
-        //     return Response::error($message, 401);
-        // });
+        $exceptions->renderable(function (AuthenticationException $e, $request) {
+            if ($request->is('api/*')) {
+                $locale = $request->header('Accept-Language', config('app.locale'));
+                if ($locale == 'ar') {
+                    $message = '!يجب تسجيل الدخول أولاً';
+                } else {
+                    $message = 'Unauthenticated!';
+                }
+                return Response::error($message, 401);
+            }
+            return null;
+        });
     })->withSchedule(function (Schedule $schedule) {
         $schedule->command('active:check')->dailyAt('03:00')->timezone('Asia/Damascus');
     })->create();

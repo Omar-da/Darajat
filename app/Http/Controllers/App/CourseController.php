@@ -211,11 +211,11 @@ class CourseController extends Controller
         }
     }
 
-    public function store(CourseRequest $request): JsonResponse
+    public function createDraftCourse(CourseRequest $request): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->courseService->store($request->validated());
+            $data = $this->courseService->createDraftCourse($request->validated());
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
@@ -253,27 +253,12 @@ class CourseController extends Controller
         }
     }
 
-    public function destroy($id): JsonResponse
+    public function destroyDraft($id): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->courseService->destroy($id);
+            $data = $this->courseService->destroyDraftCourse($id);
             if($data['code'] == 403) {
-                return Response::error($data['message'], $data['code']);
-            }
-            return Response::success([], $data['message'], $data['code']);
-        } catch (Throwable $th) {
-            $message = $th->getMessage();
-            return Response::error($message);
-        }
-    }
-
-    public function restore($id): JsonResponse
-    {
-        $data = [];
-        try {
-            $data = $this->courseService->restore($id);
-            if($data['code'] == 403 || $data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success([], $data['message'], $data['code']);

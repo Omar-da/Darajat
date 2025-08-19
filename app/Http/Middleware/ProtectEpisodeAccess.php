@@ -20,6 +20,7 @@ class ProtectEpisodeAccess
 
         if (auth('web')->user() ||
             auth('api')->user()->followed_courses->contains($episode->course_id) ||
+            auth('api')->user()->published_courses->contains($episode->course_id) ||
             $episode->episode_number == 1) {
             return $next($request);
         }

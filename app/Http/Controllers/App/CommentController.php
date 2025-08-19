@@ -98,28 +98,12 @@ class CommentController extends Controller
         }
     }
 
-    // Delete a specific comment by the course teacher.
-    public function destroyForTeacher($id): JsonResponse
-    {
-        $data = [];
-        try {
-            $data = $this->commentService->destroyForTeacher($id);
-            if($data['code'] == 404 || $data['code'] == 401) {
-                return Response::error($data['message'], $data['code']);
-            }
-            return Response::success([], $data['message'], $data['code']);
-        } catch (Throwable $th) {
-            $message  = $th->getMessage();
-            return Response::error($message);
-        }
-    }
-
     // Delete a specific comment by the comment's owner.
-    public function destroyForStudent($id): JsonResponse
+    public function destroy($id): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->commentService->destroyForStudent($id);
+            $data = $this->commentService->destroy($id);
             if($data['code'] == 404 || $data['code'] == 401) {
                 return Response::error($data['message'], $data['code']);
             }
@@ -131,11 +115,11 @@ class CommentController extends Controller
     }
 
     // Add Like to specific comment.
-    public function addLikeToComment($id): JsonResponse
+    public function like($id): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->commentService->addLikeToComment($id);
+            $data = $this->commentService->like($id);
             if($data['code'] == 404 || $data['code'] == 401) {
                 return Response::error($data['message'], $data['code']);
             }
@@ -146,19 +130,4 @@ class CommentController extends Controller
         }
     }
 
-    // Remove Like from specific comment.
-    public function removeLikeFromComment($id): JsonResponse
-    {
-        $data = [];
-        try {
-            $data = $this->commentService->removeLikeFromComment($id);
-            if($data['code'] == 404) {
-                return Response::error($data['message'], $data['code']);
-            }
-            return Response::success($data['data'], $data['message'], $data['code']);
-        } catch (Throwable $th) {
-            $message  = $th->getMessage();
-            return Response::error($message);
-        }
-    }
 }

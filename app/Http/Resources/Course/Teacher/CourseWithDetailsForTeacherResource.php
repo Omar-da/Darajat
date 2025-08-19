@@ -27,7 +27,7 @@ class CourseWithDetailsForTeacherResource extends JsonResource
             'what_will_you_learn' => $this->episodes->pluck('title'),
             'teacher' => [
                 'id' => $this->teacher->id,
-                'full_name' => $this->teacher->full_namel,
+                'full_name' => $this->teacher->full_name,
                 'profile_image_url' => $this->teacher->profile_image_url ? Storage::url("profiles/{$this->teacher->profile_image_url}") : null
             ],
             'difficulty_level' => $this->difficulty_level->label(),
