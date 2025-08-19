@@ -152,6 +152,8 @@ class QuizService
 
         $quiz->delete();
 
+        $quiz->episode->course->decrement('total_quizzes');
+
         return ['message' => __('msg.quiz_deleted'), 'code' => 200];
     }
 }
