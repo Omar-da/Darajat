@@ -31,6 +31,7 @@ class CourseWithDetailsForStudentResource extends JsonResource
                 'full_name' => $this->teacher->full_name,
                 'profile_image_url' => $this->teacher->profile_image_url ? Storage::url($this->teacher->profile_image_url) : null
             ],
+            'is_my_course' => (bool)auth('api')->id() == $this->teacher->id,
             'difficulty_level' => $this->difficulty_level->label(),
             'num_of_hours' => $this->total_time ? floor($this->total_time / 3600) : 0,
             'price' => $this->price . '$',

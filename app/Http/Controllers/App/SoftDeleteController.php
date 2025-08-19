@@ -20,6 +20,7 @@ class SoftDeleteController
 
     public function restore(Course $course): array
     {
+        $course = Course::onlyTrashed()->find($id);
         $course->update([
             'status' => CourseStatusEnum::PENDING,
             'publishing_request_date' => now()->format('Y-m-d H:i:s')

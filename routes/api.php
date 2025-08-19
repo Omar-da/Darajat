@@ -98,7 +98,6 @@ Route::middleware('localization')->group(function () {
         Route::get('search/{title}', 'search');
         Route::get('free', 'getFreeCourses');
         Route::get('paid', 'getPaidCourses');
-        Route::get('student/{id}', 'showToStudent');
         Route::post('payment-process/{course}', 'paymentProcess')->name('courses.payment_process');
         Route::post('get-certificate/{course}', 'getCertificate')->name('courses.get_certificate')->middleware('get_certificate');
         Route::middleware('regular_or_socialite')->group(function () {
@@ -108,6 +107,7 @@ Route::middleware('localization')->group(function () {
             Route::get('rejected', 'getRejectedCoursesToTeacher');
             Route::get('deleted', 'getDeletedCoursesToTeacher');
             Route::post('create-draft', 'createDraftCourse')->middleware('is_teacher');
+            Route::get('student/{id}', 'showToStudent');
             Route::middleware('is_owner')->group(function () {
                 Route::put('update-draft/{course_id}', 'updateDraftCourse');
                 Route::delete('delete-draft/{course_id}', 'destroyDraft');
