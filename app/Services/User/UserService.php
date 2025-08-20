@@ -14,7 +14,7 @@ class UserService
 {
     public function updateProfile($request): array
     {
-        $user = User::query()->find(Auth::id());
+        $user = User::query()->find(auth('api')->id());
         $moreDetail = $user->moreDetail;
 
         $user->update([
@@ -64,7 +64,7 @@ class UserService
     public function updateProfileImage($request): array
     {
         $user = User::query()->find(auth('api')->id());
-        Storage::delete("profiles/{$user->profile_image_url}");
+        Storage::disk('uploads')->delete($user->profile_image_url);
         if (!empty($request['profile_image_url'])) {
             $path = $request['profile_image_url']->store('profiles');
             $user->update([
@@ -80,7 +80,7 @@ class UserService
 
     public function changePassword($request): array
     {
-        $user = User::query()->find(Auth::id());
+        $user = User::query()->find(auth('api')->id());
         if(!Hash::check($request['old_password'], $user['password'])) {
             $message = __('msg.old_password');
             $code = 401;
@@ -114,9 +114,9 @@ class UserService
 
     public function delete(): array
     {
-        $user = User::query()->find(Auth::id());
+        $user = User::query()->find(auth('api')->id());
         $user->delete();
-        return ['user' => $user, 'message' => __('msg.user_deleted')];
+        return ['user' => [], 'message' => __('msg.user_deleted')];
     }
 
 
