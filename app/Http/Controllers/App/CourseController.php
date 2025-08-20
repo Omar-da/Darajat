@@ -253,7 +253,7 @@ class CourseController extends Controller
         }
     }
 
-    public function destroyDraft($id): JsonResponse
+    public function destroyDraftCourse($id): JsonResponse
     {
         $data = [];
         try {
