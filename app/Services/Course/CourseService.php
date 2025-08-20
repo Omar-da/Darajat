@@ -12,9 +12,9 @@ use App\Http\Resources\Course\Teacher\CourseWithDetailsForTeacherResource;
 use App\Http\Resources\Course\Teacher\DeletedCourseForTeacherResource;
 use App\Models\Category;
 use App\Models\Course;
-use App\Models\DraftCourse;
 use App\Models\Language;
 use App\Models\Topic;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class CourseService
@@ -340,7 +340,7 @@ class CourseService
 
         $course->update([
             'status' => CourseStatusEnum::PENDING,
-            'publishing_request_date' => now(),
+            'publishing_request_date' => now()->format('Y-m-d H:i:s'),
             'response_date' => null
         ]);
 
