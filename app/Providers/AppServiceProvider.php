@@ -12,6 +12,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -47,6 +48,14 @@ class AppServiceProvider extends ServiceProvider
                     ->timezone('Asia/Damascus');
             });
         }
+
+        if (str_contains(request()->getHttpHost(), 'ngrok-free.app')) {
+        // Force Laravel to use the current request's scheme and host
+        // This makes asset() URLs generate using https://your-url.ngrok-free.app
+        URL::forceScheme('https');
+        URL::forceRootUrl(request()->getSchemeAndHttpHost());
+    }
+
     }
 }
 

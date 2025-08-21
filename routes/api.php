@@ -20,6 +20,7 @@ use App\Http\Controllers\App\SkillController;
 use App\Http\Controllers\App\SoftDeleteController;
 use App\Http\Controllers\App\SpecialityController;
 use App\Http\Controllers\App\StatisticController;
+use App\Http\Controllers\app\StripeWebhookController;
 use App\Http\Controllers\App\TopicController;
 use App\Http\Controllers\App\UniversityController;
 use App\Http\Controllers\App\UpdateCopiedCourseController;
@@ -88,7 +89,7 @@ Route::middleware('localization')->group(function () {
         Route::get('search/{title}', 'search');
     });
 
-// courses
+    // courses
     Route::controller(CourseController::class)->prefix('courses')->group(function () {
         Route::get('', 'index');
         Route::post('load-more', 'loadMore');
@@ -120,6 +121,9 @@ Route::middleware('localization')->group(function () {
             Route::get('followed', 'getFollowedCoursesForStudent');
         });
     });
+
+    // Stripe
+    Route::post('/stripe-webhook', [StripeWebhookController::class, 'handleWebhook']);
 
     // coupons
     Route::controller(CouponController::class)->middleware('regular_or_socialite')->prefix('coupons')->group(function () {
@@ -183,7 +187,7 @@ Route::middleware('localization')->group(function () {
             Route::get('get-copy-of-course/{course_id}', 'getCopyOfCourse');
             Route::put('update-course/{course}/copy', 'updateCourseCopy');
             Route::get('repost-course/{draft_course_id}', 'repostCourse');
-            Route::delete('cancel-updating/{course}', 'cancel');
+            Route::delete('cancel-updating/{course_id}', 'cancel');
         });
 
         Route::prefix('episodes')->group(function () {
@@ -203,9 +207,6 @@ Route::middleware('localization')->group(function () {
             Route::put('restore/{course_id}', 'restore');
         });
     });
-
-    // Soft Delete
-
 
     Route::middleware('regular_or_socialite')->group(function () {
 

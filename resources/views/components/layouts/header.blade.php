@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="{{asset('css/main/footer_navbar.css')}}">
     {{-- courses --}}
     <link rel="stylesheet" href="{{asset('css/courses/index.css')}}">
-    <link rel="stylesheet" href="{{asset('css/courses/episodes.css')}}">
     <link rel="stylesheet" href="{{asset('css/courses/video.css')}}">
     <link rel="stylesheet" href="{{asset('css/courses/show_course.css')}}">
     <link rel="stylesheet" href="{{asset('css/courses/quiz.css')}}">
@@ -38,7 +37,7 @@
     <nav class="navbar">
         <!-- Platform Name -->
         <div class="brand">
-            <span class="gradient-text"><img src="{{asset('img/icons/Darajat.png')}}" alt="logo"></span>
+            <span class="gradient-text"><img src="{{asset('img/icons/DarajatTrans.png')}}" alt="logo"></span>
         </div>
 
         <!-- Navigation Links -->
@@ -88,37 +87,5 @@
     @endif
     
     <x-layouts.footer-navbar/>
-
-    <script src="script.js">
-        document.getElementById('profileToggler').addEventListener('click', function() {
-            const dropdown = document.getElementById('dropdownContent');
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-        });
-
-        // Optional: Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('dropdownContent');
-            const toggler = document.getElementById('profileToggler');
-        
-        if (!toggler.contains(event.target)) {
-            dropdown.style.display = 'none';
-            }
-        });
-
-        
-        // Tab functionality
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Remove active class from all tabs and content
-                document.querySelectorAll('.tab, .tab-content').forEach(el => {
-                    el.classList.remove('active');
-                });
-                
-                // Add active class to clicked tab and corresponding content
-                tab.classList.add('active');
-                document.querySelector(`.tab-content:nth-child(${tab.dataset.tab})`).classList.add('active');
-            });
-        });
-    </script>
 </body>
 </html>

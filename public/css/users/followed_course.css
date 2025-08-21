@@ -76,7 +76,6 @@
 .arrow {
     width: 15px;
     height: 15px;
-    border: 2px solid var(--primary); /* Blue-500 */
     border-left: 0;
     border-top: 0;
     transform: rotate(-45deg);
