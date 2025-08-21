@@ -20,6 +20,7 @@ use App\Http\Controllers\App\SkillController;
 use App\Http\Controllers\App\SoftDeleteController;
 use App\Http\Controllers\App\SpecialityController;
 use App\Http\Controllers\App\StatisticController;
+use App\Http\Controllers\app\StripeWebhookController;
 use App\Http\Controllers\App\TopicController;
 use App\Http\Controllers\App\UniversityController;
 use App\Http\Controllers\App\UpdateCopiedCourseController;
@@ -120,6 +121,9 @@ Route::middleware('localization')->group(function () {
             Route::get('followed', 'getFollowedCoursesForStudent');
         });
     });
+
+    // Stripe
+    Route::post('/stripe-webhook', [StripeWebhookController::class, 'handleWebhook']);
 
     // coupons
     Route::controller(CouponController::class)->middleware('regular_or_socialite')->prefix('coupons')->group(function () {

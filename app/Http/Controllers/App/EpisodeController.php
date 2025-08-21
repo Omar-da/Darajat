@@ -9,6 +9,7 @@ use App\Models\Episode;
 use App\Responses\Response;
 use App\Services\Episode\EpisodeService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -78,11 +79,11 @@ class EpisodeController extends Controller
         }
     }
 
-    public function showToTeacher($id): JsonResponse
+    public function showToTeacher(Request $request, $id): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->episodeService->showToTeacher($id);
+            $data = $this->episodeService->showToTeacher($request, $id);
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
@@ -168,12 +169,16 @@ class EpisodeController extends Controller
         }
     }
 
-    public function get_video($episode_id)
+    public function get_video(Request $request, $episode_id)
     {
-        $episode = Episode::withTrashed()->where('id', $episode_id)->firstOrFail();
+        $episode = Episode::where('id', $episode_id)->firstOrFail();
         $course = Course::where('id', $episode->course_id)->firstOrFail();
 
-        $videoPath = "courses/$course->id/episodes/$episode_id/video.mp4";
+        if($request->query('copy') == 'true')
+            $videoPath = "courses/$course->id/episodes/$episode_id/video_copy.mp4";
+        else
+            $videoPath = "courses/$course->id/episodes/$episode_id/video.mp4";
+
 
         if (!Storage::disk('local')->exists($videoPath)) {
             abort(404, 'Video file not found');
@@ -196,12 +201,14 @@ class EpisodeController extends Controller
         );
     }
 
-    public function get_poster($episode_id)
+    public function get_poster(Request $request, $episode_id)
     {
-        $episode = Episode::withTrashed()->where('id', $episode_id)->firstOrFail();
+        $episode = Episode::findOrFail();
         $course = Course::where('id', $episode->course_id)->firstOrFail();
-        $thumbnailPath = "courses/$course->id/episodes/$episode_id/thumbnail.jpg";
-
+        if($request->query('copy') == 'true')
+            $thumbnailPath = "courses/$course->id/episodes/$episode_id/thumbnail_copy.jpg";
+        else
+            $thumbnailPath = "courses/$course->id/episodes/$episode_id/thumbnail.jpg";
 
         return response()->file(
             Storage::disk('local')->path($thumbnailPath),
@@ -214,14 +221,15 @@ class EpisodeController extends Controller
         );
     }
 
-    public function getFile($episode_id): StreamedResponse|JsonResponse
+    public function getFile(Request $request, $episode_id): StreamedResponse|JsonResponse
     {
-        $episode = Episode::query()->find($episode_id);
+        $episode = Episode::query()->findOrFail($episode_id);
 
         $directory = "courses/{$episode->course_id}/episodes/{$episode_id}";
-
-        $file = collect(Storage::disk('local')->files($directory))
-            ->first(fn($f) => str_contains(basename($f), 'file'));
+        if($request->query('copy') == 'true')
+            $file = collect(Storage::disk('local')->files($directory))->first(fn($f) => str_contains(basename($f), 'file_copy'));
+        else
+            $file = collect(Storage::disk('local')->files($directory))->first(fn($f) => str_contains(basename($f), 'file'));
 
         if (!$file) {
             return Response::error(__('msg.file_not_found'), 404);
