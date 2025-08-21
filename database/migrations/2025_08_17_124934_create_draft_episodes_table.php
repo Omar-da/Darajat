@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('id')->primary();
             $table->string('title', 100);
             $table->unsignedSmallInteger('episode_number');
-            $table->unique(['course_id', 'episode_number']);
+            $table->unique(['draft_course_id', 'episode_number']);
             $table->unsignedMediumInteger('duration')->nullable();
             $table->unsignedInteger('views')->default(0);
             $table->unsignedInteger('likes')->default(0);
