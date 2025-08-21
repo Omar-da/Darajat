@@ -5,10 +5,12 @@ namespace App\Console\Commands;
 use App\Enums\RoleEnum;
 use App\Models\User;
 use App\Services\Firebase\FCMService;
+use App\Traits\BadgeTrait;
 use Illuminate\Console\Command;
 
 class CheckIsActiveCommand extends Command
 {
+    use BadgeTrait;
     protected $signature = 'active:check';
 
     protected $description = 'check if user is active daily';
@@ -40,16 +42,19 @@ class CheckIsActiveCommand extends Command
                 switch ($current_enthusiasm->pivot->progress) {
                     case 20:
                         $user->badges()->attach(1);
+                        $this->bronzeBadge();
                         $user->statistics()->where('title->en', 'Num Of Bronze Badges')->first()->pivot->increment('progress');
                         $user->statistics()->where('title->en', 'Num Of Badges')->first()->pivot->increment('progress');
                         break;
                     case 50:
                         $user->badges()->attach(2);
+                        $this->silverBadge();
                         $user->statistics()->where('title->en', 'Num Of Silver Badges')->first()->pivot->increment('progress');
                         $user->statistics()->where('title->en', 'Num Of Badges')->first()->pivot->increment('progress');
                         break;
                     case 100:
                         $user->badges()->attach(3);
+                        $this->goldBadge();
                         $user->statistics()->where('title->en', 'Num Of Gold Badges')->first()->pivot->increment('progress');
                         $user->statistics()->where('title->en', 'Num Of Badges')->first()->pivot->increment('progress');
                         break;

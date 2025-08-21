@@ -82,7 +82,7 @@ class AuthController extends Controller
         $email = $verifiedToken->claims()->get('email');
         $name = $verifiedToken->claims()->get('name') ?? 'No Name';
         $picture = $verifiedToken->claims()->get('picture') ?? null;
-    
+
         // Split the name into parts
         $nameParts = explode(' ', $name);
 
@@ -92,7 +92,7 @@ class AuthController extends Controller
         // The rest is last name
         $lastName = implode(' ', $nameParts) ?? '';
 
-        // Check if user exists in Laravel DB   
+        // Check if user exists in Laravel DB
         $user = User::firstOrCreate(
             ['firebase_uid' => $firebaseUserId],
             [

@@ -22,7 +22,7 @@ class FCMService
 
 
 
-    public function sendNotification($deviceToken, $title, $body, array $data = [])
+    public function sendNotification($deviceToken, $title, $body, array $data = []): array
     {
         $notification = Notification::create($title, $body);
 

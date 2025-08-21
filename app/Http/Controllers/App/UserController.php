@@ -30,6 +30,9 @@ class UserController extends Controller
         $data = [];
         try {
             $data = $this->userService->updateProfile($request->validated());
+            if($data['code'] == 422) {
+                return Response::error($data['message'], $data['code']);
+            }
             return Response::success($data['user'], $data['message']);
         } catch (Throwable $th) {
             $message = $th->getMessage();

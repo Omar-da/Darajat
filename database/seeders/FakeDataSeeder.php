@@ -49,7 +49,7 @@ class FakeDataSeeder extends Seeder
             'id' => 3,
             'first_name' => 'Omar',
             'last_name' => 'Od',
-            'profile_image_url' => 'profiles/personal_img.jpg',
+            'profile_image_url' => 'personal_img.jpg',
             'email' => 'Omar@gmail.com',
             'password' => '147258369',
             'role' => 'student',
@@ -73,15 +73,15 @@ class FakeDataSeeder extends Seeder
         {
             DB::insert("INSERT INTO 'courses'
             ('title'               , 'description'                                                 , 'image_url'  , 'topic_id', 'teacher_id', 'admin_id', 'difficulty_level', 'total_time', 'price', 'rate', 'language_id', 'num_of_episodes', 'num_of_students_enrolled', 'publishing_request_date', 'response_date', 'status'  , 'has_certificate', 'total_quizzes') VALUES
-            ('Laravel for beginner', 'Laravel course that explains the basics of back-end concepts', 'courses/course1.png', '2'       , '2'         , '1'       , 'beginner'       , '23'        , '0'    , '4'   , '1'          , '20'             , '1'                       , '2004-08-23'             , '2005-08-23'   , 'approved', 'true'           , '1');
+            ('Laravel for beginner', 'Laravel course that explains the basics of back-end concepts', 'course1.png', '2'       , '2'         , '1'       , 'beginner'       , '23'        , '0'    , '4'   , '1'          , '20'             , '1'                       , '2004-08-23'             , '2005-08-23'   , 'approved', 'true'           , '1');
             ");
             DB::insert("INSERT INTO 'courses'
             ('title'                   , 'description'                                                               , 'image_url'  , 'topic_id', 'teacher_id', 'admin_id', 'difficulty_level', 'total_time', 'price', 'rate', 'language_id', 'num_of_episodes', 'num_of_students_enrolled', 'publishing_request_date', 'response_date', 'status'  , 'has_certificate', 'total_quizzes') VALUES
-            ('Laravel for intermediate', 'Laravel course that explains the intermediate concepts of back-end', 'courses/course2.png', '2'       , '2'         , '1'       , 'intermediate'    , '19'        , '10'   , '0'   , '1'          , '10'             , '0'                       , '2004-08-23'             , '2005-08-23'   , 'rejected', 'false'          , '1');
+            ('Laravel for intermediate', 'Laravel course that explains the intermediate concepts of back-end', 'course2.png', '2'       , '2'         , '1'       , 'intermediate'    , '19'        , '10'   , '0'   , '1'          , '10'             , '0'                       , '2004-08-23'             , '2005-08-23'   , 'rejected', 'false'          , '1');
             ");
             DB::insert("INSERT INTO 'courses'
             ('title'               , 'description'                                               , 'image_url'  , 'topic_id', 'teacher_id', 'admin_id', 'difficulty_level', 'total_time', 'price', 'rate', 'language_id', 'num_of_episodes', 'num_of_students_enrolled', 'publishing_request_date', 'status'  , 'has_certificate', 'total_quizzes') VALUES
-            ('Laravel for expert'  , 'Laravel course that explains advanced concepts of back-end', 'courses/course3.png', '2'       , '2'         , '1'       , 'expert'          , '40'        , '32'   , '0'   , '1'          , '34'             , '1'                       , '2004-08-23'             , 'pending' , 'false'          , '1');
+            ('Laravel for expert'  , 'Laravel course that explains advanced concepts of back-end', 'course3.png', '2'       , '2'         , '1'       , 'expert'          , '40'        , '32'   , '0'   , '1'          , '34'             , '1'                       , '2004-08-23'             , 'pending' , 'false'          , '1');
             ");
         }
 

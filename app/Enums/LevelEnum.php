@@ -19,4 +19,14 @@ enum LevelEnum: string
     {
         return __("enums.level.$this->value");
     }
+
+    public static function getTranslatedValues(): array
+    {
+        return array_map(fn($case) => $case->label(), self::cases());
+    }
+
+    public static function getTranslatedValuesString(): string
+    {
+        return implode(', ', self::getTranslatedValues());
+    }
 }

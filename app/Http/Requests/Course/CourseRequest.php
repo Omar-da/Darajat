@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Course;
 
 use App\Enums\LevelEnum;
+use App\Rules\ValidLevel;
 use App\Traits\HandlesFailedValidationTrait;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -32,7 +33,7 @@ class CourseRequest extends FormRequest
             'title' => 'required|string|max:100',
             'description' => 'required|string',
             'image_url' => 'required|image|mimes:jpeg,png,bmp,jpg,gif,svg|max:2048',
-            'difficulty_level' => ['required', Rule::in(LevelEnum::values())],
+            'difficulty_level' => ['required', new ValidLevel('course')],
             'price' => 'required|numeric|min:0',
             'has_certificate' => ['nullable', 'string', 'in:true,false'],
         ];

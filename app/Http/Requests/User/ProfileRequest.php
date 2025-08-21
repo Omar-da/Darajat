@@ -6,6 +6,7 @@ use App\Enums\EducationEnum;
 use App\Enums\LevelEnum;
 use App\Models\Speciality;
 use App\Rules\SpecialityValue;
+use App\Rules\ValidLevel;
 use App\Traits\HandlesFailedValidationTrait;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -34,16 +35,16 @@ class ProfileRequest extends FormRequest
             'first_name' => 'required|string|max:50|regex:/^[\pL\s]+$/u',
             'last_name' => 'required|string|max:50|regex:/^[\pL\s]+$/u',
             'country_id' => 'required|exists:countries,id',
-            'languages' => 'array|required',
-            'languages.*.language_id' => 'exists:languages,id|distinct',
-            'languages.*.level' => Rule::in(LevelEnum::values()),
-            'job_title_id' => 'exists:job_titles,id',
-            'linked_in_url' => 'url',
-            'education' => Rule::in(EducationEnum::values()),
+            'languages' => 'required|array',
+            'languages.*.language_id' => 'required|exists:languages,id|distinct',
+            'languages.*.level' => ['required', new ValidLevel()],
+            'job_title_id' => 'nullable|exists:job_titles,id',
+            'linked_in_url' => 'nullable|url',
+            'education' => ['required', Rule::in(EducationEnum::values())],
             'university_id' => 'nullable|exists:universities,id',
             'speciality' => ['nullable', new SpecialityValue()],
-            'work_experience' => 'string|max:1000',
-            'skills' => 'array',
+            'work_experience' => 'nullable|string|max:1000',
+            'skills' => 'nullable|array',
             'skills.*.skill_id' => 'exists:skills,id|distinct',
         ];
     }
