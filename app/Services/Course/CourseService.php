@@ -270,7 +270,7 @@ class CourseService
     public function createDraftCourse($request): array
     {
         $request['teacher_id'] = auth('api')->id();
-        $request['image_url'] = $request['image_url']->store('img/courses', 'public');
+        $request['image_url'] = $request['image_url']->store('courses', 'uploads');
         $course = Course::query()->create($request);
         $course->refresh();
         return ['data' => new CourseWithDetailsForTeacherResource($course), 'message' => __('msg.courses_created'), 'code' => 201];
@@ -296,8 +296,8 @@ class CourseService
         if ($course->status !== CourseStatusEnum::DRAFT)
             return ['message' => __('msg.can_not_updated_course') . $course->status->label() . __('msg.status'), 'code' => 403];
 
-        Storage::disk('public')->delete("img/courses/{$course->image_url}");
-        $request['image_url'] = $request['image_url']->store('img/courses', 'public');
+        Storage::disk('uploads')->delete($course->image_url);
+        $request['image_url'] = $request['image_url']->store('courses', 'uploads');
         $course->update($request);
 
         return ['data' => new CourseForTeacherResource($course), 'message' => __('msg.course_updated'), 'code' => 200];
@@ -309,8 +309,8 @@ class CourseService
         if ($course->status !== CourseStatusEnum::DRAFT)
             return ['message' => __('msg.can_not_delete_course') . $course->status->label() . __('msg.status'), 'code' => 403];
 
-        Storage::disk('public')->delete("img/courses/{$course->image_url}");
-        $course->force_delete();
+        Storage::disk('uploads')->delete($course->image_url);
+        $course->forceDelete();
 
         return ['data' => new DeletedCourseForTeacherResource($course), 'message' => __('msg.course_deleted'), 'code' => 200];
     }
