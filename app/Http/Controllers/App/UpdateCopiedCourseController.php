@@ -41,19 +41,18 @@ class UpdateCopiedCourseController
                 $copiedEpisode = $copiedCourse->draft_episodes()->create($episodeData);
 
                 // Copy quiz for this episode
-                if ($episode->quiz->isNotEmpty()) {
-                    $episode->quiz->each(function($quiz) use ($copiedEpisode) {
-                        $quizData = $quiz->toArray();
-                        unset($quizData['id'], $quizData['episode_id'], $quizData['quiz_writing_date']);
-                        $copiedQuiz = $copiedEpisode->draft_quiz()->create($quizData);
+                if ($episode->quiz->exists()) {
+                    $quiz = $episode->quiz;
+                    $quizData = $quiz->toArray();
+                    unset($quizData['id'], $quizData['episode_id'], $quizData['quiz_writing_date']);
+                    $copiedQuiz = $copiedEpisode->draft_quiz()->create($quizData);
 
-                        foreach($quiz->questions as $question)
-                        {
-                            $questionData = $question->toArray();
-                            unset($questionData['id'], $questionData['quiz_id']);
-                            $copiedQuiz->draft_questions()->create($questionData);
-                        }
-                    });
+                    foreach($quiz->questions as $question)
+                    {
+                        $questionData = $question->toArray();
+                        unset($questionData['id'], $questionData['quiz_id']);
+                        $copiedQuiz->draft_questions()->create($questionData);
+                    }
                 }
             });
 
