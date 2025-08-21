@@ -15,7 +15,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('draft_courses', function (Blueprint $table) {
-            $table->id();
+            $table->integer('id')->primary();
             $table->string('title', 100);
             $table->text('description');
             $table->string('image_url');

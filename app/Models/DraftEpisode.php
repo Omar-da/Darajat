@@ -11,6 +11,7 @@ class DraftEpisode extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'id',
         'draft_course_id',
         'title',
         'episode_number',

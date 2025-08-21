@@ -7,6 +7,7 @@ use App\Http\Resources\Episode\EpisodeStudentResource;
 use App\Http\Resources\Episode\EpisodeTeacherResource;
 use App\Http\Resources\Episode\EpisodeWithDetailsResource;
 use App\Models\Course;
+use App\Models\DraftEpisode;
 use App\Models\Episode;
 use App\Traits\BadgeTrait;
 use Illuminate\Support\Facades\Storage;
@@ -108,9 +109,12 @@ class EpisodeService
         return ['data' => new EpisodeTeacherResource($episode), 'message' => __('msg.episode_updated'), 'code' => 200];
     }
 
-    public function showToTeacher($id): array
+    public function showToTeacher($request, $id): array
     {
-        $episode = Episode::query()->find($id);
+        if($request->query('copy') == 'true')
+            $episode = DraftEpisode::query()->findOrFail($id);
+        else
+            $episode = Episode::query()->findOrFail($id);
 
         return ['data' => new EpisodeTeacherResource($episode), 'message' => __('msg.episode_retrieved'), 'code' => 200];
     }

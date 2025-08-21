@@ -198,7 +198,7 @@ class CourseService
 
     public function showToTeacher($id): array
     {
-        $course = Course::query()->find($id);
+        $course = Course::query()->findOrFail($id);
 
         return ['data' => new CourseWithDetailsForTeacherResource($course), 'message' => __('msg.course_retrieved'), 'code' => 200];
     }

@@ -104,23 +104,3 @@
     </div>
 </div>
 
-<script>
-    // Preview profile image before upload
-    document.getElementById('profile_image').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                    const preview = document.getElementById('avatar-preview');
-                if (preview) {
-                    preview.src = e.target.result;
-                } else {
-                    const initialsPreview = document.getElementById('avatar-placeholder');
-                    initialsPreview.innerHTML = `<img src="${e.target.result}" class="profile-avatar">`;
-                    initialsPreview.classList.remove('initials-avatar');
-                }
-            }
-            reader.readAsDataURL(file);
-        }
-    });
-</script>
