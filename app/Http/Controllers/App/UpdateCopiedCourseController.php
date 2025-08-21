@@ -255,8 +255,10 @@ class UpdateCopiedCourseController
         });
     }
 
-    public function cancel(DraftCourse $course)
+    public function cancel($course_id)
     {
+        $course = DraftCourse::findOrFail($course_id);
+
         foreach($course->draft_episodes as $episode)
         {
             $episode_path = "courses/$course->id/episodes/$episode->id";
