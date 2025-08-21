@@ -79,8 +79,7 @@ class StripeWebhookController extends Controller
 
         // Fulfill order
         if (isset($paymentIntent->metadata->order_id)) {
-            Order::where('id', $paymentIntent->metadata->order_id)
-                 ->update(['status' => 'paid', 'paid_at' => now()]);
+            Order::where('id', $paymentIntent->metadata->order_id)->update(['status' => 'paid', 'paid_at' => now()]);
         }
 
         // Send confirmation email, etc.
@@ -102,6 +101,8 @@ class StripeWebhookController extends Controller
 
     private function handlePaymentFailure($paymentIntent)
     {
+        return response()->json('hello success');
+
         Log::error('Payment failed: ' . $paymentIntent->id);
         
         $error = $paymentIntent->last_payment_error->message ?? 'Unknown error';
