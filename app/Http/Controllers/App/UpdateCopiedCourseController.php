@@ -4,6 +4,7 @@ namespace App\Http\Controllers\App;
 
 use App\Enums\CourseStatusEnum;
 use App\Http\Resources\Course\Teacher\CourseForTeacherResource;
+use App\Http\Resources\Course\Teacher\CourseWithDetailsForTeacherResource;
 use App\Http\Resources\Episode\EpisodeTeacherResource;
 use App\Http\Resources\Quiz\TeacherQuizResource;
 use App\Models\Course;
@@ -59,7 +60,7 @@ class UpdateCopiedCourseController
             DB::commit();
 
             // Return fully loaded draft with relationships
-            return $copiedCourse;
+            return ['data' => new CourseWithDetailsForTeacherResource($copiedCourse), 'message' => __('msg.course_retrieved'), 'code' => 200];
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;

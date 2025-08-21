@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('draft_episodes', function (Blueprint $table) {
-            $table->id();
+            $table->integer('id')->primary();
             $table->string('title', 100);
             $table->unsignedSmallInteger('episode_number');
             $table->unique(['course_id', 'episode_number']);
