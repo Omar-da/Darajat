@@ -187,7 +187,7 @@ Route::middleware('localization')->group(function () {
             Route::get('get-copy-of-course/{course_id}', 'getCopyOfCourse');
             Route::put('update-course/{course}/copy', 'updateCourseCopy');
             Route::get('repost-course/{draft_course_id}', 'repostCourse');
-            Route::delete('cancel-updating/{course}', 'cancel');
+            Route::delete('cancel-updating/{course_id}', 'cancel');
         });
 
         Route::prefix('episodes')->group(function () {
