@@ -30,7 +30,7 @@ class UpdateCopiedCourseController
             // Prepare and create course draft
             $draftData = $originalCourse->toArray();
             unset($draftData['created_at'], $draftData['admin_id'], $draftData['publishing_request_date'], $draftData['response_date']);
-
+            $draftData['original_course_id'] = $$originalCourse->id;
             $copiedCourse = DraftCourse::create($draftData);
 
             // Copy episodes with quizzes
@@ -205,11 +205,11 @@ class UpdateCopiedCourseController
         {
             // 1. Load all draft data at once
             $draft = DraftCourse::with('draft_episodes.draft_quiz.draft_questions')->findOrFail($draft_course_id);
-            $original = Course::findOrFail($draft->id);
+            $original = $draft->original_course;
 
             // 2. Update course (exclude draft-specific fields)
             Storage::disk('public')->delete("img/courses/{$original->image_url}");
-            $original->update($draft);
+            $original->update($draft->except(['original_course_id']));
 
             // 3. Replace old files
             $original->episodes()->each(function ($episode) use ($original)

@@ -123,7 +123,7 @@ Route::middleware('localization')->group(function () {
     });
 
     // Stripe
-    Route::post('/stripe-webhook', [StripeWebhookController::class, 'handleWebhook']);
+    Route::post('stripe-webhook', [StripeWebhookController::class, 'handleWebhook']);
 
     // coupons
     Route::controller(CouponController::class)->middleware('regular_or_socialite')->prefix('coupons')->group(function () {

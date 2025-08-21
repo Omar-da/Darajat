@@ -62,6 +62,7 @@ class StripeWebhookController extends Controller
 
     private function handlePaymentSuccess($paymentIntent)
     {
+        return response()->json('hello success');
         Log::info('Payment succeeded: ' . $paymentIntent->id);
 
         // Update database
