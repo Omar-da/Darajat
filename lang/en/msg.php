@@ -162,4 +162,11 @@ return [
     'specialities_retrieved' => 'Specialities retrieved successfully',
     'badges_retrieved' => 'Badges retrieved successfully',
     'course_restored' => 'Course restored successfully',
+    'language_level' => 'The language level must be one of: ',
+    'mother_language' => 'You must add your mother language!',
+    'course_difficulty_level' => 'The course difficulty level must be one of: ',
+    'badge_bronze' => 'Badge Bronze!',
+    'badge_silver' => 'Badge Silver!',
+    'badge_gold' => 'Badge Gold!',
+    "congratulations" => "Congratulations! You've earned a ",
 ];

@@ -28,7 +28,7 @@ class RegisterRequest extends FormRequest
     {
         return [
             'first_name' => 'required|string|max:50|regex:/^[\pL\s]+$/u',
-            'last_name' => 'requimred|string|max:50|regex:/^[\pL\s]+$/u',
+            'last_name' => 'required|string|max:50|regex:/^[\pL\s]+$/u',
             'email' => [
                 'required',
                 'email',

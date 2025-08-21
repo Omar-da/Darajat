@@ -18,13 +18,13 @@ class CourseWithDetailsForTeacherResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'image_url' => Storage::url($this->image_url),
+            'image_url' => Storage::url("courses/$this->image_url"),
             'title' => $this->title,
             'category' => $this->topic->category->title,
             'topic' => $this->topic->title,
             'description' => $this->description,
             'language' => $this->language->name,
-            'what_will_you_learn' => $this->episodes->pluck('title'),
+            'what_will_you_learn' => $this->episodes->pluck('title', 'id'),
             'teacher' => [
                 'id' => $this->teacher->id,
                 'full_name' => $this->teacher->full_name,
