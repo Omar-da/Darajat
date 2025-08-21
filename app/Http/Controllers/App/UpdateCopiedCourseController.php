@@ -30,7 +30,7 @@ class UpdateCopiedCourseController
             // Prepare and create course draft
             $draftData = $originalCourse->toArray();
             unset($draftData['created_at'], $draftData['admin_id'], $draftData['publishing_request_date'], $draftData['response_date']);
-            $draftData['original_course_id'] = $$originalCourse->id;
+            $draftData['original_course_id'] = $originalCourse->id;
             $copiedCourse = DraftCourse::create($draftData);
 
             // Copy episodes with quizzes
@@ -41,7 +41,7 @@ class UpdateCopiedCourseController
                 $copiedEpisode = $copiedCourse->draft_episodes()->create($episodeData);
 
                 // Copy quiz for this episode
-                if ($episode->quiz->exists()) {
+                if ($episode->quiz()->exists()) {
                     $quiz = $episode->quiz;
                     $quizData = $quiz->toArray();
                     unset($quizData['id'], $quizData['episode_id'], $quizData['quiz_writing_date']);
@@ -156,7 +156,7 @@ class UpdateCopiedCourseController
     public function createQuizCopy(Request $request, DraftEpisode $episode)
     {
         // Check if quiz already exists
-        if($episode->quiz->exists())
+        if($episode->draft_quiz()->exists())
             return ['message' => __('msg.quiz_already_exists'), 'code' => 409];
 
         // Create quiz

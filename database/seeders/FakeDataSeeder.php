@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\CourseStatusEnum;
 use App\Models\Comment;
 use App\Models\Course;
 use App\Models\Episode;
@@ -71,18 +72,71 @@ class FakeDataSeeder extends Seeder
 
         for($i=0; $i<5; $i++)
         {
-            DB::insert("INSERT INTO 'courses'
-            ('title'               , 'description'                                                 , 'image_url'  , 'topic_id', 'teacher_id', 'admin_id', 'difficulty_level', 'total_time', 'price', 'rate', 'language_id', 'num_of_episodes', 'num_of_students_enrolled', 'publishing_request_date', 'response_date', 'status'  , 'has_certificate', 'total_quizzes') VALUES
-            ('Laravel for beginner', 'Laravel course that explains the basics of back-end concepts', 'courses/course1.png', '2'       , '2'         , '1'       , 'beginner'       , '23'        , '0'    , '4'   , '1'          , '20'             , '1'                       , '2004-08-23'             , '2005-08-23'   , 'approved', 'true'           , '1');
-            ");
-            DB::insert("INSERT INTO 'courses'
-            ('title'                   , 'description'                                                               , 'image_url'  , 'topic_id', 'teacher_id', 'admin_id', 'difficulty_level', 'total_time', 'price', 'rate', 'language_id', 'num_of_episodes', 'num_of_students_enrolled', 'publishing_request_date', 'response_date', 'status'  , 'has_certificate', 'total_quizzes') VALUES
-            ('Laravel for intermediate', 'Laravel course that explains the intermediate concepts of back-end', 'courses/course2.png', '2'       , '2'         , '1'       , 'intermediate'    , '19'        , '10'   , '0'   , '1'          , '10'             , '0'                       , '2004-08-23'             , '2005-08-23'   , 'rejected', 'false'          , '1');
-            ");
-            DB::insert("INSERT INTO 'courses'
-            ('title'               , 'description'                                               , 'image_url'  , 'topic_id', 'teacher_id', 'admin_id', 'difficulty_level', 'total_time', 'price', 'rate', 'language_id', 'num_of_episodes', 'num_of_students_enrolled', 'publishing_request_date', 'status'  , 'has_certificate', 'total_quizzes') VALUES
-            ('Laravel for expert'  , 'Laravel course that explains advanced concepts of back-end', 'courses/course3.png', '2'       , '2'         , '1'       , 'expert'          , '40'        , '32'   , '0'   , '1'          , '34'             , '1'                       , '2004-08-23'             , 'pending' , 'false'          , '1');
-            ");
+            $courses = [
+                [
+                    'title' => 'Laravel for beginner',
+                    'description' => 'Laravel course that explains the basics of back-end concepts',
+                    'image_url' => 'courses/course1.png',
+                    'topic_id' => 2,
+                    'teacher_id' => 2,
+                    'admin_id' => 1,
+                    'difficulty_level' => 'beginner',
+                    'total_time' => 23,
+                    'price' => 0,
+                    'rate' => 4,
+                    'language_id' => 1,
+                    'num_of_episodes' => 20,
+                    'num_of_students_enrolled' => 1,
+                    'publishing_request_date' => '2004-08-23',
+                    'response_date' => '2005-08-23',
+                    'status' => CourseStatusEnum::APPROVED,
+                    'has_certificate' => true,
+                    'total_quizzes' => 1
+                ],
+                [
+                    'title' => 'Laravel for intermediate',
+                    'description' => 'Laravel course that explains the intermediate concepts of back-end',
+                    'image_url' => 'courses/course2.png',
+                    'topic_id' => 2,
+                    'teacher_id' => 2,
+                    'admin_id' => 1,
+                    'difficulty_level' => 'intermediate',
+                    'total_time' => 19,
+                    'price' => 10,
+                    'rate' => 0,
+                    'language_id' => 1,
+                    'num_of_episodes' => 10,
+                    'num_of_students_enrolled' => 0,
+                    'publishing_request_date' => '2004-08-23',
+                    'response_date' => '2005-08-23',
+                    'status' => CourseStatusEnum::REJECTED,
+                    'has_certificate' => false,
+                    'total_quizzes' => 1
+                ],
+                [
+                    'title' => 'Laravel for expert',
+                    'description' => 'Laravel course that explains advanced concepts of back-end',
+                    'image_url' => 'courses/course3.png',
+                    'topic_id' => 2,
+                    'teacher_id' => 2,
+                    'admin_id' => 1,
+                    'difficulty_level' => 'expert',
+                    'total_time' => 40,
+                    'price' => 32,
+                    'rate' => 0,
+                    'language_id' => 1,
+                    'num_of_episodes' => 34,
+                    'num_of_students_enrolled' => 1,
+                    'publishing_request_date' => '2004-08-23',
+                    'response_date' => null, // Note: This was missing in the original query
+                    'status' => CourseStatusEnum::DRAFT,
+                    'has_certificate' => false,
+                    'total_quizzes' => 1
+                ]
+            ];
+
+            foreach ($courses as $courseData)
+                Course::create($courseData);
         }
 
         $user = User::withTrashed()->find(2);
