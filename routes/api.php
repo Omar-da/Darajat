@@ -110,8 +110,8 @@ Route::middleware('localization')->group(function () {
             Route::post('create-draft', 'createDraftCourse')->middleware('is_teacher');
             Route::get('student/{id}', 'showToStudent');
             Route::middleware('is_owner')->group(function () {
-                Route::put('update-draft/{id}', 'updateDraftCourse');
-                Route::delete('delete-draft/{id}', 'destroyDraftCourse');
+                Route::put('update-draft/{course_id}', 'updateDraftCourse');
+                Route::delete('delete-draft/{course_id}', 'destroyDraftCourse');
                 Route::patch('update-approved/{course_id}', 'updateApprovedCourse');
                 Route::get('teacher/{course_id}', 'showToTeacher');
                 Route::post('submit/{course_id}', 'submitCourse');
