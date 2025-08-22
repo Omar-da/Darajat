@@ -113,7 +113,7 @@ Route::middleware('localization')->group(function () {
                 Route::delete('delete-draft/{course_id}', 'destroyDraftCourse');
                 Route::patch('update-approved/{course_id}', 'updateApprovedCourse');
                 Route::get('teacher/{course_id}', 'showToTeacher');
-                Route::post('submit/{course_id}', 'submitCourse');
+                Route::patch('submit/{course_id}', 'submitCourse');
             });
             Route::get('with-arrangement/{topic_id}', 'getCoursesForTopicForTeacherWithArrangement')->middleware('is_teacher');;
             Route::patch('evaluation/{course_id}', 'evaluation')->middleware('is_subscribed');
@@ -203,7 +203,7 @@ Route::middleware('localization')->group(function () {
 
         Route::controller(SoftDeleteController::class)->group(function () {
             Route::delete('soft-delete/{course}', 'destroyAfterPublishing');
-            Route::put('restore/{course}', 'restore');
+            Route::put('restore/{course_id}', 'restore');
         });
     });
 
@@ -222,7 +222,7 @@ Route::middleware('localization')->group(function () {
         Route::get('universities', [UniversityController::class, 'index']);
 
         // badges
-        Route::get('badges/get-my-badges', [BadgeController::class, 'index']);
+        Route::get('badges/get', [BadgeController::class, 'index']);
 
         // statistics
         Route::get('statistics/get-my-statistics', [StatisticController::class, 'index']);

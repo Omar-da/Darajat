@@ -15,6 +15,7 @@ class UserObserver
      */
     public function created(User $user): void
     {
+        $user->refresh();
         foreach(Statistic::all() as $statistic)
             $user->statistics()->attach($statistic, ['progress' => 0]);
     }

@@ -21,6 +21,7 @@ class BadgeResource extends JsonResource
             'description' => $this->description,
             'goal' => $this->goal,
             'image_url' => Storage::url("badges/{$this->image_url}"),
+            'got_the_badge' => (bool)auth('api')->user()->badges()->where('badge_id', $this->id)->first(),
         ];
     }
 }

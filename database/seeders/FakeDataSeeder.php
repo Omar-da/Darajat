@@ -27,6 +27,7 @@ class FakeDataSeeder extends Seeder
             'id' => 2,
             'first_name' => 'Tahsin',
             'last_name' => 'abo sherko',
+            'profile_image_url' => 'profile.jpg',
             'email' => 'tahsin@gmail.com',
             'password' => '147258369',
             'role' => 'teacher',
@@ -50,7 +51,7 @@ class FakeDataSeeder extends Seeder
             'id' => 3,
             'first_name' => 'Omar',
             'last_name' => 'Od',
-            'profile_image_url' => 'profiles/personal_img.jpg',
+            'profile_image_url' => 'personal_img.jpg',
             'email' => 'Omar@gmail.com',
             'password' => '147258369',
             'role' => 'student',
@@ -76,7 +77,7 @@ class FakeDataSeeder extends Seeder
                 [
                     'title' => 'Laravel for beginner',
                     'description' => 'Laravel course that explains the basics of back-end concepts',
-                    'image_url' => 'courses/course1.png',
+                    'image_url' => 'course1.png',
                     'topic_id' => 2,
                     'teacher_id' => 2,
                     'admin_id' => 1,
@@ -96,7 +97,7 @@ class FakeDataSeeder extends Seeder
                 [
                     'title' => 'Laravel for intermediate',
                     'description' => 'Laravel course that explains the intermediate concepts of back-end',
-                    'image_url' => 'courses/course2.png',
+                    'image_url' => 'course2.png',
                     'topic_id' => 2,
                     'teacher_id' => 2,
                     'admin_id' => 1,
@@ -116,7 +117,7 @@ class FakeDataSeeder extends Seeder
                 [
                     'title' => 'Laravel for expert',
                     'description' => 'Laravel course that explains advanced concepts of back-end',
-                    'image_url' => 'courses/course3.png',
+                    'image_url' => 'course3.png',
                     'topic_id' => 2,
                     'teacher_id' => 2,
                     'admin_id' => 1,

@@ -18,9 +18,9 @@ class SoftDeleteController
         return ['message' => __('msg.course_deleted'), 'code' => 200];
     }
 
-    public function restore(Course $course): array
+    public function restore($course_id): array
     {
-        $course = Course::onlyTrashed()->find($id);
+        $course = Course::onlyTrashed()->findOrFail($course_id);
         $course->update([
             'status' => CourseStatusEnum::PENDING,
             'publishing_request_date' => now()->format('Y-m-d H:i:s')

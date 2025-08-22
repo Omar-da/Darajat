@@ -69,8 +69,8 @@ class UpdateCopiedCourseController
 
     public function updateCourseCopy(Request $request, DraftCourse $course)
     {
-        Storage::disk('public')->delete("img/courses/$course->image_url");
-        $request['image_url'] = $request['image_url']->store('img/courses', 'public');
+        Storage::disk('uploads')->delete("courses/$course->image_url");
+        $request['image_url'] = basename($request['image_url']->store('courses', 'uploads'));
         $course->update($request->all());
 
         return ['data' => new CourseForTeacherResource($course), 'message' => __('msg.course_updated'), 'code' => 200];
@@ -214,7 +214,7 @@ class UpdateCopiedCourseController
             $original = $draft->original_course;
 
             // 2. Update course (exclude draft-specific fields)
-            Storage::disk('public')->delete("img/courses/{$original->image_url}");
+            Storage::disk('uploads')->delete("courses/$original->image_url");
             $original->update($draft->except(['original_course_id']));
 
             // 3. Replace old files
