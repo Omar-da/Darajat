@@ -156,4 +156,11 @@ return [
     'specialities_retrieved' => 'تم استرداد التخصصات بنجاح',
     'badges_retrieved' => 'تم استرداد الشارات بنجاح',
     'course_restored' => 'تمت استعادة الدورة بنجاح',
+    'language_level' => 'مستوى اللغة يجب أن يكون واحداً من: ',
+    'mother_language' => 'يجب عليك إضافة لغتك الأم!',
+    'course_difficulty_level' => 'مستوى صعوبة الكورس يجب أن يكون واحداً من: ',
+    'badge_bronze' => 'شارة برونزية!',
+    'badge_silver' => 'شارة فضية!',
+    'badge_gold' => 'شارة ذهبية!',
+    "congratulations" => "مبروك! انت حصلت على ",
 ];

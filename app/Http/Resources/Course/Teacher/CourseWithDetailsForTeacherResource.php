@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\Course\Teacher;
 
-use App\Enums\CourseStatusEnum;
 use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -17,13 +16,14 @@ class CourseWithDetailsForTeacherResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        if($this instanceof Course)
+        if ($this->resource instanceof Course)
             $what_will_you_learn = $this->episodes->pluck('title');
-        else 
+        else
             $what_will_you_learn = $this->draft_episodes->pluck('title');
+
         return [
             'id' => $this->id,
-            'image_url' => Storage::url($this->image_url),
+            'image_url' => Storage::url("courses/$this->image_url"),
             'title' => $this->title,
             'category' => $this->topic->category->title,
             'topic' => $this->topic->title,
@@ -40,18 +40,18 @@ class CourseWithDetailsForTeacherResource extends JsonResource
             'price' => $this->price . '$',
             'rate' => [
                 'course_rating' => $this->rate ? $this->rate : 0,
-                '5' => $this->rate? $this->calculatePercentageForValueRate(5) : 0,
-                '4' => $this->rate? $this->calculatePercentageForValueRate(4) : 0,
-                '3' => $this->rate? $this->calculatePercentageForValueRate(3) : 0,
-                '2' => $this->rate? $this->calculatePercentageForValueRate(2) : 0,
-                '1' => $this->rate? $this->calculatePercentageForValueRate(1) : 0,
+                '5' => $this->rate ? $this->calculatePercentageForValueRate(5) : 0,
+                '4' => $this->rate ? $this->calculatePercentageForValueRate(4) : 0,
+                '3' => $this->rate ? $this->calculatePercentageForValueRate(3) : 0,
+                '2' => $this->rate ? $this->calculatePercentageForValueRate(2) : 0,
+                '1' => $this->rate ? $this->calculatePercentageForValueRate(1) : 0,
             ],
-            'num_of_episodes' => $this->num_of_episodes ? $this->num_of_episodes  : 0,
+            'num_of_episodes' => $this->num_of_episodes ? $this->num_of_episodes : 0,
             'status' => $this->status->label(),
             'response_date' => $this->response_date,
             'publishing_request_date' => $this->publishing_request_date,
-            'has_certificate' =>  $this->has_certificate,
-            'total_quizzes' =>  $this->total_quizzes ? $this->total_quizzes : 0,
+            'has_certificate' => $this->has_certificate,
+            'total_quizzes' => $this->total_quizzes ? $this->total_quizzes : 0,
             'num_of_students_enrolled' => $this->num_of_students_enrolled ? $this->num_of_students_enrolled : 0,
             'created_at' => $this->created_at,
         ];
