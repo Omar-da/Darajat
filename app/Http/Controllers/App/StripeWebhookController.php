@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\app;
 
+use App\Enums\OrderStatusEnum;
+use App\Mail\PaymentNotification;
+use App\Mail\SendOTP;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
 use Stripe\Webhook;
-use Stripe\PaymentIntent;
+use Illuminate\Support\Str;
 use App\Models\Payment;
 use App\Models\Order;
+use Illuminate\Support\Facades\Mail;
 
 class StripeWebhookController extends Controller
 {
@@ -24,11 +28,9 @@ class StripeWebhookController extends Controller
                 $payload, $sigHeader, $endpointSecret
             );
         } catch (\UnexpectedValueException $e) {
-            // Invalid payload
             Log::error('Webhook invalid payload: ' . $e->getMessage());
             return response()->json(['error' => 'Invalid payload'], 400);
         } catch (\Stripe\Exception\SignatureVerificationException $e) {
-            // Invalid signature
             Log::error('Webhook invalid signature: ' . $e->getMessage());
             return response()->json(['error' => 'Invalid signature'], 400);
         }
@@ -39,18 +41,10 @@ class StripeWebhookController extends Controller
                 $this->handlePaymentSuccess($event->data->object);
                 break;
                 
-            case 'payment_intent.amount_capturable_updated':
-                $this->handlePaymentCapture($event->data->object);
-                break;
-                
             case 'payment_intent.payment_failed':
                 $this->handlePaymentFailure($event->data->object);
                 break;
-                
-            case 'payment_intent.canceled':
-                $this->handlePaymentCanceled($event->data->object);
-                break;
-                
+
             default:
                 // Ignore other events
                 Log::info('Ignoring webhook event: ' . $event->type);
@@ -62,76 +56,48 @@ class StripeWebhookController extends Controller
 
     private function handlePaymentSuccess($paymentIntent)
     {
-        return response()->json('hello success');
-        Log::info('Payment succeeded: ' . $paymentIntent->id);
+        $order = Order::where('payment_intent_id', $paymentIntent->id)->first();
 
-        // Update database
-        Payment::updateOrCreate(
-            ['stripe_payment_id' => $paymentIntent->id],
-            [
-                'user_id' => $paymentIntent->metadata->user_id ?? null,
-                'amount' => $paymentIntent->amount / 100,
-                'currency' => $paymentIntent->currency,
-                'status' => 'succeeded',
-                'paid_at' => now(),
-            ]
-        );
-
-        // Fulfill order
-        if (isset($paymentIntent->metadata->order_id)) {
-            Order::where('id', $paymentIntent->metadata->order_id)->update(['status' => 'paid', 'paid_at' => now()]);
+        if (!$order) {
+            Log::error('Webhook: Order not found for PaymentIntent: ' . $paymentIntent->id);
+            return; 
         }
 
-        // Send confirmation email, etc.
-    }
+        if ($order->status === OrderStatusEnum::PAID) {
+            Log::info('Webhook: Ignoring duplicate succeeded webhook for order #' . $order->id);
+            return;
+        }
 
-    private function handlePaymentCapture($paymentIntent)
-    {
-        Log::info('Payment capture updated: ' . $paymentIntent->id);
-        
-        // For delayed payments (like manual review)
-        Payment::updateOrCreate(
-            ['stripe_payment_id' => $paymentIntent->id],
-            [
-                'status' => 'capturable',
-                'amount_capturable' => $paymentIntent->amount_capturable / 100,
-            ]
-        );
+        if ($order->status === OrderStatusEnum::CANCELED) {
+            Log::warning('Webhook: Payment succeeded for CANCELED order #' . $order->id . '. Access was NOT granted. Manual review may be needed.');
+            return;
+        }
+
+        $order->update([
+            'status' => OrderStatusEnum::PAID, 
+        ]);
+        $course = $order->course;
+        $user = $order->user;
+
+        $user->followed_courses()->attach($course);
+        $course->increment('num_of_students_enrolled');
+
+        Mail::to($user->email)->send(new PaymentNotification(true, $course->title));
     }
 
     private function handlePaymentFailure($paymentIntent)
     {
-        return response()->json('hello success');
-
         Log::error('Payment failed: ' . $paymentIntent->id);
         
-        $error = $paymentIntent->last_payment_error->message ?? 'Unknown error';
+        $order = Order::where('payment_intent_id', $paymentIntent->id)->first();
 
-        Payment::updateOrCreate(
-            ['stripe_payment_id' => $paymentIntent->id],
-            [
-                'status' => 'failed',
-                'error' => $error,
-                'failed_at' => now(),
-            ]
-        );
+        if ($order) 
+            $order->update(['status' => OrderStatusEnum::FAILED]);
 
-        // Notify user of failure
-        if (isset($paymentIntent->metadata->user_id)) {
-            // Send failure notification
-        }
-    }
+        $user = $order->user;
+        $course = $order->course;
 
-    private function handlePaymentCanceled($paymentIntent)
-    {
-        Log::info('Payment canceled: ' . $paymentIntent->id);
-
-        Payment::updateOrCreate(
-            ['stripe_payment_id' => $paymentIntent->id],
-            [
-                'status' => 'canceled',
-                'canceled_at' => now(),
-            ]
-        );
+        if (isset($user)) 
+            Mail::to($user->email)->send(new PaymentNotification(false, $course->title));
     }
 }

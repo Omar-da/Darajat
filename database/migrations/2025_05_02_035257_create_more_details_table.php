@@ -20,7 +20,7 @@ return new class extends Migration
         Schema::create('more_details', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
-            $table->string('stripe_connect_id')->nullable();
+            $table->string('stripe_customer_id')->nullable()->unique(   );
             $table->foreignIdFor(JobTitle::class)->nullable()->constrained()->nullOnDelete();
             $table->foreignIdFor(Country::class)->nullable()->constrained();
             $table->string('linked_in_url', )->nullable();
