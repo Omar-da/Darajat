@@ -1,5 +1,8 @@
 <?php
 
+use App\Enums\OrderStatusEnum;
+use App\Models\Course;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +16,17 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignIdFor(User::class)->constrained();
+            $table->string('order_number')->unique(); 
+            $table->unsignedInteger('amount'); 
+            $table->string('currency', 3)->default('usd'); 
+            $table->enum('status', OrderStatusEnum::values())->default(OrderStatusEnum::PENDING);
+            $table->string('payment_intent_id')->nullable()->unique(); 
+            $table->foreignIdFor(Course::class)->nullable()->constrained(); 
+            $table->string('course_name'); 
+            $table->index('status');
+            $table->index('order_number');
+            $table->index('payment_intent_id');
         });
     }
 

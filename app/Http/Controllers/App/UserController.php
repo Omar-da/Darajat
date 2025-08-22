@@ -79,53 +79,17 @@ class UserController extends Controller
 
     public function promoteStudentToTeacher()
     {
-        // $data = [];
-        // try
-        // {
-        //     $data = $this->userService->promoteStudentToTeacher();
-        //     if($data['code'] == 409)
-        //         return Response::error($data['message'], $data['code']);
-        //     return Response::success([], $data['message']);
-        // } catch (Throwable $th) {
-        //     $message = $th->getMessage();
-        //     return Response::error($message);
-        // }
-        // $user = auth('api')->user();
-        // if($user['role'] === RoleEnum::TEACHER) {
-        //     return ['message' => 'You are already a Teacher!', 'code' => 409];
-        // }
-        // $user->update([
-        //     'role' => 'teacher'
-        // ]);
-
-        $clientId = config('services.stripe.connect');
-        $redirectUri = urlencode(route('users.stripe_callback'));
-
-        return redirect("https://connect.stripe.com/oauth/authorize?response_type=code&client_id={$clientId}&scope=read_write&redirect_uri={$redirectUri}");
-    }
-
-    public function stripeCallback(Request $request)
-    {
-        Stripe::setApiKey(config('stripe.secret'));
-
-        try {
-                $response = OAuth::token([
-                    'grant_type' => 'authorization_code',
-                    'code' => $request->code,
-                ]);
-
-                // Save Stripe account ID to teacher
-                auth('api')->user()->update(['stripe_connect_id' => $response->stripe_user_id]);
-
-                return response()->json([
-                    'message' => 'Promotion succeeded'
-                ]);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'error' => 'Connection failed'
-                ]);
-            }
-
+        $data = [];
+        try
+        {
+            $data = $this->userService->promoteStudentToTeacher();
+            if($data['code'] == 409)
+                return Response::error($data['message'], $data['code']);
+            return Response::success([], $data['message']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
     }
 
     public function destroy(): JsonResponse

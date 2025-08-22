@@ -9,10 +9,7 @@ use App\Responses\Response;
 use App\Services\Course\CourseService;
 use Illuminate\Http\JsonResponse;
 use App\Models\Course;
-use App\Models\Payment;
 use GuzzleHttp\Client;
-use Stripe\PaymentIntent;
-use Stripe\Stripe;
 use Throwable;
 
 class CourseController extends Controller
@@ -335,44 +332,6 @@ class CourseController extends Controller
         } catch (Throwable $th) {
             $message = $th->getMessage();
             return Response::error($message);
-        }
-    }
-
-    public function paymentProcess(Course $course)
-    {
-        Stripe::setApiKey(config('services.stripe.secret'));
-
-        $teacher = $course->teacher;
-        $student = auth('api')->user();
-        $platformFee = $course->price * 0.10; // 10% fee
-
-        try {
-            $paymentIntent = PaymentIntent::create([
-                'amount' => $course->price * 100, // in cents
-                'currency' => 'usd',
-                'application_fee_amount' => $platformFee * 100, // 10% platform fee
-                'transfer_data' => [
-                    'destination' => $teacher->stripe_connect_id,
-                ],
-            ]);
-
-            // Save payment record
-            Payment::create([
-                'course_id' => $course->id,
-                'student_id' => $student->id,
-                'teacher_id' => $teacher->id,
-                'amount' => $course->price,
-                'platform_fee' => $platformFee,
-                'currency' => 'usd',
-                'stripe_payment_id' => $paymentIntent->id,
-                'status' => $paymentIntent->status,
-            ]);
-
-            $student->followed_courses()->attach($course);
-
-            return back()->with('success', 'Payment successful!');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Payment failed: ' . $e->getMessage());
         }
     }
 
