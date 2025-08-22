@@ -16,7 +16,7 @@ class CourseWithDetailsForTeacherResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        if ($this instanceof Course)
+        if ($this->resource instanceof Course)
             $what_will_you_learn = $this->episodes->pluck('title');
         else
             $what_will_you_learn = $this->draft_episodes->pluck('title');
