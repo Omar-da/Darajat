@@ -9,6 +9,7 @@ use App\Http\Resources\Episode\EpisodeWithDetailsResource;
 use App\Models\Course;
 use App\Models\DraftEpisode;
 use App\Models\Episode;
+use App\Models\PlatformStatistics;
 use App\Traits\BadgeTrait;
 use Illuminate\Support\Facades\Storage;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
@@ -175,6 +176,7 @@ class EpisodeService
         // Episode has been watched
         $user->episodes()->attach($episode);
         $episode->increment('views');
+        PlatformStatistics::incrementStat('num_of_views');
         $episode->course->teacher->statistics()->where('title->en', 'Acquired Views')->first()->pivot->increment('progress');
 
         // Update progress in course

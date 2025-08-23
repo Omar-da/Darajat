@@ -20,6 +20,12 @@
 
             <!-- Topics Card -->
             <x-stat-card card-name="Topics" icon-name="topic_icon.png" :count="$num_of_topics" alt="topic icon"/>
+            
+            <!-- Total Profit Card -->
+            <x-stat-card card-name="Total Profit" icon-name="money_icon.png" :count="$total_profit" alt="money icon"/>
+
+            <!-- Commission Card -->
+            <x-stat-card card-name="Commission" icon-name="commission_icon.png" :count="$commission" alt="commission icon"/>
 
         </div>
     </div>

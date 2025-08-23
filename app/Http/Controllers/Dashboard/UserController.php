@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Enums\CourseStatusEnum;
 use App\Enums\TypeEnum;
 use App\Models\Course;
 use App\Http\Controllers\App\Controller;
@@ -37,7 +38,7 @@ class UserController extends Controller
 
         $counts = [
             'followed_courses_count' => $user->followed_courses ? $user->followed_courses->count() : 0,
-            'activities_count' => $user->comments ? $user->comments->count() : 0,
+            'certificates_count' => $user->statistics()->where('statistic_id', 9)->first()->pivot->progress,
             'badges_count' => $user->badges ? $user->badges->count() : 0
         ];
 
@@ -81,19 +82,16 @@ class UserController extends Controller
             $query->withPivot('level');
             },
             'published_courses' => function($q) {
-                $q->with(['teacher' => function($q) {
+                $q->whereNot('status', CourseStatusEnum::DRAFT)->with(['teacher' => function($q) {
                     $q->withTrashed();
                 }]);
             }])->findOrFail($teacher_id);
 
         $acquired_views = $user->statistics->where('title', 'Acquired Views')->first();
-        $acquired_likes = $user->statistics->where('title', 'Acquired Likes')->first();
-
 
         $counts = [
             'published_courses' => $user->published_courses ? $user->published_courses->count() : 0,
             'acquired_views' => $acquired_views ? $acquired_views->pivot->progress : 0,
-            'acquired_likes' => $acquired_likes ? $acquired_likes->pivot->progress : 0
         ];
 
         $mother_tongue = $user->moreDetail->languages()->wherePivot('level', 'mother_tongue')->first();

@@ -14,8 +14,8 @@
                         <div class="user-profile-stat-label">Followed Courses</div>
                     </div>
                     <div class="user-profile-stat">
-                        <div class="user-profile-stat-value">{{$counts['activities_count']}}</div>
-                        <div class="user-profile-stat-label">Activity</div>
+                        <div class="user-profile-stat-value">{{$counts['certificates_count']}}</div>
+                        <div class="user-profile-stat-label">Certificates</div>
                     </div>
                     <div class="user-profile-stat">
                         <div class="user-profile-stat-value">{{$counts['badges_count']}}</div>

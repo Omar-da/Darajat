@@ -38,9 +38,14 @@ class Order extends Model
     /**
      * Get the user that owns the order.
      */
-    public function user(): BelongsTo
+    public function student(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(MoreDetail::class, 'student_id');
+    }
+
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo(MoreDetail::class, 'teacher_id');
     }
 
     /**
@@ -50,4 +55,6 @@ class Order extends Model
     {
         return $this->belongsTo(Course::class);
     }
+
+
 }
