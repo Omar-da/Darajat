@@ -16,6 +16,7 @@ use Throwable;
 class AuthController extends Controller
 {
     private AuthService $authService;
+
     // protected FirebaseOAuth $firebase;
 
     public function __construct(AuthService $authService)
@@ -49,7 +50,7 @@ class AuthController extends Controller
             }
             return Response::success($data['user'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -64,7 +65,7 @@ class AuthController extends Controller
             }
             return Response::success($data['user'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }

@@ -23,7 +23,7 @@ class ResetPasswordService
     public function checkCode($request): array
     {
         $passwordReset = ResetPassword::query()->firstWhere('code', $request['code']);
-        if($passwordReset['created_at']->addMinutes(15) < now()) {
+        if ($passwordReset['created_at']->addMinutes(15) < now()) {
             $passwordReset->delete();
             $message = __('msg.code_expired');
             $code = 422;
@@ -37,7 +37,7 @@ class ResetPasswordService
     public function resetPassword($request): array
     {
         $passwordReset = ResetPassword::query()->firstWhere('code', $request['code']);
-        if($passwordReset['created_at']->addMinutes(15) < now()) {
+        if ($passwordReset['created_at']->addMinutes(15) < now()) {
             $passwordReset->delete();
             $message = __('msg.code_expired');
             $code = 422;

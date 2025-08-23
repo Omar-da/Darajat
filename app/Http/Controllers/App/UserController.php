@@ -30,7 +30,7 @@ class UserController extends Controller
         $data = [];
         try {
             $data = $this->userService->updateProfile($request->validated());
-            if($data['code'] == 422) {
+            if ($data['code'] == 422) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['user'], $data['message']);
@@ -39,6 +39,7 @@ class UserController extends Controller
             return Response::error($message);
         }
     }
+
     public function updateProfileImage(ProfileImageRequest $request): JsonResponse
     {
         $data = [];
@@ -50,12 +51,13 @@ class UserController extends Controller
             return Response::error($message);
         }
     }
+
     public function changePassword(ChangePasswordRequest $request): JsonResponse
     {
         $data = [];
         try {
             $data = $this->userService->changePassword($request->validated());
-            if($data['code'] == 401) {
+            if ($data['code'] == 401) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['user'], $data['message']);
@@ -70,23 +72,22 @@ class UserController extends Controller
         $data = [];
         try {
             $data = $this->userService->showProfile($id);
-            if($data['code'] == 404) {
+            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['user'], $data['message']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
-            return Response::error( $message);
+            return Response::error($message);
         }
     }
 
     public function promoteStudentToTeacher()
     {
         $data = [];
-        try
-        {
+        try {
             $data = $this->userService->promoteStudentToTeacher();
-            if($data['code'] == 409)
+            if ($data['code'] == 409)
                 return Response::error($data['message'], $data['code']);
             return Response::success([], $data['message']);
         } catch (Throwable $th) {

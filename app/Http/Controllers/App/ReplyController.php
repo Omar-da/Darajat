@@ -23,12 +23,12 @@ class ReplyController extends Controller
         $data = [];
         try {
             $data = $this->replyService->index($comment_id);
-            if($data['code'] == 404) {
+            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -39,12 +39,12 @@ class ReplyController extends Controller
         $data = [];
         try {
             $data = $this->replyService->store($request->validated(), $comment_id);
-            if($data['code'] == 404) {
+            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -55,12 +55,12 @@ class ReplyController extends Controller
         $data = [];
         try {
             $data = $this->replyService->update($request->validated(), $id);
-            if($data['code'] == 404 || $data['code'] == 401) {
+            if ($data['code'] == 404 || $data['code'] == 401) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -72,12 +72,12 @@ class ReplyController extends Controller
         $data = [];
         try {
             $data = $this->replyService->destroy($id);
-            if($data['code'] == 404 || $data['code'] == 401) {
+            if ($data['code'] == 404 || $data['code'] == 401) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success([], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -88,12 +88,12 @@ class ReplyController extends Controller
         $data = [];
         try {
             $data = $this->replyService->like($id);
-            if($data['code'] == 404 || $data['code'] == 401) {
+            if ($data['code'] == 404 || $data['code'] == 401) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }

@@ -12,7 +12,7 @@ class ReplyService
     public function index($comment_id): array
     {
         $comment = Comment::query()->find($comment_id);
-        if(is_null($comment)) {
+        if (is_null($comment)) {
             return ['message' => __('msg.comment_not_found'), 'code' => 404];
         }
         $replies = $comment->replies()->latest('reply_date')->get();
@@ -22,7 +22,7 @@ class ReplyService
     // Add reply for specific comment.
     public function store($request, $comment_id): array
     {
-        if(is_null(Comment::query()->find($comment_id))) {
+        if (is_null(Comment::query()->find($comment_id))) {
             return ['message' => __('msg.comment_not_found'), 'code' => 404];
         }
         $reply = Reply::query()->create([
@@ -41,8 +41,8 @@ class ReplyService
                 'id' => $id,
                 'user_id' => auth('api')->id()
             ])->first();
-        if(is_null($reply)) {
-            if(is_null(Reply::query()->find($id))) {
+        if (is_null($reply)) {
+            if (is_null(Reply::query()->find($id))) {
                 return ['message' => __('msg.reply_not_found'), 'code' => 404];
             } else {
                 return ['message' => __('msg.unauthorized'), 'code' => 401];
@@ -62,8 +62,8 @@ class ReplyService
                 'id' => $id,
                 'user_id' => auth('api')->id()
             ])->first();
-        if(is_null($reply)) {
-            if(is_null(Reply::query()->find($id))) {
+        if (is_null($reply)) {
+            if (is_null(Reply::query()->find($id))) {
                 return ['message' => __('msg.reply_not_found'), 'code' => 404];
             } else {
                 return ['message' => __('msg.unauthorized'), 'code' => 401];
@@ -78,21 +78,18 @@ class ReplyService
     {
         $reply = Reply::query()->find($id);
 
-        if(is_null($reply)) {
+        if (is_null($reply)) {
             return ['message' => __('msg.reply_not_found'), 'code' => 404];
         }
 
-        if($reply->userlikes()->where('user_id', auth('api')->id())->exists())
-        {
+        if ($reply->userlikes()->where('user_id', auth('api')->id())->exists()) {
             $reply->userLikes()->detach(auth('api')->id());
             $reply->update([
                 'likes' => $reply->likes - 1
             ]);
-            
+
             return ['message' => __('msg.reply_unliked'), 'code' => 200];
-        }
-        else
-        {
+        } else {
             $reply->userLikes()->attach(auth('api')->id());
             $reply->update([
                 'likes' => $reply->likes + 1

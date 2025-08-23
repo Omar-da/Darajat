@@ -23,7 +23,7 @@ class UserService
             'last_name' => $request['last_name'],
         ]);
 
-        if(request()->has('speciality') && !is_numeric($request['speciality'])) {
+        if (request()->has('speciality') && !is_numeric($request['speciality'])) {
             $speciality = Speciality::query()->create([
                 'name' => $request['speciality'],
             ]);
@@ -47,9 +47,9 @@ class UserService
             $languageId = $languageInfo['language_id'] ?? null;
             $level = $languageInfo['level'] ?? null;
 
-            if(!in_array($level, LevelEnum::values())) {
+            if (!in_array($level, LevelEnum::values())) {
                 foreach (LevelEnum::values() as $value) {
-                    if($level == LevelEnum::from($value)->label()) {
+                    if ($level == LevelEnum::from($value)->label()) {
                         $level = $value;
                         break;
                     }
@@ -57,14 +57,14 @@ class UserService
             }
 
             if ($languageId !== null && $level !== null) {
-                if($level == 'mother_tongue') {
+                if ($level == 'mother_tongue') {
                     $check = 1;
                 }
                 $syncData[$languageId] = ['level' => $level];
             }
         }
 
-        if(!$check) {
+        if (!$check) {
             return ['message' => __('msg.mother_language'), 'code' => 422];
         }
 
@@ -87,7 +87,7 @@ class UserService
     public function updateProfileImage($request): array
     {
         $user = User::query()->find(auth('api')->id());
-        if(!is_null($user->profile_image_url)) {
+        if (!is_null($user->profile_image_url)) {
             Storage::delete("profiles/$user->profile_image_url");
         }
         if (!empty($request['profile_image_url'])) {
@@ -106,7 +106,7 @@ class UserService
     public function changePassword($request): array
     {
         $user = User::query()->find(auth('api')->id());
-        if(!Hash::check($request['old_password'], $user['password'])) {
+        if (!Hash::check($request['old_password'], $user['password'])) {
             $message = __('msg.old_password');
             $code = 401;
         } else {
@@ -122,7 +122,7 @@ class UserService
     public function showProfile($id): array
     {
         $user = User::query()->find($id);
-        if(!$user) {
+        if (!$user) {
             $message = __('msg.user_not_found');
             $code = 404;
         } else {
@@ -135,9 +135,9 @@ class UserService
     public function promoteStudentToTeacher()
     {
         $user = auth('api')->user();
-        if($user['role'] === RoleEnum::TEACHER)
+        if ($user['role'] === RoleEnum::TEACHER)
             return ['message' => 'You are already a Teacher!', 'code' => 409];
-        
+
         $user->update([
             'role' => 'teacher'
         ]);

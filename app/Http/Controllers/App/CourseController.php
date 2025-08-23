@@ -183,7 +183,7 @@ class CourseController extends Controller
         $data = [];
         try {
             $data = $this->courseService->showToTeacher($id);
-            if($data['code'] == 404) {
+            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -198,7 +198,7 @@ class CourseController extends Controller
         $data = [];
         try {
             $data = $this->courseService->showToStudent($id);
-            if($data['code'] == 404) {
+            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -225,7 +225,7 @@ class CourseController extends Controller
         $data = [];
         try {
             $data = $this->courseService->updateDraftCourse($request->validated(), $id);
-            if($data['code'] == 403) {
+            if ($data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -240,7 +240,7 @@ class CourseController extends Controller
         $data = [];
         try {
             $data = $this->courseService->updateApprovedCourse($request->validated(), $id);
-            if($data['code'] == 403) {
+            if ($data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -255,7 +255,7 @@ class CourseController extends Controller
         $data = [];
         try {
             $data = $this->courseService->destroyDraftCourse($id);
-            if($data['code'] == 403) {
+            if ($data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success([], $data['message'], $data['code']);
@@ -283,7 +283,7 @@ class CourseController extends Controller
         $data = [];
         try {
             $data = $this->courseService->submitCourse($id);
-            if($data['code'] == 409 || $data['code'] == 422) {
+            if ($data['code'] == 409 || $data['code'] == 422) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success([], $data['message'], $data['code']);
@@ -293,12 +293,12 @@ class CourseController extends Controller
         }
     }
 
-    public function evaluation(EvaluationCourseRequest $request , $id): JsonResponse
+    public function evaluation(EvaluationCourseRequest $request, $id): JsonResponse
     {
         $data = [];
         try {
             $data = $this->courseService->evaluation($request->validated(), $id);
-            if($data['code'] == 403) {
+            if ($data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -313,7 +313,7 @@ class CourseController extends Controller
         $data = [];
         try {
             $data = $this->courseService->getCoursesForTopicForTeacherWithArrangement($topic_id);
-            if($data['code'] == 404) {
+            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);

@@ -40,7 +40,7 @@ class StripeWebhookController extends Controller
             case 'payment_intent.succeeded':
                 $this->handlePaymentSuccess($event->data->object);
                 break;
-                
+
             case 'payment_intent.payment_failed':
                 $this->handlePaymentFailure($event->data->object);
                 break;
@@ -60,7 +60,7 @@ class StripeWebhookController extends Controller
 
         if (!$order) {
             Log::error('Webhook: Order not found for PaymentIntent: ' . $paymentIntent->id);
-            return; 
+            return;
         }
 
         if ($order->status === OrderStatusEnum::PAID) {
@@ -74,7 +74,7 @@ class StripeWebhookController extends Controller
         }
 
         $order->update([
-            'status' => OrderStatusEnum::PAID, 
+            'status' => OrderStatusEnum::PAID,
         ]);
         $course = $order->course;
         $user = $order->user;
@@ -88,16 +88,16 @@ class StripeWebhookController extends Controller
     private function handlePaymentFailure($paymentIntent)
     {
         Log::error('Payment failed: ' . $paymentIntent->id);
-        
+
         $order = Order::where('payment_intent_id', $paymentIntent->id)->first();
 
-        if ($order) 
+        if ($order)
             $order->update(['status' => OrderStatusEnum::FAILED]);
 
         $user = $order->user;
         $course = $order->course;
 
-        if (isset($user)) 
+        if (isset($user))
             Mail::to($user->email)->send(new PaymentNotification(false, $course->title));
     }
 }

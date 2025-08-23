@@ -44,16 +44,13 @@ class CourseService
     // Load more courses, they are not appearing on the last page.
     public function loadMore($request): array
     {
-        if ($request['type'] == 'all')
-        {
+        if ($request['type'] == 'all') {
             $courses = Course::query()
                 ->where('status', CourseStatusEnum::APPROVED)
                 ->orderBy('rate', 'desc')
                 ->orderBy('num_of_students_enrolled', 'desc')
                 ->paginate(5, '*', 'page', $request['page']);
-        }
-        else if ($request['type'] == 'free')
-        {
+        } else if ($request['type'] == 'free') {
             $courses = Course::query()
                 ->where([
                     'status' => CourseStatusEnum::APPROVED,
@@ -62,8 +59,7 @@ class CourseService
                 ->orderBy('rate', 'desc')
                 ->orderBy('num_of_students_enrolled', 'desc')
                 ->paginate(5, '*', 'page', $request['page']);
-        }
-        else if ($request['type'] == 'paid') {
+        } else if ($request['type'] == 'paid') {
             $courses = Course::query()
                 ->where('status', CourseStatusEnum::APPROVED)
                 ->where('price', '>', 0)
@@ -273,9 +269,9 @@ class CourseService
         $request['teacher_id'] = auth('api')->id();
         $request['image_url'] = basename($request['image_url']->store('courses', 'uploads'));
 
-        if(!in_array($request['difficulty_level'], LevelEnum::values())) {
+        if (!in_array($request['difficulty_level'], LevelEnum::values())) {
             foreach (LevelEnum::values() as $value) {
-                if($request['difficulty_level'] == LevelEnum::from($value)->label()) {
+                if ($request['difficulty_level'] == LevelEnum::from($value)->label()) {
                     $request['difficulty_level'] = $value;
                     break;
                 }
@@ -308,9 +304,9 @@ class CourseService
 
         Storage::disk('uploads')->delete("courses/$course->image_url");
         $request['image_url'] = basename($request['image_url']->store('courses', 'uploads'));
-        if(!in_array($request['difficulty_level'], LevelEnum::values())) {
+        if (!in_array($request['difficulty_level'], LevelEnum::values())) {
             foreach (LevelEnum::values() as $value) {
-                if($request['difficulty_level'] == LevelEnum::from($value)->label()) {
+                if ($request['difficulty_level'] == LevelEnum::from($value)->label()) {
                     $request['difficulty_level'] = $value;
                     break;
                 }
@@ -371,7 +367,7 @@ class CourseService
         $user = auth('api')->user();
         $course = Course::query()->where('status', CourseStatusEnum::APPROVED)->find($id);
 
-        if($user->id == $course->teacher_id)
+        if ($user->id == $course->teacher_id)
             return ['message' => __('msg.unauthorized'), 'code' => 403];
 
         //        $course->students()->updateExistingPivot($student_id, ['rate' => $request['rate']]);
