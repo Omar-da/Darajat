@@ -49,12 +49,13 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
-        if (str_contains(request()->getHttpHost(), 'ngrok-free.app')) {
-        // Force Laravel to use the current request's scheme and host
-        // This makes asset() URLs generate using https://your-url.ngrok-free.app
+        if (str_contains(request()->getHttpHost(), 'ngrok-free.app'))
         URL::forceScheme('https');
+
+        if (app()->runningInConsole()) {
+            return;
+        }
         URL::forceRootUrl(request()->getSchemeAndHttpHost());
-    }
 
     }
 }

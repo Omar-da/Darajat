@@ -10,11 +10,8 @@ class Order extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    public $timestamps = false;
+
     protected $fillable = [
         'user_id',
         'order_number',
@@ -31,15 +28,11 @@ class Order extends Model
         'notes',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'metadata' => 'array', // Automatically cast the JSON field to an array
         'amount' => 'integer',
         'quantity' => 'integer',
+        'status' => 'enum'
     ];
 
     /**
@@ -53,8 +46,8 @@ class Order extends Model
     /**
      * Get the product that was ordered.
      */
-    public function product(): BelongsTo
+    public function course(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Course::class);
     }
 }

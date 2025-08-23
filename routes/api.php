@@ -13,6 +13,7 @@ use App\Http\Controllers\App\EpisodeController;
 use App\Http\Controllers\App\JobTitleController;
 use App\Http\Controllers\App\LanguageController;
 use App\Http\Controllers\App\OTPController;
+use App\Http\Controllers\App\PaymentController;
 use App\Http\Controllers\App\QuizController;
 use App\Http\Controllers\App\ReplyController;
 use App\Http\Controllers\App\ResetPasswordController;
@@ -45,7 +46,6 @@ Route::middleware('localization')->group(function () {
             Route::post('update-profile-image', 'updateProfileImage');
             Route::post('change-password', 'changePassword');
             Route::post('promote-student-to-teacher', 'promoteStudentToTeacher');
-            Route::get('stripe-callback', 'stripeCallback')->name('users.stripe_callback');
             Route::delete('delete', 'destroy');
             Route::post('store-fcm-token', 'storeFCMToken');
         });
@@ -99,7 +99,6 @@ Route::middleware('localization')->group(function () {
         Route::get('search/{title}', 'search');
         Route::get('free', 'getFreeCourses');
         Route::get('paid', 'getPaidCourses');
-        Route::post('payment-process/{course}', 'paymentProcess')->name('courses.payment_process');
         Route::post('get-certificate/{course}', 'getCertificate')->name('courses.get_certificate')->middleware('get_certificate');
         Route::middleware('regular_or_socialite')->group(function () {
             Route::get('draft', 'getDraftCoursesToTeacher');
@@ -206,6 +205,12 @@ Route::middleware('localization')->group(function () {
             Route::delete('soft-delete/{course}', 'destroyAfterPublishing');
             Route::put('restore/{course_id}', 'restore');
         });
+    });
+
+    // Payment
+    Route::controller(PaymentController::class)->prefix('orders')->group(function () {
+        Route::post('create-payment-intent', 'createPaymentIntent');
+        Route::post('{order}/cancel', 'cancelProcess');
     });
 
     Route::middleware('regular_or_socialite')->group(function () {
