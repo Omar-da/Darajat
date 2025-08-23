@@ -16,10 +16,10 @@ class CategoryService
     public function search($title): array
     {
         $categories = Category::query()
-            ->where('title', 'LIKE' ,"%$title%")
+            ->where('title', 'LIKE', "%$title%")
             ->orderBy('title', 'asc')
             ->get();
-        if($categories->isEmpty()) {
+        if ($categories->isEmpty()) {
             return [
                 'data' => [],
                 'message' => __('msg.no_categories_found') . $title,

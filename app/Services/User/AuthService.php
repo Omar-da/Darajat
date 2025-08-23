@@ -53,13 +53,13 @@ class AuthService
     public function login($request): array
     {
         $user = User::query()->where('email', $request['email'])->first();
-        if(is_null($user->email_verified_at)) {
-            return ['message' => __('msg.email_not_verified'), 'code' => 403];
-        }
+
         if (!is_null($user)) {
             if (!Auth::attempt($request->only(['email', 'password']))) {
                 $message = __('msg.not_match');
                 $code = 401;
+            } else if (is_null($user->email_verified_at)) {
+                return ['message' => __('msg.email_not_verified'), 'code' => 403];
             } else {
                 $token = $user->createToken('Personal Access Token')->accessToken;
                 $user = (new UserResource($user))->toArray(request());

@@ -24,12 +24,12 @@ class CommentController extends Controller
         $data = [];
         try {
             $data = $this->commentService->index($episode_id);
-            if($data['code'] == 404) {
+            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::successForPaginate($data['data'], $data['meta'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -40,12 +40,12 @@ class CommentController extends Controller
         $data = [];
         try {
             $data = $this->commentService->loadMore($episode_id, $request->validated());
-            if($data['code'] == 404) {
+            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
-            return Response::successForPaginate($data['data'], $data['meta'],$data['message'], $data['code']);
+            return Response::successForPaginate($data['data'], $data['meta'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -56,12 +56,12 @@ class CommentController extends Controller
         $data = [];
         try {
             $data = $this->commentService->getMyComments($episode_id);
-            if($data['code'] == 404) {
+            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -72,12 +72,12 @@ class CommentController extends Controller
         $data = [];
         try {
             $data = $this->commentService->store($request, $episode_id);
-            if($data['code'] == 404) {
+            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -88,12 +88,12 @@ class CommentController extends Controller
         $data = [];
         try {
             $data = $this->commentService->update($request->validated(), $id);
-            if($data['code'] == 404 || $data['code'] == 401) {
+            if ($data['code'] == 404 || $data['code'] == 401) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -104,12 +104,12 @@ class CommentController extends Controller
         $data = [];
         try {
             $data = $this->commentService->destroy($id);
-            if($data['code'] == 404 || $data['code'] == 401) {
+            if ($data['code'] == 404 || $data['code'] == 401) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success([], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -120,12 +120,12 @@ class CommentController extends Controller
         $data = [];
         try {
             $data = $this->commentService->like($id);
-            if($data['code'] == 404 || $data['code'] == 401) {
+            if ($data['code'] == 404 || $data['code'] == 401) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }

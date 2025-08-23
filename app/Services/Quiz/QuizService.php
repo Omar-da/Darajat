@@ -19,10 +19,10 @@ class QuizService
     {
         $episode = Episode::findOrFail($episode_id);
 
-        if($episode->quiz->exists())
+        if ($episode->quiz->exists())
             return ['message' => __('msg.quiz_already_exists'), 'code' => 409];
 
-        if($episode->course->status !== CourseStatusEnum::DRAFT)
+        if ($episode->course->status !== CourseStatusEnum::DRAFT)
             return ['message' => __('msg.quiz_action'), 'code' => 403];
 
         $quiz = Quiz::create([
@@ -75,9 +75,9 @@ class QuizService
         }
 
         $quiz_user = $user->quizzes()->find($quiz_id);
-        if(is_null($quiz_user)) {
+        if (is_null($quiz_user)) {
             $user->quizzes()->attach($quiz_id);
-        } else if($quiz_user->pivot->success) {
+        } else if ($quiz_user->pivot->success) {
             return ['message' => __('msg.already_succeeded_quiz'), 'code' => 409];
         }
 
@@ -124,7 +124,7 @@ class QuizService
     {
         $quiz = Quiz::findOrFail($quiz_id);
 
-        if($quiz->episode->course->status !== CourseStatusEnum::DRAFT)
+        if ($quiz->episode->course->status !== CourseStatusEnum::DRAFT)
             return ['message' => __('msg.quiz_action'), 'code' => 403];
 
         $quiz->questions()->delete();
@@ -140,7 +140,7 @@ class QuizService
     {
         $quiz = Quiz::findOrFail($id);
 
-        if($quiz->episode->course->status !== CourseStatusEnum::DRAFT)
+        if ($quiz->episode->course->status !== CourseStatusEnum::DRAFT)
             return ['message' => __('msg.quiz_action'), 'code' => 403];
 
         $quiz->episode->course->decrement('total_quizzes');

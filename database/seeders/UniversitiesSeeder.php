@@ -9291,7 +9291,7 @@ class UniversitiesSeeder extends Seeder
             ["name" => "Zimbabwe Open University"]
         ];
 
-        foreach($universities as $university)
+        foreach ($universities as $university)
             University::create($university);
     }
 }
