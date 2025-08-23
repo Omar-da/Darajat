@@ -12,6 +12,7 @@ use Stripe\Webhook;
 use Illuminate\Support\Str;
 use App\Models\Payment;
 use App\Models\Order;
+use App\Models\PlatformStatistics;
 use Illuminate\Support\Facades\Mail;
 
 class StripeWebhookController extends Controller
@@ -77,12 +78,23 @@ class StripeWebhookController extends Controller
             'status' => OrderStatusEnum::PAID, 
         ]);
         $course = $order->course;
-        $user = $order->user;
+        $student = $order->student;
+        $teacher = $order->teacher;
+        $price = $course->price;
 
-        $user->followed_courses()->attach($course);
+        $commission = $price * 5 / 100;
+        $platform = PlatformStatistics::getStats();
+        $platform->commission += $commission;
+        $platform->total_profit += $price;
+        $platform->save();
+
+        $teacher->balance += $price - $commission;
+        $teacher->save();
+
+        $student->followed_courses()->attach($course);
         $course->increment('num_of_students_enrolled');
 
-        Mail::to($user->email)->send(new PaymentNotification(true, $course->title));
+        Mail::to($student->email)->send(new PaymentNotification(true, $course->title));
     }
 
     private function handlePaymentFailure($paymentIntent)
@@ -94,10 +106,10 @@ class StripeWebhookController extends Controller
         if ($order) 
             $order->update(['status' => OrderStatusEnum::FAILED]);
 
-        $user = $order->user;
+        $student = $order->student;
         $course = $order->course;
 
-        if (isset($user)) 
-            Mail::to($user->email)->send(new PaymentNotification(false, $course->title));
+        if (isset($student)) 
+            Mail::to($student->email)->send(new PaymentNotification(false, $course->title));
     }
 }

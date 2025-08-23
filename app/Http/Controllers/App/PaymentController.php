@@ -14,7 +14,7 @@ class PaymentController
 {
     public function createPaymentIntent(Request $request)
     {
-        $user = auth()->user();
+        $student = auth()->user();
 
         $request->validate([
             'course_id' => 'required|exists:courses,id',
@@ -28,7 +28,8 @@ class PaymentController
 
         // 1. CREATE THE ORDER RECORD FIRST
         $order = Order::create([
-            'user_id' => $user->id,
+            'student_id' => $student->id,
+            'teacher_id' => $course->teacher_id,
             'course_id' => $course->id,
             'amount' => $amount,
             'currency' => 'usd',
@@ -48,7 +49,8 @@ class PaymentController
                 'metadata' => [
                     'order_id' => $order->id,
                     'order_number' => $order->order_number,
-                    'user_id' => $user->id,
+                    'student_id' => $student->id,
+                    'teacher_id' => $course->teacher_id,
                     'course_id' => $course->id,
                 ],
             ]);
@@ -72,11 +74,29 @@ class PaymentController
 
     public function cancelProcess(Order $order)
     {
-        if ($order->user_id !== auth()->id() || $order->status !== OrderStatusEnum::PENDING)
+        if ($order->student_id !== auth()->id() || $order->status !== OrderStatusEnum::PENDING)
         return response()->json(['error' => 'Cannot cancel this order'], 400);
 
     $order->update(['status' => OrderStatusEnum::CANCELED]);
 
     return response()->json(['message' => 'Order canceled']);
+    }
+    
+    public function getHistoryForStudent()
+    {
+        $history = Order::where('student_id', auth()->id())
+            ->orderBy('purchase_date', 'desc')
+            ->get();
+
+        return response()->json(['history' => $history]);
+    }
+    
+    public function getHistoryForTeacher()
+    {
+        $history = Order::where('teacher_id', auth()->id())
+            ->orderBy('purchase_date', 'desc')
+            ->get();
+
+        return response()->json(['history' => $history]);
     }
 }

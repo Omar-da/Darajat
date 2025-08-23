@@ -54,6 +54,7 @@ class UserResource extends JsonResource
             'speciality' => $this->moreDetail ? $this->moreDetail->speciality : null,
             'work_experience' => $this->moreDetail ? $this->moreDetail->work_experience : null,
             'skills' => $skills,
+            'balance' => $this->moreDetail->balance
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Enums\CourseStatusEnum;
 use App\Models\Course;
+use App\Models\PlatformStatistics;
 use Livewire\Component;
 
 class PendingCourses extends Component
@@ -12,10 +13,13 @@ class PendingCourses extends Component
 
     public function approve(Course $course)
     {
+        if($course->topic->courses()->where('status', CourseStatusEnum::APPROVED)->doesntExist())
+            PlatformStatistics::incrementStat('num_of_topics');
         $course->status = CourseStatusEnum::APPROVED;
         $course->admin_id = auth()->user()->id;
         $course->response_date = now()->format('Y-m-d H:i:s');
         $course->save();
+        PlatformStatistics::incrementStat('num_of_courses');
     }
     
     public function reject(Course $course)
