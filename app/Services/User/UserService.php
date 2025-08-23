@@ -134,7 +134,15 @@ class UserService
 
     public function promoteStudentToTeacher()
     {
+        $user = auth('api')->user();
+        if($user['role'] === RoleEnum::TEACHER)
+            return ['message' => 'You are already a Teacher!', 'code' => 409];
+        
+        $user->update([
+            'role' => 'teacher'
+        ]);
 
+        return ['message' => 'You are now a Teacher!', 'code' => 200];
     }
 
     public function delete(): array

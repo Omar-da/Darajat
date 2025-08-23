@@ -116,7 +116,11 @@ class UpdateCopiedCourseController
         if(request()->hasFile('file_url'))
             $request['file_url']->storeAs($episode_path, 'file_copy.' . $request['file_url']->getClientOriginalExtension(), 'local');
         else
-           Storage::disk('local')->delete($this->get_full_path($episode_path, 'file_copy.'));
+        {
+            $file_path = $this->get_full_path($episode_path, 'file_copy.');
+            if($file_path)
+                Storage::disk('local')->delete($file_path);
+        }
 
         // Duration
         $request['duration'] = FFMpeg::fromDisk('local')->open("$episode_path/video_copy.mp4")->getDurationInSeconds();
@@ -140,7 +144,9 @@ class UpdateCopiedCourseController
         $episode_path = "courses/$course->id/episodes/$episode->id";
         Storage::disk('local')->delete("$episode_path/video_copy.mp4");
         Storage::disk('local')->delete("$episode_path/thumbnail_copy.jpg");
-        Storage::disk('local')->delete($this->get_full_path($episode_path, 'file_copy.'));
+        $file_path = $this->get_full_path($episode_path, 'file_copy.');
+        if($file_path)
+            Storage::disk('local')->delete($file_path);
 
 
         if($episode->draft_quiz->exists())
@@ -219,7 +225,12 @@ class UpdateCopiedCourseController
                 {
                     Storage::disk('local')->move("$episode_path/video_copy.mp4", "$episode_path/video.mp4");
                     Storage::disk('local')->move("$episode_path/thumbnail_copy.jpg", "$episode_path/thumbnail.jpg");
-                    Storage::disk('local')->move($this->get_full_path($episode_path, 'file_copy.'), $this->get_full_path($episode_path, 'file.'));
+                    $copied_file_path = $this->get_full_path($episode_path, 'file_copy.');
+                    $original_file_path = $this->get_full_path($episode_path, 'file.');
+                    if($copied_file_path)
+                        Storage::disk('local')->move($copied_file_path, $original_file_path);
+                    else
+                        Storage::disk('local')->delete($original_file_path);
                 }
                 else
                 {
@@ -264,7 +275,9 @@ class UpdateCopiedCourseController
             $episode_path = "courses/$course->id/episodes/$episode->id";
             Storage::disk('local')->delete("$episode_path/video_copy.mp4");
             Storage::disk('local')->delete("$episode_path/thumbnail_copy.jpg");
-            Storage::disk('local')->delete($this->get_full_path($episode_path, 'file_copy.'));
+            $file_path = $this->get_full_path($episode_path, 'file_copy.');
+            if($file_path)
+                Storage::disk('local')->delete($file_path);
         }
 
         $course->delete();
