@@ -36,9 +36,11 @@ class MoreDetail extends Model
 
     public function setWorkExperienceAttribute($value): void
     {
+        if(!is_null($value)) {
         $lang = $this->detectLanguage($value);
         $translatedContent = $this->translateContent($value, $lang);
         $this->attributes['work_experience'] = json_encode($translatedContent, JSON_UNESCAPED_UNICODE);
+        }
     }
 
     public function getWorkExperienceAttribute($value)

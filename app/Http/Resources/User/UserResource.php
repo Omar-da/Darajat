@@ -45,13 +45,28 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'otp_code' => $this->otp_code,
             'role' => $this->role->label(),
-            'country' => $this->moreDetail ? $this->moreDetail->country['name'] : null,
+            'country' => $this->moreDetail ? [
+                'id' => $this->moreDetail->country['id'],
+                'name' => $this->moreDetail->country['name']
+            ] : null,
             'languages' => $languages,
-            'job_title' => $this->moreDetail ? ($this->moreDetail->jobTitle['title'] ?? null) : null,
+            'job_title' => $this->moreDetail ?
+                ($this->moreDetail->jobTitle ? [
+                    'id' => $this->moreDetail->jobTitle['id'],
+                    'title' => $this->moreDetail->jobTitle['title']
+                ] : null) : null,
             'linked_in_url' => $this->moreDetail ? $this->moreDetail->linked_in_url : null,
             'education' => $this->moreDetail ? $this->moreDetail->education->label() : null,
-            'university' => $this->moreDetail ? $this->moreDetail->university : null,
-            'speciality' => $this->moreDetail ? $this->moreDetail->speciality : null,
+            'university' => $this->moreDetail ?
+                ($this->moreDetail->university ? [
+                    'id' => $this->moreDetail->university['id'],
+                    'title' => $this->moreDetail->university['name']
+                ] : null) : null,
+            'speciality' => $this->moreDetail ?
+                ($this->moreDetail->speciality ? [
+                    'id' => $this->moreDetail->speciality['id'],
+                    'title' => $this->moreDetail->speciality['name']
+                ] : null) : null,
             'work_experience' => $this->moreDetail ? $this->moreDetail->work_experience : null,
             'skills' => $skills,
         ];

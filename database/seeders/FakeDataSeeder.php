@@ -31,18 +31,19 @@ class FakeDataSeeder extends Seeder
             'email' => 'tahsin@gmail.com',
             'password' => '147258369',
             'role' => 'teacher',
+            'email_verified_at' => now(),
         ]);
 
         $MoreDetail1 = MoreDetail::create([
             'id' => 1,
-            'user_id' =>  2,
+            'user_id' => 2,
             'job_title_id' => 2,
             'country_id' => 3,
             'education' => 'none',
         ]);
 
-        $user1->badges()->attach([1,2,5]);
-        $MoreDetail1->skills()->attach([2,3,4]);
+        $user1->badges()->attach([1, 2, 5]);
+        $MoreDetail1->skills()->attach([2, 3, 4]);
         $MoreDetail1->languages()->attach(2, ['level' => 'mother_tongue']);
         $MoreDetail1->languages()->attach(5, ['level' => 'beginner']);
 
@@ -55,24 +56,24 @@ class FakeDataSeeder extends Seeder
             'email' => 'Omar@gmail.com',
             'password' => '147258369',
             'role' => 'student',
+            'email_verified_at' => now(),
         ]);
 
         $MoreDetail2 = MoreDetail::create([
             'id' => 2,
-            'user_id' =>  3,
+            'user_id' => 3,
             'job_title_id' => 2,
             'country_id' => 10,
             'education' => 'none',
         ]);
 
 
-        $user2->badges()->attach([1,2,5]);
-        $MoreDetail2->skills()->attach([2,3,4]);
+        $user2->badges()->attach([1, 2, 5]);
+        $MoreDetail2->skills()->attach([2, 3, 4]);
         $MoreDetail2->languages()->attach(3, ['level' => 'mother_tongue']);
         $MoreDetail2->languages()->attach(2, ['level' => 'beginner']);
 
-        for($i=0; $i<5; $i++)
-        {
+        for ($i = 0; $i < 5; $i++) {
             $courses = [
                 [
                     'title' => 'Laravel for beginner',
@@ -141,11 +142,10 @@ class FakeDataSeeder extends Seeder
         }
 
         $user = User::withTrashed()->find(2);
-        foreach(Course::all() as $course)
+        foreach (Course::all() as $course)
             $user->followed_courses()->attach($course, ['progress' => 2, 'perc_progress' => 66.6, 'num_of_completed_quizzes' => 1, 'rate' => 3]);
 
-        for($i=0; $i<3; $i++)
-        {
+        for ($i = 0; $i < 3; $i++) {
             // episode 1
             Episode::create([
                 'course_id' => $i + 1,
@@ -172,20 +172,18 @@ class FakeDataSeeder extends Seeder
         }
 
         // comments
-        for($i=0; $i<3; $i++)
-        {
-            for($j=0; $j<10; $j++)
-            Comment::create([
-                'episode_id' => $i + 1,
-                'user_id' => 2,
-                'content' => 'this is the first comment, hello world',
-                'likes' => 203,
-            ]);
+        for ($i = 0; $i < 3; $i++) {
+            for ($j = 0; $j < 10; $j++)
+                Comment::create([
+                    'episode_id' => $i + 1,
+                    'user_id' => 2,
+                    'content' => 'this is the first comment, hello world',
+                    'likes' => 203,
+                ]);
         }
 
         // reply 1
-        for($i=0; $i<10; $i++)
-        {
+        for ($i = 0; $i < 10; $i++) {
             Reply::create([
                 'comment_id' => $i + 1,
                 'user_id' => 2,
@@ -222,18 +220,18 @@ class FakeDataSeeder extends Seeder
 
 
         // questions in quiz 1
-        for($i=0; $i<3; $i++)
-        for($j=0; $j<10; $j++)
-        Question::create([
-            'quiz_id' => $i + 1,
-            'question_number' => $j + 1,
-            'content' => 'what is your name?',
-            'answer_a' => 'Omar',
-            'answer_b' => 'Hamza',
-            'answer_c' => 'Ahmad',
-            'answer_d' => 'Ali',
-            'right_answer' => 'a'
-        ]);
+        for ($i = 0; $i < 3; $i++)
+            for ($j = 0; $j < 10; $j++)
+                Question::create([
+                    'quiz_id' => $i + 1,
+                    'question_number' => $j + 1,
+                    'content' => 'what is your name?',
+                    'answer_a' => 'Omar',
+                    'answer_b' => 'Hamza',
+                    'answer_c' => 'Ahmad',
+                    'answer_d' => 'Ali',
+                    'right_answer' => 'a'
+                ]);
 
         $user->quizzes()->attach($quiz1, ['success' => false, 'mark' => 1, 'percentage_mark' => 33]);
         $user->quizzes()->attach($quiz2, ['success' => true, 'mark' => 2, 'percentage_mark' => 100]);

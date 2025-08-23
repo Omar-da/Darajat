@@ -23,7 +23,7 @@ class UserService
             'last_name' => $request['last_name'],
         ]);
 
-        if(!is_null($request['speciality']) && !is_numeric($request['speciality'])) {
+        if(request()->has('speciality') && !is_numeric($request['speciality'])) {
             $speciality = Speciality::query()->create([
                 'name' => $request['speciality'],
             ]);

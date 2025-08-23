@@ -162,4 +162,5 @@ return [
     'badge_silver' => 'شارة فضية!',
     'badge_gold' => 'شارة ذهبية!',
     "congratulations" => "مبروك! انت حصلت على ",
+    'email_not_verified' => '!البريد الإلكتروني غير مفعل',
 ];

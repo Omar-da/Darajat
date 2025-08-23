@@ -44,7 +44,7 @@ class AuthController extends Controller
         $data = [];
         try {
             $data = $this->authService->login($request);
-            if ($data['code'] == 401 || $data['code'] == 404) {
+            if ($data['code'] == 401 || $data['code'] == 404 || $data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['user'], $data['message'], $data['code']);
