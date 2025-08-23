@@ -15,9 +15,10 @@ class PendingCourses extends Component
         $course->status = CourseStatusEnum::APPROVED;
         $course->admin_id = auth()->user()->id;
         $course->response_date = now()->format('Y-m-d H:i:s');
+        $course->teacher->statistics()->where('title->en', 'Published Courses')->first()->pivot->increment('progress');
         $course->save();
     }
-    
+
     public function reject(Course $course)
     {
         $course->status = CourseStatusEnum::REJECTED;
@@ -32,7 +33,7 @@ class PendingCourses extends Component
         ->with(['teacher' => function($q) {
                 $q->withTrashed();
         }])->get();
-        
+
         return view('livewire.pending-courses');
     }
 }
