@@ -5,6 +5,7 @@ namespace App\Http\Controllers\App;
 use App\Enums\RoleEnum;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use App\Responses\Response;
 use App\Services\Firebase\FirebaseOAuth;
@@ -106,9 +107,12 @@ class AuthController extends Controller
         // Log the user in (Laravel session)
         auth('api')->login($user);
 
-        return response()->json([
-            'user' => $user,
-            'token' => $user->createToken('authToken')->accessToken,
-        ]);
+        $token = $user->createToken('authToken')->accessToken;
+        $user = (new UserResource($user))->toArray(request());
+        $user['token'] = $token;
+        $message = __('msg.login_success');
+        $code = 200;
+
+        return Response::success($user, $message, $code);
     }
 }
