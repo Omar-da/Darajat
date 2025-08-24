@@ -21,10 +21,10 @@ class PaymentController
         ]);
 
         $course = Course::find($request->course_id);
-        if($course->status !== CourseStatusEnum::APPROVED)
+        if ($course->status !== CourseStatusEnum::APPROVED)
             return ['message' => __('msg.can_not_enroll_in_course') . $course->status->label() . __('msg.status'), 'code' => 403];
 
-        $amount = $course->price * 100; 
+        $amount = $course->price * 100;
 
         // 1. CREATE THE ORDER RECORD FIRST
         $order = Order::create([
@@ -77,9 +77,9 @@ class PaymentController
         if ($order->student_id !== auth()->id() || $order->status !== OrderStatusEnum::PENDING)
         return response()->json(['error' => 'Cannot cancel this order'], 400);
 
-    $order->update(['status' => OrderStatusEnum::CANCELED]);
+        $order->update(['status' => OrderStatusEnum::CANCELED]);
 
-    return response()->json(['message' => 'Order canceled']);
+        return response()->json(['message' => 'Order canceled']);
     }
     
     public function getHistoryForStudent()

@@ -154,17 +154,17 @@ class EpisodeController extends Controller
         $data = [];
         try {
             $data = $this->episodeService->downloadFile($id);
-            if($data instanceof StreamedResponse) {
+            if ($data instanceof StreamedResponse) {
                 return $data;
             }
 
-            if(isset($data['code']) && $data['code'] == 404) {
+            if (isset($data['code']) && $data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
 
             return $data;
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -174,7 +174,7 @@ class EpisodeController extends Controller
         $episode = Episode::where('id', $episode_id)->firstOrFail();
         $course = Course::where('id', $episode->course_id)->firstOrFail();
 
-        if($request->query('copy') == 'true')
+        if ($request->query('copy') == 'true')
             $videoPath = "courses/$course->id/episodes/$episode_id/video_copy.mp4";
         else
             $videoPath = "courses/$course->id/episodes/$episode_id/video.mp4";
@@ -205,7 +205,7 @@ class EpisodeController extends Controller
     {
         $episode = Episode::findOrFail();
         $course = Course::where('id', $episode->course_id)->firstOrFail();
-        if($request->query('copy') == 'true')
+        if ($request->query('copy') == 'true')
             $thumbnailPath = "courses/$course->id/episodes/$episode_id/thumbnail_copy.jpg";
         else
             $thumbnailPath = "courses/$course->id/episodes/$episode_id/thumbnail.jpg";
@@ -226,7 +226,7 @@ class EpisodeController extends Controller
         $episode = Episode::query()->findOrFail($episode_id);
 
         $directory = "courses/{$episode->course_id}/episodes/{$episode_id}";
-        if($request->query('copy') == 'true')
+        if ($request->query('copy') == 'true')
             $file = collect(Storage::disk('local')->files($directory))->first(fn($f) => str_contains(basename($f), 'file_copy'));
         else
             $file = collect(Storage::disk('local')->files($directory))->first(fn($f) => str_contains(basename($f), 'file'));

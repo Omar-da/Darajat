@@ -21,6 +21,7 @@ class AuthService
     {
         $this->otpService = $otpService;
     }
+
     public function register($request): array
     {
         $user = User::query()->create([
@@ -30,14 +31,11 @@ class AuthService
             'password' => Hash::make($request['password']),
         ]);
 
-        if(!$user)
-        {
+        if (!$user) {
             $message = __('msg.registration_failed');
             $code = 422;
-        }
-        else
-        {
-//            $this->otpService->sendOTP($user);
+        } else {
+            $this->otpService->sendOTP($user);
             $moreDetail = MoreDetail::query()->create([
                 'user_id' => $user->id,
                 'country_id' => $request['country_id'],
@@ -60,10 +58,13 @@ class AuthService
     public function login($request): array
     {
         $user = User::query()->where('email', $request['email'])->first();
-        if(!is_null($user)) {
-            if(!Auth::attempt($request->only(['email', 'password']))) {
+
+        if (!is_null($user)) {
+            if (!Auth::attempt($request->only(['email', 'password']))) {
                 $message = __('msg.not_match');
                 $code = 401;
+            } else if (is_null($user->email_verified_at)) {
+                return ['message' => __('msg.email_not_verified'), 'code' => 403];
             } else {
                 $token = $user->createToken('Personal Access Token')->accessToken;
                 $user = (new UserResource($user))->toArray(request());

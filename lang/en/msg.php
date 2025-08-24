@@ -166,4 +166,5 @@ return [
     'badge_silver' => 'Badge Silver!',
     'badge_gold' => 'Badge Gold!',
     "congratulations" => "Congratulations! You've earned a ",
+    'email_not_verified' => 'Email not verified!',
 ];

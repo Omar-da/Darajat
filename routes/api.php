@@ -208,7 +208,7 @@ Route::middleware('localization')->group(function () {
     });
 
     // Payment
-    Route::controller(PaymentController::class)->prefix('orders')->group(function() {
+    Route::controller(PaymentController::class)->prefix('orders')->group(function () {
         Route::post('create-payment-intent', 'createPaymentIntent');
         Route::post('{order}/cancel', 'cancelProcess');
         Route::get('history/student', 'getHistoryForStudent');
