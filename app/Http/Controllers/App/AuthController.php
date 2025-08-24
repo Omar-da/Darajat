@@ -104,11 +104,11 @@ class AuthController extends Controller
         );
 
         // Log the user in (Laravel session)
-        auth()->login($user);
+        auth('api')->login($user);
 
         return response()->json([
             'user' => $user,
-            'token' => $user->createToken('authToken')->plainTextToken,
+            'token' => $user->createToken('authToken')->accessToken,
         ]);
     }
 }
