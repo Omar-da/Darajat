@@ -14,19 +14,16 @@ class Order extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'user_id',
+        'student_id',
+        'teacher_id',
         'order_number',
         'amount',
         'currency',
         'status',
         'payment_intent_id',
-        'stripe_customer_id',
-        'payment_status',
-        'product_id',
-        'product_name',
-        'quantity',
-        'metadata',
-        'notes',
+        'course_id',
+        'course_name',
+        'purchase_date',
     ];
 
     protected $casts = [

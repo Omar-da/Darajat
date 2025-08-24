@@ -108,7 +108,6 @@ class AuthController extends Controller
         auth('api')->login($user);
 
         $token = $user->createToken('authToken')->accessToken;
-        $user = (new UserResource($user))->toArray(request());
         $user['token'] = $token;
         $message = __('msg.login_success');
         $code = 200;

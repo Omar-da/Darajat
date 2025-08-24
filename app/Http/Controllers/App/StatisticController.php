@@ -16,4 +16,13 @@ class StatisticController extends Controller
 
         return Response::success(StatisticResource::collection($statistics), __('msg.statistics'));
     }
+
+    public function getEnthusiasm()
+    {
+        $statistics = auth('api')->user()->statistics;
+        $current_enthusiasm = $statistics->findOrfail(1);
+        $max_enthusiasm = $statistics->findOrfail(2);
+
+        return Response::success(StatisticResource::collection([$current_enthusiasm, $max_enthusiasm]), __('msg.statistics'));
+    }
 }

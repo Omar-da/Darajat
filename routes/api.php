@@ -227,7 +227,10 @@ Route::middleware('localization')->group(function () {
         Route::get('badges/get', [BadgeController::class, 'index']);
 
         // statistics
-        Route::get('statistics/get-my-statistics', [StatisticController::class, 'index']);
+        Route::controller(StatisticController::class)->prefix('statistics')->group(function() {
+            Route::get('get-my-statistics', 'index');
+            Route::get('get-enthusiasm', 'getEnthusiasm');
+        });
 
     });
 
