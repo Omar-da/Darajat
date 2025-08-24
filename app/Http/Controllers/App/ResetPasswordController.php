@@ -36,7 +36,7 @@ class ResetPasswordController extends Controller
         $data = [];
         try {
             $data = $this->resetPasswordService->checkCode($request->validated());
-            if($data['code'] == 422) {
+            if ($data['code'] == 422) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);

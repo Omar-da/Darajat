@@ -12,7 +12,7 @@ class CommentService
     public function index($episode_id): array
     {
         $episode = Episode::query()->find($episode_id);
-        if(is_null($episode)) {
+        if (is_null($episode)) {
             return ['message' => __('msg.episode_not_found'), 'code' => 404];
         }
         $comments = $episode->comments()->latest('comment_date')->paginate(15);
@@ -32,7 +32,7 @@ class CommentService
     public function loadMore($episode_id, $request): array
     {
         $episode = Episode::query()->find($episode_id);
-        if(is_null($episode)) {
+        if (is_null($episode)) {
             return ['message' => __('msg.episode_not_found'), 'code' => 404];
         }
         $comments = $episode->comments()->latest('comment_date')->paginate(15, '*', 'page', $request['page']);
@@ -51,7 +51,7 @@ class CommentService
     // Get the authenticated user's comments for a specific episode.
     public function getMyComments($episode_id): array
     {
-        if(is_null(Episode::query()->find($episode_id))) {
+        if (is_null(Episode::query()->find($episode_id))) {
             return ['message' => __('msg.episode_not_found'), 'code' => 404];
         }
         $comments = Comment::query()
@@ -65,12 +65,17 @@ class CommentService
     // Add comment for specific episode.
     public function store($request, $episode_id): array
     {
-        if(is_null(Episode::query()->find($episode_id))) {
+        if (is_null(Episode::query()->find($episode_id))) {
             return ['message' => __('msg.episode_not_found'), 'code' => 404];
         }
+
+        $user = auth('api')->user();
+        if($user->is_banned)
+            return ['message' => 'You are currently banned from commenting. This action was taken for violating our community guidelines.', 'code' => 403];
+
         $comment = Comment::query()->create([
             'episode_id' => $episode_id,
-            'user_id' => auth('api')->id(),
+            'user_id' => $user->id,
             'content' => $request['content']
         ]);
         return ['data' => new CommentResource($comment), 'message' => __('msg.comment_created'), 'code' => 201];
@@ -79,13 +84,17 @@ class CommentService
     // Update specific comment.
     public function update($request, $id): array
     {
+        $user = auth('api')->user();
+        if($user->is_banned)
+            return ['message' => 'You are currently banned from commenting. This action was taken for violating our community guidelines.', 'code' => 403];
+
         $comment = Comment::query()
             ->where([
                 'id' => $id,
-                'user_id' => auth('api')->id()
+                'user_id' => $user->id
             ])->first();
-        if(is_null($comment)) {
-            if(!Comment::query()->find($id)) {
+        if (is_null($comment)) {
+            if (!Comment::query()->find($id)) {
                 return ['message' => __('msg.comment_not_found'), 'code' => 404];
             } else {
                 return ['message' => __('msg.unauthorized'), 'code' => 401];
@@ -107,8 +116,8 @@ class CommentService
                 'id' => $id,
                 'user_id' => auth('api')->id()
             ])->first();
-        if(is_null($comment)) {
-            if(!Comment::query()->find($id)) {
+        if (is_null($comment)) {
+            if (!Comment::query()->find($id)) {
                 return ['message' => __('msg.comment_not_found'), 'code' => 404];
             } else {
                 return ['message' => __('msg.unauthorized'), 'code' => 401];
@@ -122,17 +131,15 @@ class CommentService
     public function like($id): array
     {
         $comment = Comment::query()->find($id);
-        if(is_null($comment)) {
+        if (is_null($comment)) {
             return ['message' => __('msg.comment_not_found'), 'code' => 404];
         }
 
-        if($comment->userLikes()->where('user_id', auth('api')->id())->exists()) {
+        if ($comment->userLikes()->where('user_id', auth('api')->id())->exists()) {
             $comment->userLikes()->detach(auth('api')->id());
             $comment->decrement('likes');
             return ['data' => new CommentResource($comment), 'message' => __('msg.comment_unliked'), 'code' => 200];
-        }
-        else
-        {
+        } else {
             $comment->userLikes()->attach(auth('api')->id());
             $comment->increment('likes');
             return ['data' => new CommentResource($comment), 'message' => __('msg.comment_liked'), 'code' => 200];

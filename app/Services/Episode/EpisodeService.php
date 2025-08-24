@@ -58,7 +58,7 @@ class EpisodeService
         $episode_path = "courses/$course->id/episodes/$episode->id";
         $request['image_url']->storeAs($episode_path, 'thumbnail.jpg', 'local');
         $request['video_url']->storeAs($episode_path, 'video.mp4', 'local');
-        if(request()->hasFile('file_url'))
+        if (request()->hasFile('file_url'))
             $request['file_url']->storeAs($episode_path, 'file.' . $request['file_url']->getClientOriginalExtension(), 'local');
 
         // Duration
@@ -87,13 +87,12 @@ class EpisodeService
         $episode_path = "courses/$course->id/episodes/$episode->id";
         $request['image_url']->storeAs($episode_path, 'thumbnail.jpg', 'local');
         $request['video_url']->storeAs($episode_path, 'video.mp4', 'local');
-        if(request()->hasFile('file_url'))
+        if (request()->hasFile('file_url'))
             $request['file_url']->storeAs($episode_path, 'file.' . $request['file_url']->getClientOriginalExtension(), 'local');
-        else
-        {
+        else {
             $file = collect(Storage::disk('local')->files($episode_path))
                 ->first(fn($f) => str_contains(basename($f), 'file'));
-            if(!is_null($file))
+            if (!is_null($file))
                 Storage::disk('local')->delete("$episode_path/file." . pathinfo($file, PATHINFO_EXTENSION));
         }
 
@@ -112,7 +111,7 @@ class EpisodeService
 
     public function showToTeacher($request, $id): array
     {
-        if($request->query('copy') == 'true')
+        if ($request->query('copy') == 'true')
             $episode = DraftEpisode::query()->findOrFail($id);
         else
             $episode = Episode::query()->findOrFail($id);
@@ -150,7 +149,7 @@ class EpisodeService
         Storage::disk('local')->delete("$episode_path/file_copy.$extention");
 
 
-        if($episode->quiz->exists())
+        if ($episode->quiz->exists())
             $course->decrement('total_quizzes');
         $course->decrement('num_of_episodes');
         $course->update([
@@ -167,7 +166,7 @@ class EpisodeService
         $user = auth('api')->user();
         $episode = Episode::query()->find($id);
 
-        if($episode->course->teacher_id == auth('api')->id())
+        if ($episode->course->teacher_id == auth('api')->id())
             return ['message' => __('msg.teacher_watched_his_course'), 'code' => 409];
 
         if ($user->episodes()->where('episode_id', $id)->exists())
@@ -205,19 +204,16 @@ class EpisodeService
         $user = auth('api')->user();
         $episode = Episode::query()->find($id);
 
-        if($episode->course->teacher_id == auth('api')->id())
+        if ($episode->course->teacher_id == auth('api')->id())
             return ['message' => __('msg.teacher_liked_his_episode'), 'code' => 409];
 
-        if ($episode->userLikes()->where('user_id', auth('api')->id())->exists())
-        {
+        if ($episode->userLikes()->where('user_id', auth('api')->id())->exists()) {
             $episode->userLikes()->detach($user->id);
             $episode->decrement('likes');
             $user->statistics()->where('title->en', 'Granted Likes')->first()->pivot->decrement('progress');
             $episode->course->teacher->statistics()->where('title->en', 'Acquired Likes')->first()->pivot->decrement('progress');
             return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_unliked'), 'code' => 200];
-        }
-        else
-        {
+        } else {
             $episode->userLikes()->attach($user->id);
             $episode->increment('likes');
             $user->statistics()->where('title->en', 'Granted Likes')->first()->pivot->increment('progress');

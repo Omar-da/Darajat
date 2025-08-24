@@ -12,7 +12,7 @@ class ReplyService
     public function index($comment_id): array
     {
         $comment = Comment::query()->find($comment_id);
-        if(is_null($comment)) {
+        if (is_null($comment)) {
             return ['message' => __('msg.comment_not_found'), 'code' => 404];
         }
         $replies = $comment->replies()->latest('reply_date')->get();
@@ -22,12 +22,17 @@ class ReplyService
     // Add reply for specific comment.
     public function store($request, $comment_id): array
     {
-        if(is_null(Comment::query()->find($comment_id))) {
+        if (is_null(Comment::query()->find($comment_id))) {
             return ['message' => __('msg.comment_not_found'), 'code' => 404];
         }
+
+        $user = auth('api')->user();
+        if($user->is_banned)
+            return ['message' => 'You are currently banned from commenting. This action was taken for violating our community guidelines.', 'code' => 403];
+
         $reply = Reply::query()->create([
             'comment_id' => $comment_id,
-            'user_id' => auth('api')->id(),
+            'user_id' => $user->id,
             'content' => $request['content']
         ]);
         return ['data' => new ReplyResource($reply), 'message' => __('msg.reply_created'), 'code' => 201];
@@ -36,18 +41,23 @@ class ReplyService
     // Update specific reply.
     public function update($request, $id): array
     {
+        $user = auth('api')->user();
+        if($user->is_banned)
+            return ['message' => 'You are currently banned from commenting. This action was taken for violating our community guidelines.', 'code' => 403];
+
         $reply = Reply::query()
             ->where([
                 'id' => $id,
-                'user_id' => auth('api')->id()
+                'user_id' => $user->id
             ])->first();
-        if(is_null($reply)) {
-            if(is_null(Reply::query()->find($id))) {
+        if (is_null($reply)) {
+            if (is_null(Reply::query()->find($id))) {
                 return ['message' => __('msg.reply_not_found'), 'code' => 404];
             } else {
                 return ['message' => __('msg.unauthorized'), 'code' => 401];
             }
         }
+
         $reply->update([
             'content' => $request['content']
         ]);
@@ -62,8 +72,8 @@ class ReplyService
                 'id' => $id,
                 'user_id' => auth('api')->id()
             ])->first();
-        if(is_null($reply)) {
-            if(is_null(Reply::query()->find($id))) {
+        if (is_null($reply)) {
+            if (is_null(Reply::query()->find($id))) {
                 return ['message' => __('msg.reply_not_found'), 'code' => 404];
             } else {
                 return ['message' => __('msg.unauthorized'), 'code' => 401];
@@ -78,21 +88,18 @@ class ReplyService
     {
         $reply = Reply::query()->find($id);
 
-        if(is_null($reply)) {
+        if (is_null($reply)) {
             return ['message' => __('msg.reply_not_found'), 'code' => 404];
         }
 
-        if($reply->userlikes()->where('user_id', auth('api')->id())->exists())
-        {
+        if ($reply->userlikes()->where('user_id', auth('api')->id())->exists()) {
             $reply->userLikes()->detach(auth('api')->id());
             $reply->update([
                 'likes' => $reply->likes - 1
             ]);
-            
+
             return ['message' => __('msg.reply_unliked'), 'code' => 200];
-        }
-        else
-        {
+        } else {
             $reply->userLikes()->attach(auth('api')->id());
             $reply->update([
                 'likes' => $reply->likes + 1

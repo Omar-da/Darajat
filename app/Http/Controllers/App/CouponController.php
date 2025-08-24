@@ -27,7 +27,7 @@ class CouponController extends Controller
             $data = $this->couponService->index($course_id);
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -40,7 +40,7 @@ class CouponController extends Controller
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
-            if($th instanceof AuthorizationException) {
+            if ($th instanceof AuthorizationException) {
                 return Response::error($message, $th->getCode());
             }
             return Response::error($message);
@@ -55,7 +55,7 @@ class CouponController extends Controller
             $data = $this->couponService->update($request->validated(), $id);
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -68,7 +68,7 @@ class CouponController extends Controller
             $data = $this->couponService->show($id);
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -81,7 +81,7 @@ class CouponController extends Controller
             $data = $this->couponService->destroy($id);
             return Response::success([], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }
@@ -91,12 +91,12 @@ class CouponController extends Controller
         $data = [];
         try {
             $data = $this->couponService->applyCoupon($id, $request->validated());
-            if($data['code'] == 404 || $data['code'] == 409 || $data['code'] == 403 || $data['code'] == 400) {
+            if ($data['code'] == 404 || $data['code'] == 409 || $data['code'] == 403 || $data['code'] == 400) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
-            $message  = $th->getMessage();
+            $message = $th->getMessage();
             return Response::error($message);
         }
     }

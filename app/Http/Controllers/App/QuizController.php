@@ -27,13 +27,13 @@ class QuizController extends Controller
         $data = [];
         try {
             $data = $this->quizService->store($episode_id, $request->validated());
-            if($data['code'] == 404 || $data['code'] == 409) {
+            if ($data['code'] == 404 || $data['code'] == 409) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
-            if($th instanceof AuthorizationException) {
+            if ($th instanceof AuthorizationException) {
                 return Response::error($message, $th->getCode());
             }
             return Response::error($message);
@@ -46,13 +46,13 @@ class QuizController extends Controller
         $data = [];
         try {
             $data = $this->quizService->processAnswer($request->validated());
-            if($data['code'] == 404) {
+            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
-            if($th instanceof AuthorizationException) {
+            if ($th instanceof AuthorizationException) {
                 return Response::error($message, $th->getCode());
             }
             return Response::error($message);
@@ -65,13 +65,13 @@ class QuizController extends Controller
         $data = [];
         try {
             $data = $this->quizService->calculateQuizResult($quiz_id, $request->validated());
-            if($data['code'] == 404 || $data['code'] == 403 || $data['code'] == 409) {
+            if ($data['code'] == 404 || $data['code'] == 403 || $data['code'] == 409) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
-            if($th instanceof AuthorizationException) {
+            if ($th instanceof AuthorizationException) {
                 return Response::error($message, $th->getCode());
             }
             return Response::error($message);
@@ -84,13 +84,13 @@ class QuizController extends Controller
         $data = [];
         try {
             $data = $this->quizService->update($quiz_id, $request->validated());
-            if($data['code'] == 404) {
+            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
-            if($th instanceof AuthorizationException) {
+            if ($th instanceof AuthorizationException) {
                 return Response::error($message, $th->getCode());
             }
             return Response::error($message);
@@ -103,13 +103,13 @@ class QuizController extends Controller
         $data = [];
         try {
             $data = $this->quizService->destroy($quiz_id);
-            if($data['code'] == 404) {
+            if ($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success([], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
-            if($th instanceof AuthorizationException) {
+            if ($th instanceof AuthorizationException) {
                 return Response::error($message, $th->getCode());
             }
             return Response::error($message);
