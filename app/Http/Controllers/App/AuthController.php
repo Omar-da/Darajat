@@ -16,12 +16,7 @@ use Throwable;
 class AuthController extends Controller
 {
     private AuthService $authService;
-<<<<<<< Updated upstream
-
-    // protected FirebaseOAuth $firebase;
-=======
     protected FirebaseOAuth $firebase_oauth;
->>>>>>> Stashed changes
 
     public function __construct(AuthService $authService, FirebaseOAuth $firebase_oauth)
     {
