@@ -19,7 +19,7 @@ class AuthMiddleware
         $idToken = $request->bearerToken();
         
         $isTokenValid = $idToken && $this->firebase->verifyToken($idToken);
-        $isUserAuthenticated = auth()->user();
+        $isUserAuthenticated = auth('api')->user();
 
         if (!$isTokenValid && !$isUserAuthenticated)
             return response()->json(['error' => 'Unauthorized'], 401);

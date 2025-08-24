@@ -14,7 +14,7 @@ class PaymentController
 {
     public function createPaymentIntent(Request $request)
     {
-        $student = auth()->user();
+        $student = auth('api')->user();
 
         $request->validate([
             'course_id' => 'required|exists:courses,id',
@@ -74,7 +74,7 @@ class PaymentController
 
     public function cancelProcess(Order $order)
     {
-        if ($order->student_id !== auth()->id() || $order->status !== OrderStatusEnum::PENDING)
+        if ($order->student_id !== auth('api')->id() || $order->status !== OrderStatusEnum::PENDING)
         return response()->json(['error' => 'Cannot cancel this order'], 400);
 
         $order->update(['status' => OrderStatusEnum::CANCELED]);
@@ -84,7 +84,7 @@ class PaymentController
     
     public function getHistoryForStudent()
     {
-        $history = Order::where('student_id', auth()->id())
+        $history = Order::where('student_id', auth('api')->id())
             ->orderBy('purchase_date', 'desc')
             ->get();
 
@@ -93,7 +93,7 @@ class PaymentController
     
     public function getHistoryForTeacher()
     {
-        $history = Order::where('teacher_id', auth()->id())
+        $history = Order::where('teacher_id', auth('api')->id())
             ->orderBy('purchase_date', 'desc')
             ->get();
 
