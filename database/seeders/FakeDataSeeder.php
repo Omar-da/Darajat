@@ -84,7 +84,7 @@ class FakeDataSeeder extends Seeder
                     'admin_id' => 1,
                     'difficulty_level' => 'beginner',
                     'total_time' => 23,
-                    'price' => 0,
+                    'price' => 100,
                     'rate' => 4,
                     'language_id' => 1,
                     'num_of_episodes' => 20,

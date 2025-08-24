@@ -24,6 +24,14 @@ class PaymentController
         if ($course->status !== CourseStatusEnum::APPROVED)
             return ['message' => __('msg.can_not_enroll_in_course') . $course->status->label() . __('msg.status'), 'code' => 403];
 
+        if(Order::where('course_id', $course->id)
+                ->where(function($query) {
+                    $query->where('status', OrderStatusEnum::PAID)
+                        ->orWhere('status', OrderStatusEnum::PENDING);
+                })
+                ->exists())
+        return ['message' => __('msg.already_subscribed'), 'code' => 403];
+
         $amount = $course->price * 100;
 
         // 1. CREATE THE ORDER RECORD FIRST
