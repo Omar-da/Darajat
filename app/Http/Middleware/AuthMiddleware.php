@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Responses\Response;
 use Closure;
 use App\Services\Firebase\FirebaseOAuth;
 
@@ -17,12 +18,12 @@ class AuthMiddleware
     public function handle($request, Closure $next)
     {
         $idToken = $request->bearerToken();
-        
+
         $isTokenValid = $idToken && $this->firebase->verifyToken($idToken);
         $isUserAuthenticated = auth('api')->user();
 
         if (!$isTokenValid && !$isUserAuthenticated)
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return Response::error(__('msg.unauthenticated'), 401);
 
         return $next($request);
     }

@@ -71,7 +71,7 @@ class CommentService
 
         $user = auth('api')->user();
         if($user->is_banned)
-            return ['message' => 'You are currently banned from commenting. This action was taken for violating our community guidelines.', 'code' => 403];
+            return ['message' => __('msg.you_are_baned'), 'code' => 403];
 
         $comment = Comment::query()->create([
             'episode_id' => $episode_id,
@@ -86,7 +86,7 @@ class CommentService
     {
         $user = auth('api')->user();
         if($user->is_banned)
-            return ['message' => 'You are currently banned from commenting. This action was taken for violating our community guidelines.', 'code' => 403];
+            return ['message' => __('msg.you_are_baned'), 'code' => 403];
 
         $comment = Comment::query()
             ->where([

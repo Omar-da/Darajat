@@ -203,7 +203,7 @@ class EpisodeController extends Controller
 
     public function get_poster(Request $request, $episode_id)
     {
-        $episode = Episode::findOrFail();
+        $episode = Episode::findOrFail($episode_id);
         $course = Course::where('id', $episode->course_id)->firstOrFail();
         if ($request->query('copy') == 'true')
             $thumbnailPath = "courses/$course->id/episodes/$episode_id/thumbnail_copy.jpg";
