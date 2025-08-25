@@ -17,7 +17,7 @@ class StatisticController extends Controller
         return Response::success(StatisticResource::collection($statistics), __('msg.statistics'));
     }
 
-    public function getEnthusiasm()
+    public function getEnthusiasm(): JsonResponse
     {
         $statistics = auth('api')->user()->statistics;
         $current_enthusiasm = $statistics->findOrfail(1);

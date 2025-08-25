@@ -39,7 +39,7 @@ class ReplyController extends Controller
         $data = [];
         try {
             $data = $this->replyService->store($request->validated(), $comment_id);
-            if ($data['code'] == 404) {
+            if ($data['code'] == 404 || $data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -55,7 +55,7 @@ class ReplyController extends Controller
         $data = [];
         try {
             $data = $this->replyService->update($request->validated(), $id);
-            if ($data['code'] == 404 || $data['code'] == 401) {
+            if ($data['code'] == 404 || $data['code'] == 401 || $data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\App;
 use App\Enums\CourseStatusEnum;
 use App\Models\Course;
 
-class SoftDeleteController
+class SoftDeleteController extends Controller
 {
 
     public function destroyAfterPublishing(Course $course): array

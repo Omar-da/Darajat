@@ -167,4 +167,6 @@ return [
     'badge_gold' => 'Badge Gold!',
     "congratulations" => "Congratulations! You've earned a ",
     'email_not_verified' => 'Email not verified!',
+    'unauthenticated' => 'Unauthenticated!',
+    'you_are_banned' => 'You are currently banned from commenting. This action was taken for violating our community guidelines!',
 ];

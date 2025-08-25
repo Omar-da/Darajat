@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 
-class PaymentController
+class PaymentController extends Controller
 {
     public function createPaymentIntent(Request $request)
     {
