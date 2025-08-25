@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Question extends Model
 {
     use TranslationTrait;
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -26,6 +27,10 @@ class Question extends Model
     {
         return [
             'content' => 'array',
+            'answer_a' => 'array',
+            'answer_b' => 'array',
+            'answer_c' => 'array',
+            'answer_d' => 'array',
             'explanation' => 'array',
         ];
     }
@@ -46,7 +51,7 @@ class Question extends Model
 
     public function setExplanationAttribute($value): void
     {
-        if(!is_null($value)) {
+        if (!is_null($value)) {
             $lang = $this->detectLanguage($value);
             $translatedContent = $this->translateContent($value, $lang);
             $this->attributes['explanation'] = json_encode($translatedContent, JSON_UNESCAPED_UNICODE);
@@ -54,6 +59,62 @@ class Question extends Model
     }
 
     public function getExplanationAttribute($value)
+    {
+        $explanation = json_decode($value, true);
+        $lang = app()->getLocale();
+        return $explanation[$lang] ?? $explanation['en'] ?? null;
+    }
+
+    public function setAnswerAAttribute($value): void
+    {
+        $lang = $this->detectLanguage($value);
+        $translatedContent = $this->translateContent($value, $lang);
+        $this->attributes['answer_a'] = json_encode($translatedContent, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function getAnswerAAttribute($value)
+    {
+        $explanation = json_decode($value, true);
+        $lang = app()->getLocale();
+        return $explanation[$lang] ?? $explanation['en'] ?? null;
+    }
+
+    public function setAnswerBAttribute($value): void
+    {
+        $lang = $this->detectLanguage($value);
+        $translatedContent = $this->translateContent($value, $lang);
+        $this->attributes['answer_b'] = json_encode($translatedContent, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function getAnswerBAttribute($value)
+    {
+        $explanation = json_decode($value, true);
+        $lang = app()->getLocale();
+        return $explanation[$lang] ?? $explanation['en'] ?? null;
+    }
+
+    public function setAnswerCAttribute($value): void
+    {
+        $lang = $this->detectLanguage($value);
+        $translatedContent = $this->translateContent($value, $lang);
+        $this->attributes['answer_c'] = json_encode($translatedContent, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function getAnswerCAttribute($value)
+    {
+        $explanation = json_decode($value, true);
+        $lang = app()->getLocale();
+        return $explanation[$lang] ?? $explanation['en'] ?? null;
+    }
+
+    public function setAnswerDAttribute($value): void
+    {
+        $lang = $this->detectLanguage($value);
+        $translatedContent = $this->translateContent($value, $lang);
+        $this->attributes['answer_d'] = json_encode($translatedContent, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function getAnswerDAttribute($value)
     {
         $explanation = json_decode($value, true);
         $lang = app()->getLocale();

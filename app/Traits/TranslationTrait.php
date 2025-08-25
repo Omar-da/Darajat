@@ -27,10 +27,10 @@ trait TranslationTrait
 
     protected function translateText(string $text, string $source, string $target): string
     {
-        $tr = new GoogleTranslate();
-        $tr->setSource($source);
-        $tr->setTarget($target);
-        return $tr->translate($text);
-//        return $text;
+//        $tr = new GoogleTranslate();
+//        $tr->setSource($source);
+//        $tr->setTarget($target);
+//        return $tr->translate($text);
+        return $text;
     }
 }

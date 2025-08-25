@@ -52,6 +52,7 @@ class EpisodeService
 
         // Create episode
         $request['course_id'] = $course->id;
+        $request['episode_number'] = $course->num_of_episodes + 1;
         $episode = Episode::query()->create($request);
 
         // Video, thumbnail and file
