@@ -25,9 +25,14 @@ class ReplyService
         if (is_null(Comment::query()->find($comment_id))) {
             return ['message' => __('msg.comment_not_found'), 'code' => 404];
         }
+
+        $user = auth('api')->user();
+        if($user->is_banned)
+            return ['message' => __('msg.you_are_baned'), 'code' => 403];
+
         $reply = Reply::query()->create([
             'comment_id' => $comment_id,
-            'user_id' => auth('api')->id(),
+            'user_id' => $user->id,
             'content' => $request['content']
         ]);
         return ['data' => new ReplyResource($reply), 'message' => __('msg.reply_created'), 'code' => 201];
@@ -36,10 +41,14 @@ class ReplyService
     // Update specific reply.
     public function update($request, $id): array
     {
+        $user = auth('api')->user();
+        if($user->is_banned)
+            return ['message' => __('msg.you_are_baned'), 'code' => 403];
+
         $reply = Reply::query()
             ->where([
                 'id' => $id,
-                'user_id' => auth('api')->id()
+                'user_id' => $user->id
             ])->first();
         if (is_null($reply)) {
             if (is_null(Reply::query()->find($id))) {
@@ -48,6 +57,7 @@ class ReplyService
                 return ['message' => __('msg.unauthorized'), 'code' => 401];
             }
         }
+
         $reply->update([
             'content' => $request['content']
         ]);

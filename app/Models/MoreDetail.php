@@ -7,6 +7,7 @@ use App\Traits\TranslationTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MoreDetail extends Model
 {
@@ -84,5 +85,15 @@ class MoreDetail extends Model
     public function speciality(): BelongsTo
     {
         return $this->belongsTo(Speciality::class);
+    }
+
+    public function ordersAsStudent(): HasMany
+    {
+        return $this->hasMany(Order::class, 'student_id');
+    }
+
+    public function ordersAsTeacher(): HasMany
+    {
+        return $this->hasMany(Order::class, 'teacher_id');
     }
 }

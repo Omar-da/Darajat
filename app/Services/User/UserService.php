@@ -5,6 +5,7 @@ namespace App\Services\User;
 use App\Enums\LevelEnum;
 use App\Enums\RoleEnum;
 use App\Http\Resources\User\UserResource;
+use App\Models\PlatformStatistics;
 use App\Models\Speciality;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -142,6 +143,7 @@ class UserService
             'role' => 'teacher'
         ]);
 
+        PlatformStatistics::incrementStat('num_of_teachers');
         return ['message' => 'You are now a Teacher!', 'code' => 200];
     }
 

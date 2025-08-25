@@ -49,7 +49,7 @@ class User extends Authenticatable
             'otp_sent_at' => 'datetime'
         ];
     }
-
+    
     public function setFirstNameAttribute($value): void
     {
         $this->attributes['first_name'] = ucfirst(strtolower($value));
@@ -64,27 +64,27 @@ class User extends Authenticatable
     {
         return trim("{$this->first_name} {$this->last_name}");
     }
-
+    
     public function moreDetail(): HasOne
     {
         return $this->hasOne(MoreDetail::class);
     }
-
+    
     public function adminBadges(): HasMany
     {
         return $this->hasMany(Badge::class);
     }
-
+    
     public function adminCourses(): HasMany
     {
         return $this->hasMany(Course::class);
     }
-
+    
     public function published_courses(): HasMany
     {
         return $this->hasMany(Course::class, 'teacher_id');
     }
-
+    
     public function followed_courses(): BelongsToMany
     {
         return $this->belongsToMany(Course::class, 'course_user', 'student_id')->withPivot(['perc_progress', 'progress', 'num_of_completed_quizzes', 'purchase_date','rate', 'is_episodes_completed', 'is_quizzes_completed', 'get_certificate']);
@@ -94,44 +94,44 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Statistic::class)->withPivot('progress');
     }
-
+    
     public function badges(): BelongsToMany
     {
         return $this->belongsToMany(Badge::class);
     }
-
+    
     public function quizzes(): BelongsToMany
     {
         return $this->belongsToMany(Quiz::class)->withPivot(['mark', 'percentage_mark', 'success']);
     }
-
+    
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
-
+    
     public function replies(): HasMany
     {
         return $this->hasMany(Reply::class);
     }
-
+    
     public function topics(): BelongsToMany
     {
         return $this->belongsToMany(Topic::class, 'completed_courses')->withPivot('progress');
     }
-
+    
     public function likeEpisode(): BelongsToMany
     {
         return $this->belongsToMany(Episode::class, 'episode_likes');
     }
-
+    
     public function likeComment(): BelongsToMany
     {
         return $this->belongsToMany(Comment::class, 'comment_likes');
     }
-
+    
     public function likeReply(): BelongsToMany
-    {
+    {   
         return $this->belongsToMany(Reply::class, 'reply_likes');
     }
 
@@ -139,7 +139,7 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Episode::class)->withPivot('pass_quiz');
     }
-
+    
     public function appliedCoupons(): BelongsToMany
     {
         return $this->belongsToMany(Coupon::class, 'coupon_user', 'student_id', 'coupon_id');

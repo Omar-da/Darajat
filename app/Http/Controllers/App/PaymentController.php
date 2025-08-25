@@ -14,7 +14,7 @@ class PaymentController extends Controller
 {
     public function createPaymentIntent(Request $request)
     {
-        $user = auth()->user();
+        $student = auth('api')->user();
 
         $request->validate([
             'course_id' => 'required|exists:courses,id',
@@ -24,11 +24,20 @@ class PaymentController extends Controller
         if ($course->status !== CourseStatusEnum::APPROVED)
             return ['message' => __('msg.can_not_enroll_in_course') . $course->status->label() . __('msg.status'), 'code' => 403];
 
+        if(Order::where('course_id', $course->id)
+                ->where(function($query) {
+                    $query->where('status', OrderStatusEnum::PAID)
+                        ->orWhere('status', OrderStatusEnum::PENDING);
+                })
+                ->exists())
+        return ['message' => __('msg.already_subscribed'), 'code' => 403];
+
         $amount = $course->price * 100;
 
         // 1. CREATE THE ORDER RECORD FIRST
         $order = Order::create([
-            'user_id' => $user->id,
+            'student_id' => $student->id,
+            'teacher_id' => $course->teacher_id,
             'course_id' => $course->id,
             'amount' => $amount,
             'currency' => 'usd',
@@ -48,7 +57,8 @@ class PaymentController extends Controller
                 'metadata' => [
                     'order_id' => $order->id,
                     'order_number' => $order->order_number,
-                    'user_id' => $user->id,
+                    'student_id' => $student->id,
+                    'teacher_id' => $course->teacher_id,
                     'course_id' => $course->id,
                 ],
             ]);
@@ -72,11 +82,29 @@ class PaymentController extends Controller
 
     public function cancelProcess(Order $order)
     {
-        if ($order->user_id !== auth()->id() || $order->status !== OrderStatusEnum::PENDING)
-            return response()->json(['error' => 'Cannot cancel this order'], 400);
+        if ($order->student_id !== auth('api')->id() || $order->status !== OrderStatusEnum::PENDING)
+        return response()->json(['error' => 'Cannot cancel this order'], 400);
 
         $order->update(['status' => OrderStatusEnum::CANCELED]);
 
         return response()->json(['message' => 'Order canceled']);
+    }
+    
+    public function getHistoryForStudent()
+    {
+        $history = Order::where('student_id', auth('api')->id())
+            ->orderBy('purchase_date', 'desc')
+            ->get();
+
+        return response()->json(['history' => $history]);
+    }
+    
+    public function getHistoryForTeacher()
+    {
+        $history = Order::where('teacher_id', auth('api')->id())
+            ->orderBy('purchase_date', 'desc')
+            ->get();
+
+        return response()->json(['history' => $history]);
     }
 }
