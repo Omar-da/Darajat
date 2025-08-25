@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 
-class UpdateCopiedCourseController
+class UpdateCopiedCourseController extends Controller
 {
     public function getCopyOfCourse($course_id)
     {

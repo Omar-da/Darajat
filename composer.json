@@ -19,6 +19,8 @@
         "stripe/stripe-php": "*"
     },
     "require-dev": {
+        "andyabih/laravel-to-uml": "^1.0",
+        "beyondcode/laravel-er-diagram-generator": "^5.0",
         "fakerphp/faker": "^1.23",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
