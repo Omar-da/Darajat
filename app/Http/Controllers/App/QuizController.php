@@ -27,7 +27,7 @@ class QuizController extends Controller
         $data = [];
         try {
             $data = $this->quizService->store($episode_id, $request->validated());
-            if ($data['code'] == 404 || $data['code'] == 409) {
+            if ($data['code'] == 404 || $data['code'] == 409 || $data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -84,7 +84,7 @@ class QuizController extends Controller
         $data = [];
         try {
             $data = $this->quizService->update($quiz_id, $request->validated());
-            if ($data['code'] == 404) {
+            if ($data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -103,7 +103,7 @@ class QuizController extends Controller
         $data = [];
         try {
             $data = $this->quizService->destroy($quiz_id);
-            if ($data['code'] == 404) {
+            if ($data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success([], $data['message'], $data['code']);
