@@ -145,12 +145,12 @@ class EpisodeService
 
         // Video, Thumbnail and File
         $episode_path = "courses/$course->id/episodes/$episode->id";
-        Storage::disk('local')->delete("$episode_path/video_copy.mp4");
-        Storage::disk('local')->delete("$episode_path/thumbnail_copy.jpg");
+        Storage::disk('local')->delete("$episode_path/video.mp4");
+        Storage::disk('local')->delete("$episode_path/thumbnail.jpg");
         $file = collect(Storage::disk('local')->files($episode_path))
-            ->first(fn($f) => str_contains(basename($f), 'file_copy'));
+            ->first(fn($f) => str_contains(basename($f), 'file'));
         $extention = pathinfo($file, PATHINFO_EXTENSION);
-        Storage::disk('local')->delete("$episode_path/file_copy.$extention");
+        Storage::disk('local')->delete("$episode_path/file.$extention");
 
 
         if ($episode->quiz)
