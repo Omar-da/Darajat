@@ -48,7 +48,6 @@ class PaymentController
 
         $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
 
-        try {
             // 2. CREATE THE STRIPE PAYMENT INTENT
             $paymentIntent = $stripe->paymentIntents->create([
                 'amount' => $amount,
@@ -72,12 +71,10 @@ class PaymentController
                 'orderNumber' => $order->order_number, // Optional: for display in the UI
             ]);
 
-        } catch (\Exception $e) {
             // If Stripe fails, update the order status to reflect the error
             $order->update(['status' => OrderStatusEnum::FAILED, 'notes' => $e->getMessage()]);
 
             return response()->json(['error' => 'Payment setup failed'], 500);
-        }
     }
 
     public function cancelProcess(Order $order)
