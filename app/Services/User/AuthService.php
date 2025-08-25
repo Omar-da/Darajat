@@ -4,8 +4,10 @@ namespace App\Services\User;
 
 use App\Enums\LevelEnum;
 use App\Http\Resources\User\UserResource;
+use App\Models\Country;
 use App\Models\Language;
 use App\Models\MoreDetail;
+use App\Models\PlatformStatistics;
 use App\Models\Statistic;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -38,12 +40,15 @@ class AuthService
                 'user_id' => $user->id,
                 'country_id' => $request['country_id'],
             ]);
+            if(MoreDetail::where('country_id', $moreDetail->country_id)->doesntExist())
+                PlatformStatistics::incrementStat('num_of_countries');
             $moreDetail->languages()->attach(Language::query()->findOrfail($request['language_id']),
                 [
                     'language_id' => $request['language_id'],
                     'more_detail_id' => $moreDetail->id,
                     'level' => LevelEnum::MOTHER_TONGUE
                 ]);
+            PlatformStatistics::incrementStat('num_of_users');
             $message = __('msg.registration_success');
             $code = 202;
         }

@@ -18,8 +18,8 @@
                         <div class="user-profile-stat-label">Acquired Views</div>
                     </div>
                     <div class="user-profile-stat">
-                        <div class="user-profile-stat-value">{{$counts['acquired_likes']}}</div>
-                        <div class="user-profile-stat-label">Acquired Likes</div>
+                        <div class="user-profile-stat-value">${{$user->moreDetail->balance}}</div>
+                        <div class="user-profile-stat-label">Balance</div>
                     </div>
                     <div class="user-profile-stat">
                         <div class="user-profile-stat-value">{{$user->role}}</div>

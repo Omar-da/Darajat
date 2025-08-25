@@ -16,7 +16,10 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class)->constrained();
+            $table->unsignedBigInteger('student_id');
+            $table->foreign('student_id')->references('id')->on('users');
+            $table->unsignedBigInteger('teacher_id');
+            $table->foreign('teacher_id')->references('id')->on('users');
             $table->string('order_number')->unique(); 
             $table->unsignedInteger('amount'); 
             $table->string('currency', 3)->default('usd'); 
@@ -24,6 +27,7 @@ return new class extends Migration
             $table->string('payment_intent_id')->nullable()->unique(); 
             $table->foreignIdFor(Course::class)->nullable()->constrained(); 
             $table->string('course_name'); 
+            $table->timestamp('purchase_date')->useCurrent();
             $table->index('status');
             $table->index('order_number');
             $table->index('payment_intent_id');

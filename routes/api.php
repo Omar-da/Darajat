@@ -211,6 +211,8 @@ Route::middleware('localization')->group(function () {
     Route::controller(PaymentController::class)->prefix('orders')->group(function () {
         Route::post('create-payment-intent', 'createPaymentIntent');
         Route::post('{order}/cancel', 'cancelProcess');
+        Route::get('history/student', 'getHistoryForStudent');
+        Route::get('history/teacher', 'getHistoryForTeacher');
     });
 
     Route::middleware('regular_or_socialite')->group(function () {
@@ -225,7 +227,10 @@ Route::middleware('localization')->group(function () {
         Route::get('badges/get', [BadgeController::class, 'index']);
 
         // statistics
-        Route::get('statistics/get-my-statistics', [StatisticController::class, 'index']);
+        Route::controller(StatisticController::class)->prefix('statistics')->group(function() {
+            Route::get('get-my-statistics', 'index');
+            Route::get('get-enthusiasm', 'getEnthusiasm');
+        });
 
     });
 

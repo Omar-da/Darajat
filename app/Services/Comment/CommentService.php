@@ -68,9 +68,14 @@ class CommentService
         if (is_null(Episode::query()->find($episode_id))) {
             return ['message' => __('msg.episode_not_found'), 'code' => 404];
         }
+
+        $user = auth('api')->user();
+        if($user->is_banned)
+            return ['message' => __('msg.you_are_baned'), 'code' => 403];
+
         $comment = Comment::query()->create([
             'episode_id' => $episode_id,
-            'user_id' => auth('api')->id(),
+            'user_id' => $user->id,
             'content' => $request['content']
         ]);
         return ['data' => new CommentResource($comment), 'message' => __('msg.comment_created'), 'code' => 201];
@@ -79,10 +84,14 @@ class CommentService
     // Update specific comment.
     public function update($request, $id): array
     {
+        $user = auth('api')->user();
+        if($user->is_banned)
+            return ['message' => __('msg.you_are_baned'), 'code' => 403];
+
         $comment = Comment::query()
             ->where([
                 'id' => $id,
-                'user_id' => auth('api')->id()
+                'user_id' => $user->id
             ])->first();
         if (is_null($comment)) {
             if (!Comment::query()->find($id)) {

@@ -5,24 +5,24 @@ namespace App\Http\Controllers\App;
 use App\Enums\RoleEnum;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use App\Responses\Response;
 use App\Services\Firebase\FirebaseOAuth;
 use App\Services\User\AuthService;
-use Illuminate\Http\Client\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Throwable;
 
 class AuthController extends Controller
 {
     private AuthService $authService;
+    protected FirebaseOAuth $firebase_oauth;
 
-    // protected FirebaseOAuth $firebase;
-
-    public function __construct(AuthService $authService)
+    public function __construct(AuthService $authService, FirebaseOAuth $firebase_oauth)
     {
         $this->authService = $authService;
-        // $this->firebase = $firebase;
+        $this->firebase_oauth = $firebase_oauth;
     }
 
     public function register(RegisterRequest $request): JsonResponse
@@ -73,7 +73,7 @@ class AuthController extends Controller
     public function loginWithGoogle(Request $request)
     {
         $idToken = $request->input('id_token');
-        $verifiedToken = $this->firebase->verifyToken($idToken);
+        $verifiedToken = $this->firebase_oauth->verifyToken($idToken);
 
         if (!$verifiedToken) {
             return response()->json(['error' => 'Invalid token'], 401);
@@ -105,11 +105,13 @@ class AuthController extends Controller
         );
 
         // Log the user in (Laravel session)
-        auth()->login($user);
+        auth('api')->login($user);
 
-        return response()->json([
-            'user' => $user,
-            'token' => $user->createToken('authToken')->plainTextToken,
-        ]);
+        $token = $user->createToken('authToken')->accessToken;
+        $user['token'] = $token;
+        $message = __('msg.login_success');
+        $code = 200;
+
+        return Response::success($user, $message, $code);
     }
 }

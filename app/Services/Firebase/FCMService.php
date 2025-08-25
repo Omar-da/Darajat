@@ -15,7 +15,7 @@ class FCMService
     public function __construct()
     {
         $firebase = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase-credentials.json'));
+            ->withServiceAccount(storage_path('app/firebase/firebase-credentials.json'));
 
         $this->messaging = $firebase->createMessaging();
     }

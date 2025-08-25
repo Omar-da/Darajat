@@ -72,7 +72,7 @@ class CommentController extends Controller
         $data = [];
         try {
             $data = $this->commentService->store($request, $episode_id);
-            if ($data['code'] == 404) {
+            if ($data['code'] == 404 || $data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -88,7 +88,7 @@ class CommentController extends Controller
         $data = [];
         try {
             $data = $this->commentService->update($request->validated(), $id);
-            if ($data['code'] == 404 || $data['code'] == 401) {
+            if ($data['code'] == 404 || $data['code'] == 401 || $data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
