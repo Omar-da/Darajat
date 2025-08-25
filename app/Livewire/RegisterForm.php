@@ -23,8 +23,8 @@ class RegisterForm extends Component
         ]);
 
         $user = User::create([
-            'first_name' => $this->firstName,
-            'last_name' => $this->lastName,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
             'email' => $this->email,
             'password' => Hash::make($this->password),
             'role' => RoleEnum::ADMIN,

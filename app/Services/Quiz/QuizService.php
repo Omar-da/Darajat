@@ -19,7 +19,7 @@ class QuizService
     {
         $episode = Episode::findOrFail($episode_id);
 
-        if ($episode->quiz->exists())
+        if ($episode->quiz)
             return ['message' => __('msg.quiz_already_exists'), 'code' => 409];
 
         if ($episode->course->status !== CourseStatusEnum::DRAFT)
@@ -30,7 +30,22 @@ class QuizService
             'num_of_questions' => $request['num_of_questions'],
         ]);
 
-        $quiz->questions()->createMany($request['questions']);
+        for($i = 0; $i < $quiz->num_of_questions; $i++) {
+            $quiz->questions()->create([
+                'quiz_id' => $quiz->id,
+                'question_number' => $i + 1,
+                'content' => $request['questions'][$i]['content'],
+                'answer_a' => $request['questions'][$i]['answer_a'],
+                'answer_b' => $request['questions'][$i]['answer_b'],
+                'answer_c' => $request['questions'][$i]['answer_c'],
+                'answer_d' => $request['questions'][$i]['answer_d'],
+                'right_answer' => $request['questions'][$i]['right_answer'],
+                'explanation' => $request['questions'][$i]['explanation'] ?? null,
+            ]);
+        }
+
+//        $quiz->questions()->createMany($request['questions']);
+
         $quiz->episode->course->increment('total_quizzes');
 
         return ['data' => new TeacherQuizResource($quiz), 'message' => __('msg.quiz_created'), 'code' => 201];
@@ -131,7 +146,22 @@ class QuizService
         $quiz->update([
             'num_of_questions' => $request['num_of_questions'],
         ]);
-        $quiz->questions()->createMany($request['questions']);
+
+        for($i = 0; $i < $quiz->num_of_questions; $i++) {
+            $quiz->questions()->create([
+                'quiz_id' => $quiz->id,
+                'question_number' => $i + 1,
+                'content' => $request['questions'][$i]['content'],
+                'answer_a' => $request['questions'][$i]['answer_a'],
+                'answer_b' => $request['questions'][$i]['answer_b'],
+                'answer_c' => $request['questions'][$i]['answer_c'],
+                'answer_d' => $request['questions'][$i]['answer_d'],
+                'right_answer' => $request['questions'][$i]['right_answer'],
+                'explanation' => $request['questions'][$i]['explanation'] ?? null,
+            ]);
+        }
+
+//        $quiz->questions()->createMany($request['questions']);
 
         return ['data' => new TeacherQuizResource($quiz), 'message' => __('msg.quiz_updated'), 'code' => 201];
     }

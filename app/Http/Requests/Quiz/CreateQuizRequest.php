@@ -27,8 +27,7 @@ class CreateQuizRequest extends FormRequest
     {
         return [
             'num_of_questions' => 'required|integer',
-            'questions' => ['required', 'array', 'size:' . $this->num_of_questions, new QuestionsAreSequential()],
-            'questions.*.question_number' => 'required|integer|min:1',
+            'questions' => ['required', 'array', 'size:' . $this->num_of_questions],
             'questions.*.content' => 'required|string',
             'questions.*.answer_a' => 'required|string',
             'questions.*.answer_b' => 'required|string',
