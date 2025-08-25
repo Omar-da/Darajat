@@ -302,8 +302,11 @@ class CourseService
         if ($course->status !== CourseStatusEnum::DRAFT)
             return ['message' => __('msg.can_not_updated_course') . $course->status->label() . __('msg.status'), 'code' => 403];
 
-        Storage::disk('uploads')->delete("courses/$course->image_url");
-        $request['image_url'] = basename($request['image_url']->store('courses', 'uploads'));
+        if (request()->hasfile('image_url')) {
+            Storage::disk('uploads')->delete("courses/$course->image_url");
+            $request['image_url'] = basename($request['image_url']->store('courses', 'uploads'));
+        }
+
         if (!in_array($request['difficulty_level'], LevelEnum::values())) {
             foreach (LevelEnum::values() as $value) {
                 if ($request['difficulty_level'] == LevelEnum::from($value)->label()) {

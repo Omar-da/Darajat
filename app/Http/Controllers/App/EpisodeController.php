@@ -169,6 +169,21 @@ class EpisodeController extends Controller
         }
     }
 
+    public function destroyFile($id): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->episodeService->destroyFile($id);
+            if($data['code'] == 404) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success([], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
     public function get_video(Request $request, $episode_id)
     {
         $episode = Episode::where('id', $episode_id)->firstOrFail();

@@ -169,4 +169,5 @@ return [
     'email_not_verified' => 'Email not verified!',
     'unauthenticated' => 'Unauthenticated!',
     'you_are_banned' => 'You are currently banned from commenting. This action was taken for violating our community guidelines!',
+    'file_deleted' => 'File deleted successfully!',
 ];
