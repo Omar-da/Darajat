@@ -154,6 +154,7 @@ Route::middleware('localization')->group(function () {
             Route::get('show/teacher/{episode_id}', 'showToTeacher');
             Route::delete('delete/{episode_id}', 'destroy');
             Route::get('get-file/{episode_id}', 'getFile');
+            Route::delete('delete-file/{episode_id}', 'destroyFile');
         });
         Route::get('student/{course_id}', 'getToStudent')->middleware('is_subscribed');
     });

@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Episode;
+namespace App\Http\Requests\Course;
 
-use App\Traits\HandlesFailedValidationTrait;
+use App\Rules\ValidLevel;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateEpisodeRequest extends FormRequest
+class UpdateDraftCourse extends FormRequest
 {
-    use HandlesFailedValidationTrait;
-
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -25,10 +23,14 @@ class UpdateEpisodeRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'topic_id' => 'required|exists:topics,id',
+            'language_id' => 'required|exists:languages,id',
             'title' => 'required|string|max:100',
-            'video_url' => 'nullable|file|mimetypes:video/mp4,video/quicktime|max:102400',
+            'description' => 'required|string',
             'image_url' => 'nullable|image|mimes:jpeg,png,bmp,jpg,gif,svg|max:2048',
-            'file_url' => 'nullable|file|mimes:pdf,ppt,pptx,txt,zip,sql,json,py,java,php,js|mimetypes:application/pdf,text/plain,application/zip,application/json|max:102400',
+            'difficulty_level' => ['required', new ValidLevel('course')],
+            'price' => 'required|numeric|min:0',
+            'has_certificate' => ['nullable', 'string', 'in:true,false'],
         ];
     }
 }

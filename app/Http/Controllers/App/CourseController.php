@@ -5,6 +5,7 @@ namespace App\Http\Controllers\App;
 use App\Http\Requests\Course\CourseRequest;
 use App\Http\Requests\Course\EvaluationCourseRequest;
 use App\Http\Requests\Course\LoadMoreCoursesRequest;
+use App\Http\Requests\Course\UpdateDraftCourse;
 use App\Responses\Response;
 use App\Services\Course\CourseService;
 use Illuminate\Http\JsonResponse;
@@ -220,7 +221,7 @@ class CourseController extends Controller
         }
     }
 
-    public function updateDraftCourse(CourseRequest $request, $id): JsonResponse
+    public function updateDraftCourse(UpdateDraftCourse $request, $id): JsonResponse
     {
         $data = [];
         try {
