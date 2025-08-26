@@ -145,14 +145,14 @@ class UserService
     {
         $user = auth('api')->user();
         if ($user['role'] === RoleEnum::TEACHER)
-            return ['message' => 'You are already a Teacher!', 'code' => 409];
+            return ['message' => __('msg.already_teacher'), 'code' => 409];
 
         $user->update([
             'role' => 'teacher'
         ]);
 
         PlatformStatistics::incrementStat('num_of_teachers');
-        return ['message' => 'You are now a Teacher!', 'code' => 200];
+        return ['message' => __('msg.you_are_teacher'), 'code' => 200];
     }
 
     public function delete(): array
