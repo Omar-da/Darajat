@@ -133,6 +133,14 @@ class UserService
         return ['user' => new UserResource($user), 'message' => $message, 'code' => $code];
     }
 
+    public function showMyProfile(): array
+    {
+        $user = auth('api')->user();
+
+        return ['user' => new UserResource($user), 'message' => __('msg.user_retrieved')];
+    }
+
+
     public function promoteStudentToTeacher()
     {
         $user = auth('api')->user();
