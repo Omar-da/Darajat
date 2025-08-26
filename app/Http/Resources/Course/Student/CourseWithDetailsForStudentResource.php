@@ -54,7 +54,7 @@ class CourseWithDetailsForStudentResource extends JsonResource
             ],
             'num_of_episodes' => $this->num_of_episodes ? $this->num_of_episodes  : 0,
             'publishing_date' => $this->response_date,
-            'has_certificate' =>  $this->has_certificate,
+            'has_certificate' => (bool)$this->has_certificate,
             'total_quizzes' =>  $this->total_quizzes ? $this->total_quizzes : 0,
             'num_of_students_enrolled' => $this->num_of_students_enrolled ? $this->num_of_students_enrolled : 0,
             'first_episode' => new EpisodeWithDetailsResource($this->episodes()->where('episode_number', 1)->first()),

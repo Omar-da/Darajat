@@ -46,7 +46,6 @@ class Course extends Model
             'status' => CourseStatusEnum::class,
             'title' => 'array',
             'description' => 'array',
-            'has_certificate' => 'array',
         ];
     }
 
@@ -78,24 +77,6 @@ class Course extends Model
         return $description[$lang] ?? $description['en'] ?? $value;
     }
 
-    public function setHasCertificateAttribute($value): void
-    {
-        if($value === true) {
-            $value = ['en' => 'Yes', 'ar' => 'نعم'];
-        }
-        else {
-            $value = ['en' => 'No', 'ar' => 'لا'];
-        }
-        $this->attributes['has_certificate'] = json_encode($value, JSON_UNESCAPED_UNICODE);
-    }
-
-    public function getHasCertificateAttribute($value)
-    {
-        $has_certificate = json_decode($value, true);
-        $lang = app()->getLocale();
-        return $has_certificate[$lang] ?? $has_certificate['en'] ?? $value;
-    }
-
     public static function popular($query)
     {
         return $query->orderBy('rate', 'desc')->limit(5);
@@ -108,7 +89,7 @@ class Course extends Model
 
     public function hasSubscribers(): bool
     {
-        return $this->num_of_students_enrolled > 0; 
+        return $this->num_of_students_enrolled > 0;
     }
 
     public function teacher(): BelongsTo

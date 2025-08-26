@@ -59,7 +59,7 @@ class CourseWithDetailsForTeacherResource extends JsonResource
             'status' => $this->status->label(),
             'response_date' => $this->response_date,
             'publishing_request_date' => $this->publishing_request_date,
-            'has_certificate' => $this->has_certificate,
+            'has_certificate' => (bool)$this->has_certificate,
             'total_quizzes' => $this->total_quizzes ? $this->total_quizzes : 0,
             'num_of_students_enrolled' => $this->num_of_students_enrolled ? $this->num_of_students_enrolled : 0,
             'created_at' => $this->created_at,
