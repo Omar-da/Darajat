@@ -3,6 +3,11 @@
 namespace App\Http\Controllers\App;
 
 use App\Enums\CourseStatusEnum;
+use App\Http\Requests\Course\UpdateDraftCourse;
+use App\Http\Requests\Episode\CreateEpisodeRequest;
+use App\Http\Requests\Episode\UpdateEpisodeRequest;
+use App\Http\Requests\Quiz\CreateQuizRequest;
+use App\Http\Requests\Quiz\UpdateQuizRequest;
 use App\Http\Resources\Course\Teacher\CourseForTeacherResource;
 use App\Http\Resources\Course\Teacher\CourseWithDetailsForTeacherResource;
 use App\Http\Resources\Episode\EpisodeTeacherResource;
@@ -12,10 +17,11 @@ use App\Models\DraftCourse;
 use App\Models\DraftEpisode;
 use App\Models\DraftQuiz;
 use App\Models\Episode;
-use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class UpdateCopiedCourseController extends Controller
 {
@@ -26,60 +32,68 @@ class UpdateCopiedCourseController extends Controller
 
         // Start transaction for data consistency
         DB::beginTransaction();
+        // Prepare and create course draft
+        $draftData = $originalCourse->toArray();
+        unset($draftData['created_at'], $draftData['admin_id'], $draftData['publishing_request_date'], $draftData['response_date']);
+        $draftData['original_course_id'] = $originalCourse->id;
+        $copiedCourse = DraftCourse::create($draftData);
 
-        try {
-            // Prepare and create course draft
-            $draftData = $originalCourse->toArray();
-            unset($draftData['created_at'], $draftData['admin_id'], $draftData['publishing_request_date'], $draftData['response_date']);
-            $draftData['original_course_id'] = $originalCourse->id;
-            $copiedCourse = DraftCourse::create($draftData);
 
-            // Copy episodes with quizzes
-            $originalCourse->episodes->each(function ($episode) use ($copiedCourse) {
-                // Copy episode
-                $episodeData = $episode->toArray();
-                unset($episodeData['course_id']);
-                $copiedEpisode = $copiedCourse->draft_episodes()->create($episodeData);
+        // Copy episodes with quizzes
+        foreach($originalCourse->episodes as $episode)
+        {
+            // Copy episode
+            $episodeData = $episode->toArray();
+            unset($episodeData['course_id']);
+            $copiedEpisode = $copiedCourse->draft_episodes()->create($episodeData);
 
-                // Copy quiz for this episode
-                if ($episode->quiz()->exists()) {
-                    $quiz = $episode->quiz;
-                    $quizData = $quiz->toArray();
-                    unset($quizData['id'], $quizData['episode_id'], $quizData['quiz_writing_date']);
-                    $copiedQuiz = $copiedEpisode->draft_quiz()->create($quizData);
-
-                    foreach ($quiz->questions as $question) {
-                        $questionData = $question->toArray();
-                        unset($questionData['id'], $questionData['quiz_id']);
-                        $copiedQuiz->draft_questions()->create($questionData);
-                    }
+            // Copy quiz for this episode
+            if ($episode->quiz()->exists()) 
+            {
+                $quiz = $episode->quiz;
+                $quizData = $quiz->toArray();
+                unset($quizData['id'], $quizData['episode_id'], $quizData['quiz_writing_date']);
+                $copiedQuiz = $copiedEpisode->draft_quiz()->create($quizData);
+                foreach ($quiz->questions as $question) {
+                    $questionData = $question->getAttributes();
+                    unset($questionData['id'], $questionData['quiz_id']);
+                    $questionData['question_number'] = $copiedQuiz->draft_questions()->count() + 1;
+                    $copiedQuiz->draft_questions()->create($questionData);
                 }
-            });
-
-            DB::commit();
-
-            // Return fully loaded draft with relationships
-            return ['data' => new CourseWithDetailsForTeacherResource($copiedCourse), 'message' => __('msg.course_retrieved'), 'code' => 200];
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
+            }
         }
+        DB::commit();
+        
+        // Return fully loaded draft with relationships
+        return ['data' => new CourseWithDetailsForTeacherResource($copiedCourse), 'message' => __('msg.course_retrieved'), 'code' => 200];
     }
 
-    public function updateCourseCopy(Request $request, DraftCourse $course)
+    public function updateCourseCopy(UpdateDraftCourse $request, $course_id)
     {
-        Storage::disk('uploads')->delete("courses/$course->image_url");
-        $request['image_url'] = basename($request['image_url']->store('courses', 'uploads'));
-        $course->update($request->all());
+        DB::beginTransaction();
+        $course = DraftCourse::findOrFail($course_id);
 
+        if($request['image_url'])
+        {
+            Storage::disk('uploads')->delete("courses/$course->image_url");
+            $request['image_url'] = basename($request['image_url']->store('courses', 'uploads'));
+        }
+        $course->update($request->all());
+        DB::commit();
+        
         return ['data' => new CourseForTeacherResource($course), 'message' => __('msg.course_updated'), 'code' => 200];
     }
 
-    public function createEpisodeCopy(Request $request, DraftCourse $course)
+    public function createEpisodeCopy(CreateEpisodeRequest $request, $course_id)
     {
+        DB::beginTransaction();
+        $course = DraftCourse::findOrFail($course_id);
+
         // Episode Data
+        $request['episode_number'] = $course->num_of_episodes + 1;
+        $request['is_copied_episode'] = true;
         $origianl_episode = $course->original_course->episodes()->create($request->all());
-        $episode = $course->draft_episodes()->create($origianl_episode->toArray());
+        $episode = $course->draft_episodes()->create(Arr::except($origianl_episode->toArray(), ['is_copied_episode']));
 
         // Video, Thumbnail and File
         $episode_path = "courses/$course->id/episodes/$episode->id";
@@ -96,48 +110,67 @@ class UpdateCopiedCourseController extends Controller
 
         // Related Course
         $course->update([
-            'num_of_episodes' => $course->num_of_episodes + 1,
             'total_time' => $course['total_time'] + $request['duration'],
+            'num_of_episodes' => $course->num_of_episodes + 1
         ]);
+        DB::commit();
 
         return ['data' => new EpisodeTeacherResource($episode), 'message' => __('msg.episode_created'), 'code' => 201];
     }
 
 
-    public function updateEpisodeCopy(Request $request, DraftEpisode $episode)
+    public function updateEpisodeCopy(UpdateEpisodeRequest $request, $episode_id)
     {
+        DB::beginTransaction();
+        $episode = DraftEpisode::findOrFail($episode_id);
         $course = $episode->draft_course;
 
         // Video, Thumbnail and File
         $episode_path = "courses/$course->id/episodes/$episode->id";
-        $request['image_url']->storeAs($episode_path, 'thumbnail_copy.jpg', 'local');
-        $request['video_url']->storeAs($episode_path, 'video_copy.mp4', 'local');
+        if($request['image_url'])
+            $request['image_url']->storeAs($episode_path, 'thumbnail_copy.jpg', 'local');
+        if($request['video_url'])
+        {
+            $request['video_url']->storeAs($episode_path, 'video_copy.mp4', 'local');
+            $request['duration'] = FFMpeg::fromDisk('local')->open("$episode_path/video_copy.mp4")->getDurationInSeconds();
+        }
         if (request()->hasFile('file_url'))
+        {
+            $file_path = $this->get_full_path($episode_path, 'file_copy.');
+            if ($file_path)
+                Storage::disk('local')->delete($file_path);
             $request['file_url']->storeAs($episode_path, 'file_copy.' . $request['file_url']->getClientOriginalExtension(), 'local');
-        else {
+        }
+        else 
+        {
             $file_path = $this->get_full_path($episode_path, 'file_copy.');
             if ($file_path)
                 Storage::disk('local')->delete($file_path);
         }
 
-        // Duration
-        $request['duration'] = FFMpeg::fromDisk('local')->open("$episode_path/video_copy.mp4")->getDurationInSeconds();
-
         // Update
         $episode->update($request->all());
-
+        DB::commit();
+        
         return ['data' => new EpisodeTeacherResource($episode), 'message' => __('msg.episode_updated'), 'code' => 200];
     }
 
-    public function destroyEpisodeCopy(DraftEpisode $episode)
+    public function destroyEpisodeCopy($episode_id)
     {
+        DB::beginTransaction();
+        $episode = DraftEpisode::findOrFail($episode_id);
         $course = $episode->draft_course;
 
         // Update numbers of episodes
+        $old_episode_number = $episode->episode_number;
+        $episode->episode_number = 0; 
+        $episode->save();
         foreach ($course->draft_episodes as $episode_from_course)
-            if ($episode_from_course->episode_number > $episode->episode_number)
+            if ($episode_from_course->episode_number > $old_episode_number)
+            {
                 $episode_from_course->decrement('episode_number');
-
+                $episode->save();
+            }
         // Video, Thumbnail and File
         $episode_path = "courses/$course->id/episodes/$episode->id";
         Storage::disk('local')->delete("$episode_path/video_copy.mp4");
@@ -146,119 +179,162 @@ class UpdateCopiedCourseController extends Controller
         if ($file_path)
             Storage::disk('local')->delete($file_path);
 
-
-        if ($episode->draft_quiz->exists())
+        if (Storage::disk('local')->exists($episode_path)) 
+            $files = Storage::disk('local')->allFiles($episode_path);
+            
+        if (empty($files)) 
+            Storage::disk('local')->deleteDirectory($episode_path);
+        
+        if ($episode->draft_quiz()->exists())
             $course->decrement('total_quizzes');
         $course->decrement('num_of_episodes');
         $course->update([
             'total_time' => $course->total_time - $episode->duration
         ]);
+
+        Episode::where(['id' => $episode->id, 'is_copied_episode' => true])->delete();
         $episode->delete();
 
+        DB::commit();
         return ['message' => __('msg.episode_deleted'), 'code' => 200];
-    }
+    }   
 
-    public function createQuizCopy(Request $request, DraftEpisode $episode)
+    public function createQuizCopy(CreateQuizRequest $request, $episode_id)
     {
+        DB::beginTransaction();
+        
+        $episode = DraftEpisode::findOrFail($episode_id);
+
         // Check if quiz already exists
         if ($episode->draft_quiz()->exists())
             return ['message' => __('msg.quiz_already_exists'), 'code' => 409];
 
         // Create quiz
         $quiz = DraftQuiz::create([
-            'episode_id' => $episode->id,
+            'draft_episode_id' => $episode->id,
             'num_of_questions' => $request['num_of_questions'],
         ]);
 
         // Create questions
-        $quiz->questions()->createMany($request['questions']);
+        foreach($request['questions'] as $question)
+        {
+            $question['question_number'] = $quiz->draft_questions()->count() + 1;
+            $quiz->draft_questions()->create($question);
+        }
 
         // Increment total quizzes
         $episode->draft_course->increment('total_quizzes');
 
+        DB::commit();
+        
         return ['data' => new TeacherQuizResource($quiz), 'message' => __('msg.quiz_created'), 'code' => 201];
     }
 
-    public function updateQuizCopy(Request $request, DraftQuiz $quiz)
+    public function updateQuizCopy(UpdateQuizRequest $request, $quiz_id)
     {
+        DB::beginTransaction();
+        $quiz = DraftQuiz::findOrFail($quiz_id);
+
         // Delete old questions
         $quiz->draft_questions()->delete();
 
-        // Create new questions
-        $quiz->draft_questions()->createMany($request['questions']);
+        // Create questions
+        foreach($request['questions'] as $question)
+        {
+            $question['question_number'] = $quiz->draft_questions()->count() + 1;
+            $quiz->draft_questions()->create($question);
+        }
 
         // Update num of questions
         $quiz->update([
             'num_of_questions' => $request['num_of_questions'],
         ]);
-
+        DB::commit();
+        
         return ['data' => new TeacherQuizResource($quiz), 'message' => __('msg.quiz_updated'), 'code' => 201];
     }
 
-    public function destroyQuizCopy(DraftQuiz $quiz)
+    public function destroyQuizCopy($quiz_id)
     {
+        DB::beginTransaction();
+        $quiz = DraftQuiz::findOrFail($quiz_id);
         $quiz->draft_episode->draft_course->decrement('total_quizzes');
         $quiz->delete();
+        DB::commit();
 
         return ['message' => __('msg.quiz_deleted'), 'code' => 200];
     }
 
-    public function repostCourse($draft_course_id)
+    public function repostCourse($course_id)
     {
-        DB::transaction(function () use ($draft_course_id) {
+        DB::beginTransaction();
             // 1. Load all draft data at once
-            $draft = DraftCourse::with('draft_episodes.draft_quiz.draft_questions')->findOrFail($draft_course_id);
+            $draft = DraftCourse::with('draft_episodes.draft_quiz.draft_questions')->findOrFail($course_id);
             $original = $draft->original_course;
 
             // 2. Update course (exclude draft-specific fields)
             Storage::disk('uploads')->delete("courses/$original->image_url");
-            $original->update($draft->except(['original_course_id']));
+            $original->update(Arr::except($draft->toArray(), ['original_course']));
 
             // 3. Replace old files
-            $original->episodes()->each(function ($episode) use ($original) {
-                $episode_path = "courses/$original->id/episodes/$episode->id";
-                if (DraftEpisode::where('id', $episode->id)->exists()) {
+            $original->episodes()->each(function ($original_episode) use ($original) {
+                $episode_path = "courses/$original->id/episodes/$original_episode->id";
+                if (DraftEpisode::where('id', $original_episode->id)->exists()) 
+                {
+                    $draft_episode = DraftEpisode::findOrFail($original_episode->id);
                     Storage::disk('local')->move("$episode_path/video_copy.mp4", "$episode_path/video.mp4");
                     Storage::disk('local')->move("$episode_path/thumbnail_copy.jpg", "$episode_path/thumbnail.jpg");
                     $copied_file_path = $this->get_full_path($episode_path, 'file_copy.');
                     $original_file_path = $this->get_full_path($episode_path, 'file.');
                     if ($copied_file_path)
-                        Storage::disk('local')->move($copied_file_path, $original_file_path);
-                    else
+                    {
+                        if($original_file_path)
+                            Storage::disk('local')->delete($original_file_path);
+                        Storage::disk('local')->move($copied_file_path, str_replace('file_copy', 'file', $copied_file_path));
+                    }
+                    else if($original_file_path)
                         Storage::disk('local')->delete($original_file_path);
-                } else {
+
+                    $original_episode->update(Arr::except($draft_episode->toArray(), ['course_id']));
+
+                    if($original_episode->quiz()->exists())
+                        $original_episode->quiz()->delete();
+                    if($draft_episode->draft_quiz()->exists())
+                    {
+                        $draft_quiz = $draft_episode->draft_quiz;
+                        $quizData = Arr::except($draft_quiz->toArray(), ['id', 'draft_episode_id']);
+                        $newQuiz = $original_episode->quiz()->create($quizData);
+                        foreach($draft_quiz->draft_questions as $draft_question)
+                        {
+                            $questionData['question_number'] = Arr::except($draft_question->getAttributes(), ['id', 'draft_quiz_id']);
+                            $questionData['question_number'] = $newQuiz->questions()->count() + 1;
+                            $newQuiz->questions()->create($questionData);
+                        }
+                    }
+                }
+                else 
+                {
                     Storage::disk('local')->deleteDirectory($episode_path);
+                    $original_episode->delete();
                 }
 
-                $episode->delete();            // Then delete episode
             });
-
-            // 4. Copy all new content
-            foreach ($draft->draft_episodes as $episode) {
-                $newEpisode = $original->episodes()->create($episode->except(['draft_course_id']));
-
-                if ($episode->draft_quiz->exists()) {
-                    $quiz = $episode->draft_quiz;
-                    $newQuiz = $newEpisode->quiz()->create($quiz->except(['id', 'draft_episode_id']));
-                    $newQuiz->questions()->createMany($quiz->questions->map->except(['id', 'draft_quiz_id']));
-                }
-            }
-
+                
             // 5. Cleanup
             $draft->delete();
 
             // 6. Repost Course
             $original->update([
                 'status' => CourseStatusEnum::PENDING,
-                'publishing_request_date' => now()->format('Y-m-d H:i:s')
+                'publishing_request_date' => now()->format('Y-m-d')
             ]);
-
-            return $original;
-        });
+            DB::commit();
+            return new CourseWithDetailsForTeacherResource($original);
     }
 
     public function cancel($course_id)
     {
+        DB::beginTransaction();
         $course = DraftCourse::findOrFail($course_id);
 
         foreach ($course->draft_episodes as $episode) {
@@ -268,9 +344,16 @@ class UpdateCopiedCourseController extends Controller
             $file_path = $this->get_full_path($episode_path, 'file_copy.');
             if ($file_path)
                 Storage::disk('local')->delete($file_path);
+            if (Storage::disk('local')->exists($episode_path)) 
+                $files = Storage::disk('local')->allFiles($episode_path);
+            if (empty($files)) 
+                Storage::disk('local')->deleteDirectory($episode_path);
         }
 
+        $course->original_course->episodes()->where('is_copied_episode', true)->delete();
         $course->delete();
+
+        DB::commit();
 
         return response()->json([
             'message' => 'Changes deleted successfully'

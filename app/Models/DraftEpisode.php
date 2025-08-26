@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class DraftEpisode extends Model
 {
@@ -25,8 +26,8 @@ class DraftEpisode extends Model
         return $this->belongsTo(DraftCourse::class);
     }
 
-    public function draft_quizzes(): HasMany
+    public function draft_quiz(): HasOne
     {
-        return $this->hasMany(DraftQuiz::class);
+        return $this->hasOne(DraftQuiz::class);
     }
 }

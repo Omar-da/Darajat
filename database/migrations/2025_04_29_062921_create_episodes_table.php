@@ -13,14 +13,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('episodes', function (Blueprint $table) {
-            $table->id();
+            $table->integer('id')->primary();
             $table->foreignIdFor(Course::class)->constrained()->cascadeOnDelete();
             $table->string('title', 100);
             $table->unsignedSmallInteger('episode_number');
             $table->unique(['course_id', 'episode_number']);
             $table->unsignedMediumInteger('duration')->nullable();
             $table->unsignedInteger('views')->default(0);
-        $table->unsignedInteger('likes')->default(0);
+            $table->unsignedInteger('likes')->default(0);
+            $table->boolean('is_copied_episode')->default(false);
         });
     }
 

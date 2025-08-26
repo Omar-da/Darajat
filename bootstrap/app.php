@@ -6,6 +6,7 @@ use App\Http\Middleware\CheckSubscribed;
 use App\Http\Middleware\CheckTeacherRole;
 use App\Http\Middleware\CertificateMiddleware;
 use App\Http\Middleware\AuthMiddleware;
+use App\Http\Middleware\CheckOwnerCourseCopy;
 use App\Http\Middleware\ProtectEpisodeAccess;
 use App\Http\Middleware\Localization;
 use App\Responses\Response;
@@ -37,6 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'episode_protection' => ProtectEpisodeAccess::class,
             'localization' => Localization::class,
             'is_owner' => CheckOwnerCourse::class,
+            'is_owner_for_copy' => CheckOwnerCourseCopy::class,
             'is_subscribed' => CheckSubscribed::class,
             'regular_or_socialite' => AuthMiddleware::class
         ]);

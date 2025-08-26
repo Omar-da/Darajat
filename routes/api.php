@@ -109,6 +109,10 @@ Route::middleware('localization')->group(function () {
             Route::get('deleted', 'getDeletedCoursesToTeacher');
             Route::post('create-draft', 'createDraftCourse')->middleware('is_teacher');
             Route::get('student/{id}', 'showToStudent');
+            Route::get('enroll-in-free-course/{id}', 'enrollInFreeCourse');
+            Route::get('with-arrangement/{topic_id}', 'getCoursesForTopicForTeacherWithArrangement')->middleware('is_teacher');;
+            Route::patch('evaluation/{course_id}', 'evaluation')->middleware('is_subscribed');
+            Route::get('followed', 'getFollowedCoursesForStudent');
             Route::middleware('is_owner')->group(function () {
                 Route::put('update-draft/{course_id}', 'updateDraftCourse');
                 Route::delete('delete-draft/{course_id}', 'destroyDraftCourse');
@@ -116,14 +120,8 @@ Route::middleware('localization')->group(function () {
                 Route::get('teacher/{course_id}', 'showToTeacher');
                 Route::patch('submit/{course_id}', 'submitCourse');
             });
-            Route::get('with-arrangement/{topic_id}', 'getCoursesForTopicForTeacherWithArrangement')->middleware('is_teacher');;
-            Route::patch('evaluation/{course_id}', 'evaluation')->middleware('is_subscribed');
-            Route::get('followed', 'getFollowedCoursesForStudent');
         });
     });
-
-    // Stripe
-    Route::post('/stripe-webhook', [StripeWebhookController::class, 'handleWebhook']);
 
     // coupons
     Route::controller(CouponController::class)->middleware('regular_or_socialite')->prefix('coupons')->group(function () {
@@ -183,28 +181,30 @@ Route::middleware('localization')->group(function () {
     });
 
     // copy
-    Route::controller(UpdateCopiedCourseController::class)->middleware('is_owner')->group(function () {
+    Route::controller(UpdateCopiedCourseController::class)->middleware('is_owner_for_copy')->group(function () {
         Route::prefix('courses')->group(function () {
             Route::get('get-copy-of-course/{course_id}', 'getCopyOfCourse');
-            Route::put('update-course/{course}/copy', 'updateCourseCopy');
+            Route::post('update-course/{draft_course_id}/copy', 'updateCourseCopy');
             Route::get('repost-course/{draft_course_id}', 'repostCourse');
-            Route::delete('cancel-updating/{course_id}', 'cancel');
+            Route::delete('cancel-updating/{draft_course_id}', 'cancel');
         });
 
         Route::prefix('episodes')->group(function () {
-            Route::post('create/{course}/copy', 'storeEpisodeCopy');
-            Route::put('update/{episode}/copy', 'updateEpisodeCopy');
-            Route::delete('delete/{episode}/copy', 'destroyEpisodeCopy');
+            Route::post('create/{draft_course_id}/copy', 'createEpisodeCopy');
+            Route::post('update/{draft_episode_id}/copy', 'updateEpisodeCopy');
+            Route::delete('delete/{draft_episode_id}/copy', 'destroyEpisodeCopy');
+            Route::get('get-file/{draft_episode_id}/copy', 'getFileCopy');
+            Route::delete('delete-file/{draft_episode_id}/copy', 'destroyFileCopy');
         });
 
         Route::prefix('quizzes')->group(function () {
-            Route::post('create/{episode}/copy', 'storeQuizCopy');
-            Route::put('update/{quiz}/copy', 'updateQuizCopy');
-            Route::delete('delete/{quiz}/copy', 'destroyQuizCopy');
+            Route::post('create/{draft_episode_id}/copy', 'createQuizCopy');
+            Route::put('update/{draft_quiz_id}/copy', 'updateQuizCopy');
+            Route::delete('delete/{draft_quiz_id}/copy', 'destroyQuizCopy');
         });
 
         Route::controller(SoftDeleteController::class)->group(function () {
-            Route::delete('soft-delete/{course}', 'destroyAfterPublishing');
+            Route::delete('soft-delete/{course_id}', 'destroyAfterPublishing');
             Route::put('restore/{course_id}', 'restore');
         });
     });
@@ -216,6 +216,7 @@ Route::middleware('localization')->group(function () {
         Route::get('history/student', 'getHistoryForStudent');
         Route::get('history/teacher', 'getHistoryForTeacher');
     });
+    Route::post('/stripe-webhook', [StripeWebhookController::class, 'handleWebhook']);
 
     Route::middleware('regular_or_socialite')->group(function () {
 

@@ -11,6 +11,7 @@ use App\Models\DraftEpisode;
 use App\Models\Episode;
 use App\Models\PlatformStatistics;
 use App\Traits\BadgeTrait;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -249,20 +250,30 @@ class EpisodeService
         );
     }
 
-    public function destroyFile($episode_id): array
+    public function destroyFile($request, $episode_id): array
     {
         $episode = Episode::query()->find($episode_id);
 
         $directory = "courses/{$episode->course_id}/episodes/{$episode_id}";
 
-        $file = collect(Storage::disk('local')->files($directory))
-            ->first(fn($f) => str_contains(basename($f), 'file'));
-
-        if (!$file) {
-            return ['message' => __('msg.file_not_found'), 'code' => 404];
+        if ($request->query('copy') == 'true')
+        {
+            $file = collect(Storage::disk('local')->files($directory))
+                ->first(fn($f) => str_contains(basename($f), 'file_copy'));
+            if (!$file) {
+                return ['message' => __('msg.file_not_found'), 'code' => 404];
+            }
+            Storage::disk('local')->delete("$directory/file_copy." . pathinfo($file, PATHINFO_EXTENSION));
         }
-
-        Storage::disk('local')->delete("$directory/file." . pathinfo($file, PATHINFO_EXTENSION));
+        else 
+        {
+            $file = collect(Storage::disk('local')->files($directory))
+                ->first(fn($f) => str_contains(basename($f), 'file'));
+            if (!$file) {
+                return ['message' => __('msg.file_not_found'), 'code' => 404];
+            }
+            Storage::disk('local')->delete("$directory/file." . pathinfo($file, PATHINFO_EXTENSION));
+        }
 
         return ['message' => __('msg.file_deleted'), 'code' => 200];
     }

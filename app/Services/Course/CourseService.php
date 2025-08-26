@@ -408,4 +408,17 @@ class CourseService
         return ['data' => EnrolledCourseForStudentResource::collection($followed_courses), 'message' => __('msg.courses_retrieved')];
     }
 
+    public function enrollInFreeCourse($course_id)
+    {
+        $user = auth('api')->user();
+        $course = Course::findOrFail($course_id);
+        if ($course->status !== CourseStatusEnum::APPROVED)
+            return ['message' => __('msg.can_not_enroll_in_course') . $course->status->label() . __('msg.status'), 'code' => 403];
+        if($course->price != 0)
+            return ['message' => 'course_is_not_free', 'code' => 403];
+        $user->followed_courses()->attach($course);
+        $course->increment('num_of_students_enrolled');
+        return ['data' => new CourseWithDetailsForStudentResource($course), 'message' => __('msg.course_retrieved'), 'code' => 200];
+    }
+
 }

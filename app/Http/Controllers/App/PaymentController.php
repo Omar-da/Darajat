@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 
-class PaymentController extends Controller
+class PaymentController
 {
     public function createPaymentIntent(Request $request)
     {
@@ -70,11 +70,6 @@ class PaymentController extends Controller
                 'clientSecret' => $paymentIntent->client_secret,
                 'orderNumber' => $order->order_number, // Optional: for display in the UI
             ]);
-
-            // If Stripe fails, update the order status to reflect the error
-            $order->update(['status' => OrderStatusEnum::FAILED, 'notes' => $e->getMessage()]);
-
-            return response()->json(['error' => 'Payment setup failed'], 500);
     }
 
     public function cancelProcess(Order $order)

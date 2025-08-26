@@ -21,7 +21,8 @@ class Episode extends Model
         'episode_number',
         'duration',
         'views',
-        'likes'
+        'likes',
+        'is_copied_episode'
     ];
 
     protected function casts(): array

@@ -8,8 +8,10 @@ use App\Models\Course;
 class SoftDeleteController extends Controller
 {
 
-    public function destroyAfterPublishing(Course $course): array
+    public function destroyAfterPublishing($course_id): array
     {
+        $course = Course::findOrFail($course_id);
+        
         if ($course->status !== CourseStatusEnum::APPROVED || $course->num_of_students_enrolled > 0)
             return ['message' => __('msg.can_not_delete_course'), 'code' => 403];
 
