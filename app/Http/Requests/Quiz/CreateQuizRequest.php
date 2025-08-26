@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Quiz;
 
-use App\Rules\QuestionsAreSequential;
 use App\Traits\HandlesFailedValidationTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -27,7 +26,7 @@ class CreateQuizRequest extends FormRequest
     {
         return [
             'num_of_questions' => 'required|integer',
-            'questions' => ['required', 'array', 'size:' . $this->num_of_questions],
+            'questions' => ['required', 'array', 'size:' . (int) $this->num_of_questions],
             'questions.*.content' => 'required|string',
             'questions.*.answer_a' => 'required|string',
             'questions.*.answer_b' => 'required|string',

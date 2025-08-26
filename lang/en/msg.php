@@ -170,4 +170,5 @@ return [
     'unauthenticated' => 'Unauthenticated!',
     'you_are_banned' => 'You are currently banned from commenting. This action was taken for violating our community guidelines!',
     'file_deleted' => 'File deleted successfully!',
+    'you_are_teacher' => 'You are now a Teacher!',
 ];
