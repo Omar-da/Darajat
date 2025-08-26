@@ -3,6 +3,8 @@
 namespace App\Http\Resources\Episode;
 
 use App\Http\Resources\Quiz\TeacherQuizResource;
+use App\Models\DraftEpisode;
+use App\Models\Episode;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -13,9 +15,18 @@ class EpisodeTeacherResource extends JsonResource
 
     public function toArray(Request $request): array
     {
-        $directory = "courses/{$this->course_id}/episodes/{$this->id}";
-        $file = collect(Storage::disk('local')->files($directory))
-            ->first(fn($f) => str_contains(basename($f), 'file'));
+        if($this->resource instanceof Episode)
+        {
+            $directory = "courses/{$this->course_id}/episodes/{$this->id}";
+            $file = collect(Storage::disk('local')->files($directory))
+                ->first(fn($f) => str_contains(basename($f), 'file'));
+        }
+        else if($this->resource instanceof DraftEpisode)
+        {
+            $directory = "courses/{$this->draft_course_id}/episodes/{$this->id}";
+            $file = collect(Storage::disk('local')->files($directory))
+                ->first(fn($f) => str_contains(basename($f), 'file_copy'));
+        }
 
         $data = [
             'id' => $this->id,

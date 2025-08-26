@@ -169,11 +169,11 @@ class EpisodeController extends Controller
         }
     }
 
-    public function destroyFile($id): JsonResponse
+    public function destroyFile(Request $request, $id): JsonResponse
     {
         $data = [];
         try {
-            $data = $this->episodeService->destroyFile($id);
+            $data = $this->episodeService->destroyFile($request, $id);
             if($data['code'] == 404) {
                 return Response::error($data['message'], $data['code']);
             }

@@ -17,36 +17,29 @@ class CheckOwnerCourse
      *
      * @param \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response) $next
      */
-    public function handle(Request $request, Closure $next)
+    public function handle($request, Closure $next)
     {
-        $course_id = $request->route()->hasParameter('course_id') ? $request->route()->parameter('course_id') : null;
-
-        if (is_null($course_id)) {
-            $episode_id = $request->route()->hasParameter('episode_id') ? $request->route()->parameter('episode_id') : null;
-            if (is_null($episode_id)) {
-                $quiz = Quiz::query()->find(request()->route()->parameter('quiz_id'));
-                if (is_null($quiz)) {
-                    return Response::error(__('msg.quiz_not_found'), 404);
-                }
-                $course = $quiz->episode->course;
+            // Get parameters from route
+            $courseId = $request->route('course_id');
+            $episodeId = $request->route('episode_id');
+            $quizId = $request->route('quiz_id');
+            
+            // Determine which course to check based on available parameters
+            if ($courseId) {
+                $course = Course::findOrFail($courseId);
+            } elseif ($episodeId) {
+                $course = Episode::with('course')->findOrFail($episodeId)->course;
+            } elseif ($quizId) {
+                $course = Quiz::with('episode.course')->findOrFail($quizId)->episode->course;
             } else {
-                $episode = Episode::query()->find($episode_id);
-                if (is_null($episode)) {
-                    return Response::error(__('msg.episode_not_found'), 404);
-                }
-                $course = $episode->course;
+                return Response::error(__('msg.unauthorized'), 403);
             }
-        } else {
-            $course = Course::query()->find($course_id);
-            if (is_null($course)) {
-                return Response::error(__('msg.course_not_found'), 404);
+            
+            // Check ownership
+            if ($course->teacher_id != auth('api')->id()) {
+                return Response::error(__('msg.unauthorized'), 403);
             }
-        }
-
-        if ($course->teacher_id != auth('api')->id()) {
-            return Response::error(__('msg.unauthorized'), 403);
-        }
-
-        return $next($request);
+            
+            return $next($request);
     }
 }

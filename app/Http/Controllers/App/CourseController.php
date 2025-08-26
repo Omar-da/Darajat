@@ -336,6 +336,21 @@ class CourseController extends Controller
         }
     }
 
+    public function enrollInFreeCourse($id)
+    {
+        $data = [];
+        try {
+            $data = $this->courseService->enrollInFreeCourse($id);
+            if ($data['code'] == 404) {
+                return Response::error($data['message'], $data['code']);
+            }
+            return Response::success($data['data'], $data['message'], $data['code']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
     public function getCertificate(Course $course)
     {
         $user = auth('api')->user();

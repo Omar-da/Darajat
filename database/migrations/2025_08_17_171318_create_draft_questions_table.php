@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(DraftQuiz::class)->constrained()->cascadeOnDelete();
             $table->unsignedSmallInteger('question_number');
-            $table->unique(['quiz_id', 'question_number']);
+            $table->unique(['draft_quiz_id', 'question_number']);
             $table->text('content');
             $table->string('answer_a');
             $table->string('answer_b');

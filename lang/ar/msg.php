@@ -99,6 +99,7 @@ return [
     'course_updated' => 'تم تحديث الدورة بنجاح',
     'can_not_delete_course' => 'لا يمكن حذف هذه الدورة في حالة ',
     'can_not_enroll_in_course' => 'لا يمكن التسجيل في الدورة',
+    'course_is_not_free' => 'لا يمكنك التسجيل في هذه الدورة عليك أن تشتريها أولاً',
     'enrolled_students' => ' عندما يكون بها طلاب مسجلون!',
     'can_not_delete_course_pending' => 'لا يمكن حذف هذه الدورة في حالة الانتظار الحالية!',
     'course_deleted' => 'تم حذف الدورة بنجاح',

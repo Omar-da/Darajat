@@ -4,13 +4,10 @@ namespace App\Http\Controllers\App;
 
 use App\Enums\OrderStatusEnum;
 use App\Mail\PaymentNotification;
-use App\Mail\SendOTP;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
 use Stripe\Webhook;
-use Illuminate\Support\Str;
-use App\Models\Payment;
 use App\Models\Order;
 use App\Models\PlatformStatistics;
 use Illuminate\Support\Facades\Mail;
