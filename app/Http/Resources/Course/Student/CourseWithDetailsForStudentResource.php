@@ -21,10 +21,19 @@ class CourseWithDetailsForStudentResource extends JsonResource
             'id' => $this->id,
             'image_url' => Storage::url("courses/$this->image_url"),
             'title' => $this->title,
-            'category' => $this->topic->category->title,
-            'topic' => $this->topic->title,
+            'category' => [
+                'id' => $this->topic->category->id,
+                'title' => $this->topic->category->title
+            ],
+            'topic' => [
+                'id' => $this->topic->id,
+                'title' => $this->topic->title
+            ],
             'description' => $this->description,
-            'language' => $this->language->name,
+            'language' => [
+                'id' => $this->language->id,
+                'name' => $this->language->name
+            ],
             'what_will_you_learn' => $this->episodes->pluck('title'),
             'teacher' => [
                 'id' => $this->teacher->id,
