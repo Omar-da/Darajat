@@ -30,7 +30,7 @@ class UpdateDraftCourse extends FormRequest
             'image_url' => 'nullable|image|mimes:jpeg,png,bmp,jpg,gif,svg|max:2048',
             'difficulty_level' => ['required', new ValidLevel('course')],
             'price' => 'required|numeric|min:0',
-            'has_certificate' => ['nullable', 'string', 'in:true,false'],
+            'has_certificate' => ['required', 'boolean'],
         ];
     }
 }
