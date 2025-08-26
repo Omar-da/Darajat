@@ -48,6 +48,7 @@ Route::middleware('localization')->group(function () {
             Route::post('promote-student-to-teacher', 'promoteStudentToTeacher');
             Route::delete('delete', 'destroy');
             Route::post('store-fcm-token', 'storeFCMToken');
+            Route::get('show-my-profile', 'showMyProfile');
         });
         Route::get('show-profile/{id}', 'showProfile');
     });

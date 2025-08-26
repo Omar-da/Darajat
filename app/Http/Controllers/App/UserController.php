@@ -82,7 +82,19 @@ class UserController extends Controller
         }
     }
 
-    public function promoteStudentToTeacher()
+    public function showMyProfile(): JsonResponse
+    {
+        $data = [];
+        try {
+            $data = $this->userService->showMyProfile();
+            return Response::success($data['user'], $data['message']);
+        } catch (Throwable $th) {
+            $message = $th->getMessage();
+            return Response::error($message);
+        }
+    }
+
+    public function promoteStudentToTeacher(): JsonResponse
     {
         $data = [];
         try {
