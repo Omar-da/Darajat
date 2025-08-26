@@ -138,10 +138,6 @@ class EpisodeService
         if ($course->status !== CourseStatusEnum::DRAFT)
             return ['message' => __('msg.can_not_delete_episode') . $course->status->label() . '!', 'code' => 403];
 
-        // Update numbers of episodes
-        foreach ($course->draft_episodes as $episode_from_course)
-            if ($episode_from_course->episode_number > $episode->episode_number)
-                $episode_from_course->decrement('episode_number');
 
         // Video, Thumbnail and File
         $episode_path = "courses/$course->id/episodes/$episode->id";
@@ -159,7 +155,14 @@ class EpisodeService
         $course->update([
             'total_time' => $course->total_time - $episode->duration
         ]);
+        $episode_number = $episode->episode_number;
+
         $episode->delete();
+
+        // Update numbers of episodes
+        foreach ($course->episodes as $episode_from_course)
+            if ($episode_from_course->episode_number > $episode_number)
+                $episode_from_course->decrement('episode_number');
 
         return ['message' => __('msg.episode_deleted'), 'code' => 200];
     }
