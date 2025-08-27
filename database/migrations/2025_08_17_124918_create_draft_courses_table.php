@@ -40,6 +40,7 @@ return new class extends Migration
             $table->timestamp('created_at')->useCurrent();
             $table->unsignedBigInteger('original_course_id');
             $table->foreign('original_course_id')->references('id')->on('courses');
+            $table->boolean('was_edited')->default(false);
         });
     }
 
