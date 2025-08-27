@@ -15,12 +15,12 @@ class CertificateMiddleware
         $user = auth('api')->user();
 
         // Extract course ID from route (assuming route is like /certificates/{course})
-        $courseId = $request->route('course');
+        $courseId = $request->route('course_id');
 
         $course = Course::findOrFail($courseId);
-        $followedCourse = $user->moreDetail->followed_courses()
+        $followedCourse = $user->followed_courses()
                             ->where('course_id', $courseId)
-                            ->first();
+                            ->firstOrFail();
 
         if(!$course->has_certificate)
             return response()->json([

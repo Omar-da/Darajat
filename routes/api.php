@@ -100,7 +100,7 @@ Route::middleware('localization')->group(function () {
         Route::get('search/{title}', 'search');
         Route::get('free', 'getFreeCourses');
         Route::get('paid', 'getPaidCourses');
-        Route::post('get-certificate/{course}', 'getCertificate')->name('courses.get_certificate')->middleware('get_certificate');
+        Route::post('get-certificate/{course_id}', 'getCertificate')->name('courses.get_certificate')->middleware('get_certificate');
         Route::middleware('regular_or_socialite')->group(function () {
             Route::get('draft', 'getDraftCoursesToTeacher');
             Route::get('pending', 'getPendingCoursesToTeacher');
