@@ -67,5 +67,5 @@ return Application::configure(basePath: dirname(__DIR__))
         });
     })->withSchedule(function (Schedule $schedule) {
         $schedule->command('active:check')->dailyAt('03:00')->timezone('Asia/Damascus');
-        $schedule->command('orders:cancel-abandoned')->everyThirtyMinutes();
+        $schedule->command('orders:cancel-abandoned')->dailyAt('03:00')->timezone('Asia/Damascus');
     })->create();
