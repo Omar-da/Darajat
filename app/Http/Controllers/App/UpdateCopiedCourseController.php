@@ -120,7 +120,7 @@ class UpdateCopiedCourseController extends Controller
             $request['file_url']->storeAs($episode_path, 'file_copy.' . $request['file_url']->getClientOriginalExtension(), 'local');
 
         // Duration
-        // $request['duration'] = FFMpeg::fromDisk('local')->open("$episode_path/video_copy.mp4")->getDurationInSeconds();
+        $request['duration'] = FFMpeg::fromDisk('local')->open("$episode_path/video_copy.mp4")->getDurationInSeconds();
         $episode->update([
             'duration' => $request['duration']
         ]);
@@ -157,12 +157,6 @@ class UpdateCopiedCourseController extends Controller
             if ($file_path)
                 Storage::disk('local')->delete($file_path);
             $request['file_url']->storeAs($episode_path, 'file_copy.' . $request['file_url']->getClientOriginalExtension(), 'local');
-        }
-        else 
-        {
-            $file_path = $this->get_full_path($episode_path, 'file_copy.');
-            if ($file_path)
-                Storage::disk('local')->delete($file_path);
         }
 
         // Update
