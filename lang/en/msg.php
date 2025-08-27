@@ -102,6 +102,7 @@ return [
     'enrolled_students' => 'status when it has enrolled students!',
     'course_is_not_free' => 'You can\'t enroll in this course, you must purchase it first',
     'can_not_delete_course_pending' => 'You can\'t delete this course in current pending status!',
+    'can_not_repost_course' => 'You can\'t repost this course without make a change',
     'course_deleted' => 'Course deleted successfully',
     'add_one_episode' => 'Please add at least one episode before submitting the course for review',
     'course_already_submitted' => 'Course already submitted for review!',

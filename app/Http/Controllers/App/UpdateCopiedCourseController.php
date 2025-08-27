@@ -77,8 +77,9 @@ class UpdateCopiedCourseController extends Controller
 
     public function updateCourseCopy(UpdateDraftCourse $request, $course_id)
     {
-        DB::beginTransaction();
         $course = DraftCourse::findOrFail($course_id);
+
+        DB::beginTransaction();
         $image_url = ['image_url' => $course->image_url];
 
         if ($request->hasFile('image_url')) 
@@ -97,15 +98,19 @@ class UpdateCopiedCourseController extends Controller
         $course->update(array_merge($request->all(), $image_url));
 
         DB::commit();
+
+        $course->update([
+            'was_edited' => true
+        ]);
         
         return ['data' => new CourseForTeacherResource($course), 'message' => __('msg.course_updated'), 'code' => 200];
     }
 
     public function createEpisodeCopy(CreateEpisodeRequest $request, $course_id)
     {
-        DB::beginTransaction();
         $course = DraftCourse::findOrFail($course_id);
-
+        
+        DB::beginTransaction();
         // Episode Data
         $request['episode_number'] = $course->num_of_episodes + 1;
         $request['is_copied_episode'] = true;
@@ -132,15 +137,20 @@ class UpdateCopiedCourseController extends Controller
         ]);
         DB::commit();
 
+        $course->update([
+            'was_edited' => true
+        ]);
+
         return ['data' => new EpisodeTeacherResource($episode), 'message' => __('msg.episode_created'), 'code' => 201];
     }
 
 
     public function updateEpisodeCopy(UpdateEpisodeRequest $request, $episode_id)
     {
-        DB::beginTransaction();
         $episode = DraftEpisode::findOrFail($episode_id);
         $course = $episode->draft_course;
+
+        DB::beginTransaction();
 
         // Video, Thumbnail and File
         $episode_path = "courses/$course->id/episodes/$episode->id";
@@ -163,14 +173,19 @@ class UpdateCopiedCourseController extends Controller
         $episode->update($request->all());
         DB::commit();
         
+        $course->update([
+            'was_edited' => true
+        ]);
+
         return ['data' => new EpisodeTeacherResource($episode), 'message' => __('msg.episode_updated'), 'code' => 200];
     }
 
     public function destroyEpisodeCopy($episode_id)
     {
-        DB::beginTransaction();
         $episode = DraftEpisode::findOrFail($episode_id);
         $course = $episode->draft_course;
+
+        DB::beginTransaction();
 
         // Update numbers of episodes
         $old_episode_number = $episode->episode_number;
@@ -207,14 +222,20 @@ class UpdateCopiedCourseController extends Controller
         $episode->delete();
 
         DB::commit();
+
+        $course->update([
+            'was_edited' => true
+        ]);
+
         return ['message' => __('msg.episode_deleted'), 'code' => 200];
     }   
 
     public function createQuizCopy(CreateQuizRequest $request, $episode_id)
     {
-        DB::beginTransaction();
-        
         $episode = DraftEpisode::findOrFail($episode_id);
+        $course = $episode->draft_course;
+
+        DB::beginTransaction();
 
         // Check if quiz already exists
         if ($episode->draft_quiz()->exists())
@@ -238,14 +259,20 @@ class UpdateCopiedCourseController extends Controller
 
         DB::commit();
         
+        $course->update([
+            'was_edited' => true
+        ]);
+
         return ['data' => new TeacherQuizResource($quiz), 'message' => __('msg.quiz_created'), 'code' => 201];
     }
 
     public function updateQuizCopy(UpdateQuizRequest $request, $quiz_id)
     {
-        DB::beginTransaction();
         $quiz = DraftQuiz::findOrFail($quiz_id);
+        $course = $quiz->draft_episode->draft_course;
 
+        DB::beginTransaction();
+        
         // Delete old questions
         $quiz->draft_questions()->delete();
 
@@ -262,30 +289,46 @@ class UpdateCopiedCourseController extends Controller
         ]);
         DB::commit();
         
+        $course->update([
+            'was_edited' => true
+        ]);
+
         return ['data' => new TeacherQuizResource($quiz), 'message' => __('msg.quiz_updated'), 'code' => 201];
     }
 
     public function destroyQuizCopy($quiz_id)
     {
-        DB::beginTransaction();
         $quiz = DraftQuiz::findOrFail($quiz_id);
+        $course = $quiz->draft_episode->draft_course;
+        
+        DB::beginTransaction();
         $quiz->draft_episode->draft_course->decrement('total_quizzes');
         $quiz->delete();
         DB::commit();
+
+        $course->update([
+            'was_edited' => true
+        ]);
 
         return ['message' => __('msg.quiz_deleted'), 'code' => 200];
     }
 
     public function repostCourse($course_id)
     {
+        // 1. Load all draft data at once
+        $draft = DraftCourse::with('draft_episodes.draft_quiz.draft_questions')->findOrFail($course_id);
+        $original = $draft->original_course;
+        
+        if(!$draft->was_edited)
+            return response()->json([
+                'message' => __('msg.can_not_repost_course'),
+            ], 409);
+
         DB::beginTransaction();
-            // 1. Load all draft data at once
-            $draft = DraftCourse::with('draft_episodes.draft_quiz.draft_questions')->findOrFail($course_id);
-            $original = $draft->original_course;
 
             // 2. Update course (exclude draft-specific fields)
             Storage::disk('uploads')->delete("courses/$original->image_url");
-            $original->update(Arr::except($draft->toArray(), ['original_course']));
+            $original->update(Arr::except($draft->toArray(), ['original_course', 'was_edited']));
 
             // 3. Replace old files
             $original->episodes()->each(function ($original_episode) use ($original) {

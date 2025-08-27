@@ -40,8 +40,8 @@ class PlatformStatistics extends Model
         ]);
     }
 
-    public function incrementStat($stat)
+    public static function incrementStat($stat)
     {
-        $this->getStats()->increment($stat);
+        self::getStats()->increment($stat);
     }
 }

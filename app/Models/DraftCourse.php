@@ -31,6 +31,7 @@ class DraftCourse extends Model
         'response_date',
         'status',
         'has_certificate',
+        'was_edited'
     ];
 
         protected function casts(): array
