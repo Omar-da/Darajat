@@ -351,8 +351,9 @@ class CourseController extends Controller
         }
     }
 
-    public function getCertificate(Course $course)
+    public function getCertificate($course_id)
     {
+        $course = Course::findOrFail($course_id);
         $user = auth('api')->user();
         $apiKey = env('CERTIFIER_API_KEY');
         $followed_course = $user->followed_courses()->where('course_id', $course->id)->firstOrFail();
