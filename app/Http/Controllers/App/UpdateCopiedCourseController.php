@@ -42,6 +42,13 @@ class UpdateCopiedCourseController extends Controller
         // Copy episodes with quizzes
         foreach($originalCourse->episodes as $episode)
         {
+            $episode_path = "courses/$originalCourse->id/episodes/$episode->id";
+            Storage::disk('local')->copy("$episode_path/video.mp4", "$episode_path/video_copy.mp4");
+            Storage::disk('local')->copy("$episode_path/thumbnail.jpg", "$episode_path/thumbnail_copy.jpg");
+            $original_file_path = $this->get_full_path($episode_path, 'file.');
+            if ($original_file_path)
+                Storage::disk('local')->copy($original_file_path, str_replace('file', 'file_copy', $original_file_path));
+
             // Copy episode
             $episodeData = $episode->toArray();
             unset($episodeData['course_id']);
@@ -72,13 +79,23 @@ class UpdateCopiedCourseController extends Controller
     {
         DB::beginTransaction();
         $course = DraftCourse::findOrFail($course_id);
+        $image_url = ['image_url' => $course->image_url];
 
-        if($request['image_url'])
+        if ($request->hasFile('image_url')) 
         {
-            Storage::disk('uploads')->delete("courses/$course->image_url");
-            $request['image_url'] = basename($request['image_url']->store('courses', 'uploads'));
+            $file = $request->file('image_url');
+            
+            // Generate a proper filename
+            $extension = $file->getClientOriginalExtension();
+            $filename = uniqid() . '.' . $extension;
+            
+            // Store the file properly
+            $file->storeAs('courses', $filename, 'uploads');
+            $image_url = ['image_url' => $filename];
         }
-        $course->update($request->all());
+        
+        $course->update(array_merge($request->all(), $image_url));
+
         DB::commit();
         
         return ['data' => new CourseForTeacherResource($course), 'message' => __('msg.course_updated'), 'code' => 200];
@@ -306,7 +323,7 @@ class UpdateCopiedCourseController extends Controller
                         $newQuiz = $original_episode->quiz()->create($quizData);
                         foreach($draft_quiz->draft_questions as $draft_question)
                         {
-                            $questionData['question_number'] = Arr::except($draft_question->getAttributes(), ['id', 'draft_quiz_id']);
+                            $questionData = Arr::except($draft_question->getAttributes(), ['id', 'draft_quiz_id']);
                             $questionData['question_number'] = $newQuiz->questions()->count() + 1;
                             $newQuiz->questions()->create($questionData);
                         }
