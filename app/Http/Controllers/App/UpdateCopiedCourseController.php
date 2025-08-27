@@ -103,7 +103,7 @@ class UpdateCopiedCourseController extends Controller
             $request['file_url']->storeAs($episode_path, 'file_copy.' . $request['file_url']->getClientOriginalExtension(), 'local');
 
         // Duration
-        $request['duration'] = FFMpeg::fromDisk('local')->open("$episode_path/video_copy.mp4")->getDurationInSeconds();
+        // $request['duration'] = FFMpeg::fromDisk('local')->open("$episode_path/video_copy.mp4")->getDurationInSeconds();
         $episode->update([
             'duration' => $request['duration']
         ]);

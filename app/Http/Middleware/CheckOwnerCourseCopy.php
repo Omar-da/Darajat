@@ -31,9 +31,9 @@ class CheckOwnerCourseCopy
             } elseif ($courseId) {
                 $course = DraftCourse::with('original_course')->findOrFail($courseId)->original_course;
             } elseif ($episodeId) {
-                $course = DraftEpisode::with('course.original_course')->findOrFail($episodeId)->draft_course->original_course;
+                $course = DraftEpisode::with('draft_course.original_course')->findOrFail($episodeId)->draft_course->original_course;
             } elseif ($quizId) {
-                $course = DraftQuiz::with('episode.course.original_course')->findOrFail($quizId)->draft_episode->draft_course->original_course;
+                $course = DraftQuiz::with('draft_episode.draft_course.original_course')->findOrFail($quizId)->draft_episode->draft_course->original_course;
             } else {
                 return Response::error(__('msg.unauthorized'), 403);
             }

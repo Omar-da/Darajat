@@ -20,8 +20,6 @@ class FCMService
         $this->messaging = $firebase->createMessaging();
     }
 
-
-
     public function sendNotification($deviceToken, $title, $body, array $data = []): array
     {
         $notification = Notification::create($title, $body);
