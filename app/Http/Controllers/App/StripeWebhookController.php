@@ -106,7 +106,7 @@ class StripeWebhookController extends Controller
         $student = $order->student;
         $course = $order->course;
 
-        if (isset($student)) 
+        if (isset($student))
             Mail::to($student->email)->send(new PaymentNotification(false, $course->title));
     }
 }

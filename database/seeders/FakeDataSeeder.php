@@ -93,7 +93,7 @@ class FakeDataSeeder extends Seeder
                     'response_date' => '2005-08-23',
                     'status' => CourseStatusEnum::APPROVED,
                     'has_certificate' => true,
-                    'total_quizzes' => 1
+                    'total_quizzes' => 3
                 ],
                 [
                     'title' => 'Laravel for intermediate',
@@ -203,19 +203,19 @@ class FakeDataSeeder extends Seeder
         // quiz 1
         $quiz1 = Quiz:: create([
             'episode_id' => 1,
-            'num_of_questions' => 3,
+            'num_of_questions' => 10,
         ]);
 
         // quiz 2
         $quiz2 = Quiz::create([
             'episode_id' => 2,
-            'num_of_questions' => 2,
+            'num_of_questions' => 10,
         ]);
 
         // quiz 3
         Quiz::create([
             'episode_id' => 3,
-            'num_of_questions' => 2,
+            'num_of_questions' => 10,
         ]);
 
 

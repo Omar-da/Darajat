@@ -35,14 +35,14 @@ class CertificateMiddleware
         }
 
         // Check course progress
-        if($followedCourse->pivot->episodes_completed) {
+        if($followedCourse->pivot->is_episodes_completed) {
             return response()->json([
                 'message' => 'Course is not completed yet'
             ], 403);
         }
 
         // Check quizzes completion
-        if($followedCourse->pivot->quizzes_completed) {
+        if($followedCourse->pivot->is_quizzes_completed) { // is_quizzes_completed
             return response()->json([
                 'message' => 'Quizzes is not completed yet'
             ], 403);

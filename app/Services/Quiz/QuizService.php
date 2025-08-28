@@ -9,7 +9,6 @@ use App\Models\Episode;
 use App\Models\Question;
 use App\Models\Quiz;
 use App\Traits\BadgeTrait;
-use Illuminate\Support\Facades\Gate;
 
 class QuizService
 {
@@ -30,7 +29,7 @@ class QuizService
             'num_of_questions' => $request['num_of_questions'],
         ]);
 
-        for($i = 0; $i < $quiz->num_of_questions; $i++) {
+        for ($i = 0; $i < $quiz->num_of_questions; $i++) {
             $quiz->questions()->create([
                 'quiz_id' => $quiz->id,
                 'question_number' => $i + 1,
@@ -61,7 +60,9 @@ class QuizService
             return ['message' => __('msg.question_not_found'), 'code' => 404];
         }
 
-        Gate::authorize('haveAccess', $quiz);
+        if (!$user->episodes->contains($quiz->episode_id)) {
+            return ['message' => __('msg.must_watch_episode'), 'code' => 403];
+        }
 
         if ($question->right_answer == $request['answer']) {
             $data['is_correct'] = true;
@@ -83,7 +84,9 @@ class QuizService
             return ['message' => __('msg.quiz_not_found'), 'code' => 404];
         }
 
-        Gate::authorize('haveAccess', $quiz);
+        if (!$user->episodes->contains($quiz->episode_id)) {
+            return ['message' => __('msg.must_watch_episode'), 'code' => 403];
+        }
 
         if (count($request) < $quiz->num_of_questions) {
             return ['message' => __('msg.not_answered_all_questions'), 'code' => 403];
@@ -110,8 +113,10 @@ class QuizService
                 'percentage_mark' => $percentage_mark,
                 'success' => $percentage_mark >= 60 ? 1 : 0,
             ]);
+
         $result = new ResultResource($quiz_user);
-        if ($result['success']) {
+
+        if ($quiz_user->pivot->success) {
             // Update the episode quiz status to mark that the user has passed the quiz
             $episode = $user->episodes()->where('episode_id', $quiz->episode_id)->first();
             $episode->pivot->pass_quiz = true;
@@ -122,8 +127,8 @@ class QuizService
             $course->pivot->increment('num_of_completed_quizzes');
 
             if ($course->pivot->num_of_completed_quizzes == $course->total_quizzes) {
-                $course->pivot->update(['quizzes_completed' => true]);
-                if ($course->pivot->episodes_completed) {
+                $course->pivot->update(['is_quizzes_completed' => true]);
+                if ($course->pivot->is_episodes_completed) {
                     $this->checkStatistic($course);
                 }
             }
@@ -147,7 +152,7 @@ class QuizService
             'num_of_questions' => $request['num_of_questions'],
         ]);
 
-        for($i = 0; $i < $quiz->num_of_questions; $i++) {
+        for ($i = 0; $i < $quiz->num_of_questions; $i++) {
             $quiz->questions()->create([
                 'quiz_id' => $quiz->id,
                 'question_number' => $i + 1,

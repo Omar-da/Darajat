@@ -22,6 +22,7 @@ class ReplyResource extends JsonResource
             'content' => $this->content,
             'reply_date' => Carbon::parse($this->reply_date)->diffForHumans(),
             'is_liked' => (bool)auth('api')->user()->likeReply()->where('reply_id', $this->id)->exists(),
+            'is_my_reply' => $this->user->id == auth('api')->id(),
             'likes' => $this->likes ? $this->likes : 0,
             'replier' => [
                 'id' => $this->user->id,

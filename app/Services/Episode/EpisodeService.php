@@ -33,16 +33,22 @@ class EpisodeService
     public function getToStudent($course_id): array
     {
         $user = auth('api')->user();
-        $course = $user->followed_courses()
-            ->where('course_id', $course_id)
-            ->with(['episodes.quiz.questions']) // Eager load relationships
-            ->first();
+        $course = Course::find($course_id);
+        if($user->id == $course->teacher_id) {
+            $episodes['episodes'] = EpisodeStudentResource::collection($course->episodes);
+            return ['data' => $episodes, 'message' => __('msg.episodes_retrieved'), 'code' => 200];
+        } else {
+            $course = $user->followed_courses()
+                ->where('course_id', $course_id)
+                ->with(['episodes.quiz.questions']) // Eager load relationships
+                ->first();
 
-        $episodes['episodes'] = EpisodeStudentResource::collection($course->episodes);
-        $episodes['progress_percentage'] = $course->pivot->perc_progress . '%';
-        $episodes['num_of_completed_quizzes'] = $course->pivot->num_of_completed_quizzes;
-        $episodes['get_certificate'] = (bool)$course->pivot->get_certificate;
-        return ['data' => $episodes, 'message' => __('msg.episodes_retrieved'), 'code' => 200];
+            $episodes['episodes'] = EpisodeStudentResource::collection($course->episodes);
+            $episodes['progress_percentage'] = $course->pivot->perc_progress . '%';
+            $episodes['num_of_completed_quizzes'] = $course->pivot->num_of_completed_quizzes;
+            $episodes['get_certificate'] = (bool)$course->pivot->get_certificate;
+            return ['data' => $episodes, 'message' => __('msg.episodes_retrieved'), 'code' => 200];
+        }
     }
 
     public function store($request, $course_id): array
@@ -197,8 +203,8 @@ class EpisodeService
 
         // Check to user end the course
         if ($course->pivot->perc_progress == 100) {
-            $course->pivot->update(['episodes_completed' => true]);
-            if ($course->pivot->quizzes_completed) {
+            $course->pivot->update(['is_episodes_completed' => true]);
+            if ($course->pivot->is_quizzes_completed) {
                 $this->checkStatistic($course);
             }
         }
@@ -265,7 +271,7 @@ class EpisodeService
             }
             Storage::disk('local')->delete("$directory/file_copy." . pathinfo($file, PATHINFO_EXTENSION));
         }
-        else 
+        else
         {
             $file = collect(Storage::disk('local')->files($directory))
                 ->first(fn($f) => str_contains(basename($f), 'file'));

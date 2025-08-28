@@ -46,7 +46,7 @@ class QuizController extends Controller
         $data = [];
         try {
             $data = $this->quizService->processAnswer($request->validated());
-            if ($data['code'] == 404) {
+            if ($data['code'] == 404 || $data['code'] == 403) {
                 return Response::error($data['message'], $data['code']);
             }
             return Response::success($data['data'], $data['message'], $data['code']);
@@ -71,9 +71,6 @@ class QuizController extends Controller
             return Response::success($data['data'], $data['message'], $data['code']);
         } catch (Throwable $th) {
             $message = $th->getMessage();
-            if ($th instanceof AuthorizationException) {
-                return Response::error($message, $th->getCode());
-            }
             return Response::error($message);
         }
     }
