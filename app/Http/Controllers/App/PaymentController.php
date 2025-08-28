@@ -31,10 +31,29 @@ class PaymentController
             'student_id' => $student->id
         ])->first();
 
+        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+        
         // 2. IF AN ORDER EXISTS, CHECK ITS STATUS ON STRIPE
         if ($existingOrder) {
-            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
-            
+            // Check if payment_intent_id exists and is valid
+            if (empty($existingOrder->payment_intent_id)) {
+                // Create a new payment intent for the existing order
+                $newPaymentIntent = $stripe->paymentIntents->create([
+                    'amount' => $amount,
+                    'currency' => 'usd',
+                    'automatic_payment_methods' => ['enabled' => true],
+                    'metadata' => [
+                        'order_id' => $existingOrder->id,
+                        'order_number' => $existingOrder->order_number,
+                        'student_id' => $student->id,
+                        'teacher_id' => $course->teacher_id,
+                        'course_id' => $course->id,
+                    ],
+                ]);
+                $existingOrder->update(['payment_intent_id' => $newPaymentIntent->id]);
+                return response()->json(['clientSecret' => $newPaymentIntent->client_secret]);
+            }
+    
             // Retrieve the LIVE status from Stripe
             $existingPaymentIntent = $stripe->paymentIntents->retrieve($existingOrder->payment_intent_id);
             
