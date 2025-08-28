@@ -27,7 +27,8 @@ class CourseWithDetailsForTeacherResource extends JsonResource
             'title' => $this->title,
             'category' => [
                 'id' => $this->topic->category->id,
-                'title' => $this->topic->category->title
+                'title' => $this->topic->category->title,
+                'image_url' => asset("img/categories/{$this->topic->category->image_url}")
             ],
             'topic' => [
                 'id' => $this->topic->id,

@@ -18,7 +18,7 @@ class ResultResource extends JsonResource
         return [
             'mark' => $this->pivot->mark . '/' . $this->num_of_questions,
             'percentage_mark' => $this->pivot->percentage_mark . '%',
-            'success' => $this->pivot->success
+            'success' => (bool)$this->pivot->success
         ];
     }
 }

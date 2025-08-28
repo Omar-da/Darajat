@@ -27,7 +27,7 @@ class ReplyService
         }
 
         $user = auth('api')->user();
-        if($user->is_banned)
+        if ($user->is_banned)
             return ['message' => __('msg.you_are_baned'), 'code' => 403];
 
         $reply = Reply::query()->create([
@@ -42,7 +42,7 @@ class ReplyService
     public function update($request, $id): array
     {
         $user = auth('api')->user();
-        if($user->is_banned)
+        if ($user->is_banned)
             return ['message' => __('msg.you_are_baned'), 'code' => 403];
 
         $reply = Reply::query()
@@ -98,7 +98,7 @@ class ReplyService
                 'likes' => $reply->likes - 1
             ]);
 
-            return ['message' => __('msg.reply_unliked'), 'code' => 200];
+            return ['data' => new ReplyResource($reply), 'message' => __('msg.reply_unliked'), 'code' => 200];
         } else {
             $reply->userLikes()->attach(auth('api')->id());
             $reply->update([

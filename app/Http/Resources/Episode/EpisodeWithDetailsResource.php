@@ -26,12 +26,11 @@ class EpisodeWithDetailsResource extends JsonResource
             'duration' => $this->formatted_duration,
             'views' => $this->views ? $this->views : 0,
             'likes' => $this->likes ? $this->likes : 0,
-            'is_watched' => (bool)$this->students()->whereUserId(auth()->id())->exists(),
-            'is_liked' => (bool)$this->userLikes()->whereUserId(auth()->id())->exists(),
+            'is_watched' => (bool)$this->students()->whereUserId(auth('api')->id())->exists(),
+            'is_liked' => (bool)$this->userLikes()->whereUserId(auth('api')->id())->exists(),
             'has_quiz' => !is_null($this->quiz),
-            'is_quiz_completed' => auth('api')->check() ?
-                auth('api')->user()->episodes->contains($this->id) &&
-                (bool)auth('api')->user()->episodes()->find($this->id)->pivot->pass_quiz : null,
+            'is_quiz_completed' => auth('api')->user()->episodes->contains($this->id) &&
+                auth('api')->user()->episodes()->find($this->id)->pivot->pass_quiz,
             'has_file' => !is_null($file),
         ];
     }
