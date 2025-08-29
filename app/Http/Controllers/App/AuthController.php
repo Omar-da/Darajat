@@ -80,35 +80,51 @@ class AuthController extends Controller
         $firebaseUserId = $verifiedToken->claims()->get('sub');
         $email = $verifiedToken->claims()->get('email');
         $name = $verifiedToken->claims()->get('name') ?? 'No Name';
-        $picture = $verifiedToken->claims()->get('picture') ?? null;
 
         // Split the name into parts
         $nameParts = explode(' ', $name);
-
-        // Extract first name (first part)
         $firstName = array_shift($nameParts) ?? '';
-
-        // The rest is last name
         $lastName = implode(' ', $nameParts) ?? '';
 
-        // Check if user exists in Laravel DB
-        $user = User::firstOrCreate(
-            ['firebase_uid' => $firebaseUserId],
-            [
+        // Check if user exists by firebase_uid OR email
+        $user = User::where('firebase_uid', $firebaseUserId)
+                    ->orWhere('email', $email)
+                    ->first();
+
+        if (!$user) {
+            // Create new user
+            $user = User::create([
+                'firebase_uid' => $firebaseUserId,
                 'first_name' => $firstName,
                 'last_name' => $lastName,
                 'email' => $email,
-                'avatar' => $picture,
-            ]
-        );
+            ]);
+            
+            // Create moreDetail only for new users
+            $user->moreDetail()->create();
+        } else {
+            // Update existing user with firebase_uid if missing
+            if (!$user->firebase_uid) {
+                $user->update(['firebase_uid' => $firebaseUserId]);
+            }
+            
+            // Update user info if needed
+            $user->update([
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+            ]);
+        }
 
-        $user->moreDetail()->create();
-
+        // Revoke existing tokens and create new one
+        $user->tokens()->delete();
         $token = $user->createToken('authToken')->accessToken;
-        $user['token'] = $token;
+
+        $userData = $user->toArray();
+        $userData['token'] = $token;
+        
         $message = __('msg.login_success');
         $code = 200;
 
-        return Response::success($user, $message, $code);
+        return Response::success($userData, $message, $code);
     }
 }
