@@ -54,7 +54,7 @@ class StripeWebhookController extends Controller
 
     private function handlePaymentSuccess($paymentIntent)
     {
-        $order = Order::where('payment_intent_id', $paymentIntent->id)->first();
+        $order = Order::with(['course', 'student.followed_courses', 'teacher.moreDetail'])->where('payment_intent_id', $paymentIntent->id)->first();
 
         if (!$order) {
             Log::error('Webhook: Order not found for PaymentIntent: ' . $paymentIntent->id);
@@ -74,6 +74,7 @@ class StripeWebhookController extends Controller
         $order->update([
             'status' => OrderStatusEnum::PAID,
         ]);
+
         $course = $order->course;
         $student = $order->student;
         $teacher = $order->teacher;
@@ -85,28 +86,27 @@ class StripeWebhookController extends Controller
         $platform->total_profit += $price;
         $platform->save();
 
-        $teacher->balance += $price - $commission;
-        $teacher->save();
+        $teacher->moreDetail->balance += $price - $commission;
+        $teacher->moreDetail->save();
 
         $student->followed_courses()->attach($course);
         $course->increment('num_of_students_enrolled');
 
-        Mail::to($student->email)->send(new PaymentNotification(true, $course->title));
+        Mail::to('omaraldalati3@gmail.com')->send(new PaymentNotification($student, $order));
     }
 
     private function handlePaymentFailure($paymentIntent)
     {
         Log::error('Payment failed: ' . $paymentIntent->id);
 
-        $order = Order::where('payment_intent_id', $paymentIntent->id)->first();
+        $order = Order::with('student')->where('payment_intent_id', $paymentIntent->id)->first();
 
         if ($order)
             $order->update(['status' => OrderStatusEnum::FAILED]);
 
         $student = $order->student;
-        $course = $order->course;
 
-        if (isset($student))
-            Mail::to($student->email)->send(new PaymentNotification(false, $course->title));
+        if (isset($student)) 
+            Mail::to('omaraldalati3@gmail.com')->send(new PaymentNotification($student, $order));
     }
 }
