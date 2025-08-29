@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Enums\OrderStatusEnum;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -16,7 +17,7 @@ class PaymentNotification extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public $status, public $course_title)
+    public function __construct(public $user, public $order)
     {
         
     }
@@ -26,14 +27,7 @@ class PaymentNotification extends Mailable
      */
     public function envelope(): Envelope
     {
-        if($this->status)
-        return new Envelope(
-            subject: "Your payment was successful. The course $this->course_title has been added to your student dashboard. Start learning now!",
-        );
-        else
-            return new Envelope(
-                subject: "Payment for $this->course_title failed. Please check your payment details and try again.",
-            );
+        return new Envelope();
     }
 
     /**
@@ -41,9 +35,14 @@ class PaymentNotification extends Mailable
      */
     public function content(): Content
     {
-        return new Content(
-            view: 'emails.welcome',
-        );
+        if($this->order->status === OrderStatusEnum::PAID)
+            return new Content(
+                view: 'emails.successful-payment',
+            );
+        else
+            return new Content(
+                view: 'emails.failed-payment',
+            );
     }
 
     /**
