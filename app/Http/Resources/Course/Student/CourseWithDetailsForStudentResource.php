@@ -23,7 +23,7 @@ class CourseWithDetailsForStudentResource extends JsonResource
             'title' => $this->title,
             'category' => [
                 'id' => $this->topic->category->id,
-                'title' => $this->topic->category->title,
+                'name' => $this->topic->category->title,
                 'image_url' => asset("img/categories/{$this->topic->category->image_url}")
             ],
             'topic' => [
@@ -41,7 +41,8 @@ class CourseWithDetailsForStudentResource extends JsonResource
                 'full_name' => $this->teacher->full_name,
                 'profile_image_url' => $this->teacher->profile_image_url ? Storage::url($this->teacher->profile_image_url) : null
             ],
-            'is_my_course' => (bool)auth('api')->id() == $this->teacher->id,
+            'is_my_course' => auth('api')->id() == $this->teacher->id,
+            'is_subscribed' => (bool)auth('api')->user()->followed_courses->contains($this->id),
             'difficulty_level' => $this->difficulty_level->label(),
             'num_of_hours' => $this->total_time ? floor($this->total_time / 3600) : 0,
             'price' => $this->price . '$',
