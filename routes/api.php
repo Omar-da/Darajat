@@ -123,6 +123,7 @@ Route::middleware('localization')->group(function () {
         });
     });
 
+    // Route::get('test', [StripeWebhookController::class, 'hello']);
     // coupons
     Route::controller(CouponController::class)->middleware('regular_or_socialite')->prefix('coupons')->group(function () {
         Route::middleware('is_owner')->group(function () {

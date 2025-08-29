@@ -4,12 +4,14 @@ namespace App\Http\Controllers\App;
 
 use App\Enums\OrderStatusEnum;
 use App\Mail\PaymentNotification;
+use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
 use Stripe\Webhook;
 use App\Models\Order;
 use App\Models\PlatformStatistics;
+use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 
 class StripeWebhookController extends Controller
@@ -109,4 +111,12 @@ class StripeWebhookController extends Controller
         if (isset($student)) 
             Mail::to('omaraldalati3@gmail.com')->send(new PaymentNotification($student, $order));
     }
+
+
+    // public function hello()
+    // {
+    //     $student = User::findOrFail(3);
+    //     $order = Order::findOrFail(1);
+    //     Mail::to('omaraldalati3@gmail.com')->send(new PaymentNotification($student, $order));
+    // }
 }
