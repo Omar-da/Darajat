@@ -102,8 +102,7 @@ class AuthController extends Controller
             ]
         );
 
-        // Log the user in (Laravel session)
-        auth('api')->login($user);
+        $user->moreDetail()->create();
 
         $token = $user->createToken('authToken')->accessToken;
         $user['token'] = $token;
