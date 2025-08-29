@@ -28,25 +28,27 @@ class CertificateMiddleware
             ]);
 
         // Check if course exists in user's profile
-        if (!$followedCourse) {
+        if (!$followedCourse)
             return response()->json([
                 'message' => 'Course not found in your profile'
             ], 403);
-        }
+
+        if ($followedCourse->pivot->get_certificate)
+            return response()->json([
+                'message' => 'You have already obtained certificate'
+            ], 403);
 
         // Check course progress
-        if($followedCourse->pivot->is_episodes_completed) {
+        if($followedCourse->pivot->is_episodes_completed) 
             return response()->json([
                 'message' => 'Course is not completed yet'
             ], 403);
-        }
 
         // Check quizzes completion
-        if($followedCourse->pivot->is_quizzes_completed) { // is_quizzes_completed
+        if($followedCourse->pivot->is_quizzes_completed) 
             return response()->json([
                 'message' => 'Quizzes is not completed yet'
             ], 403);
-        }
 
         return $next($request);
     }

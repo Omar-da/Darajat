@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers\App;
 
-use App\Enums\RoleEnum;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use App\Responses\Response;
 use App\Services\Firebase\FirebaseOAuth;

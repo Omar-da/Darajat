@@ -33,22 +33,17 @@ class Order extends Model
         'status' => OrderStatusEnum::class
     ];
 
-    /**
-     * Get the user that owns the order.
-     */
+
     public function student(): BelongsTo
     {
-        return $this->belongsTo(MoreDetail::class, 'student_id');
+        return $this->belongsTo(User::class, 'student_id');
     }
 
     public function teacher(): BelongsTo
     {
-        return $this->belongsTo(MoreDetail::class, 'teacher_id');
+        return $this->belongsTo(User::class, 'teacher_id');
     }
 
-    /**
-     * Get the product that was ordered.
-     */
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);

@@ -356,14 +356,7 @@ class CourseController extends Controller
         $course = Course::findOrFail($course_id);
         $user = auth('api')->user();
         $apiKey = env('CERTIFIER_API_KEY');
-        $followed_course = $user->followed_courses()->where('course_id', $course->id)->firstOrFail();
-
-        if ($followed_course->pivot->get_certificate)
-            return response()->json([
-                'message' => 'You have already obtained certificate'
-            ]);
-
-
+        
         $client = new Client();
 
         $response = $client->request('POST', 'https://api.certifier.io/v1/credentials/create-issue-send',

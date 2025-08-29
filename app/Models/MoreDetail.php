@@ -87,13 +87,4 @@ class MoreDetail extends Model
         return $this->belongsTo(Speciality::class);
     }
 
-    public function ordersAsStudent(): HasMany
-    {
-        return $this->hasMany(Order::class, 'student_id');
-    }
-
-    public function ordersAsTeacher(): HasMany
-    {
-        return $this->hasMany(Order::class, 'teacher_id');
-    }
 }

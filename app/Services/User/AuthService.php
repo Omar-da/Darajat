@@ -48,7 +48,7 @@ class AuthService
                     'more_detail_id' => $moreDetail->id,
                     'level' => LevelEnum::MOTHER_TONGUE
                 ]);
-            PlatformStatistics::incrementStat('num_of_users');
+            PlatformStatistics::incrementStat('num_of_students');
             $message = __('msg.registration_success');
             $code = 202;
         }
