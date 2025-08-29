@@ -144,4 +144,14 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Coupon::class, 'coupon_user', 'student_id', 'coupon_id');
     }
+
+    public function ordersAsStudent(): HasMany
+    {
+        return $this->hasMany(Order::class, 'student_id');
+    }
+
+    public function ordersAsTeacher(): HasMany
+    {
+        return $this->hasMany(Order::class, 'teacher_id');
+    }
 }
