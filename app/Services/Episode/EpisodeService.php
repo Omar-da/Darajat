@@ -46,6 +46,8 @@ class EpisodeService
             $episodes['episodes'] = EpisodeStudentResource::collection($course->episodes);
             $episodes['progress_percentage'] = $course->pivot->perc_progress . '%';
             $episodes['num_of_completed_quizzes'] = $course->pivot->num_of_completed_quizzes;
+            $episodes['is_episodes_completed'] = (bool)$course->pivot->is_episodes_completed;
+            $episodes['is_quizzes_completed'] = (bool)$course->pivot->is_quizzes_completed;
             $episodes['get_certificate'] = (bool)$course->pivot->get_certificate;
             return ['data' => $episodes, 'message' => __('msg.episodes_retrieved'), 'code' => 200];
         }
