@@ -37,7 +37,7 @@ return new class extends Migration
             $table->enum('status', CourseStatusEnum::values())->default(CourseStatusEnum::DRAFT);
             $table->boolean('has_certificate')->default(false);
             $table->unsignedSmallInteger('total_quizzes')->default(0);
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('created_at')->default(now());
             $table->unsignedBigInteger('original_course_id');
             $table->foreign('original_course_id')->references('id')->on('courses');
             $table->boolean('was_edited')->default(false);

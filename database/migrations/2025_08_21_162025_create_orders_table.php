@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('payment_intent_id')->nullable()->unique(); 
             $table->foreignIdFor(Course::class)->nullable()->constrained(); 
             $table->string('course_name'); 
-            $table->timestamp('purchase_date')->useCurrent();
+            $table->timestamp('purchase_date')->default(now());
             $table->index('status');
             $table->index('order_number');
             $table->index('payment_intent_id');

@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('otp_code')->nullable();
             $table->dateTime('expire_at')->nullable();
             $table->enum('role', RoleEnum::values())->default(RoleEnum::STUDENT);
-            $table->timestamp('join_date')->useCurrent();
+            $table->timestamp('join_date')->default(now());
             $table->timestamp('email_verified_at')->nullable();
             $table->integer('otp_attempts_count')->default(0);
             $table->timestamp('otp_locked_until')->nullable();

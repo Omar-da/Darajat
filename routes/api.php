@@ -123,7 +123,6 @@ Route::middleware('localization')->group(function () {
         });
     });
 
-    // Route::get('test', [StripeWebhookController::class, 'hello']);
     // coupons
     Route::controller(CouponController::class)->middleware('regular_or_socialite')->prefix('coupons')->group(function () {
         Route::middleware('is_owner')->group(function () {
@@ -157,6 +156,15 @@ Route::middleware('localization')->group(function () {
             Route::delete('delete-file/{episode_id}', 'destroyFile');
         });
         Route::get('student/{course_id}', 'getToStudent')->middleware('is_subscribed');
+    });
+
+    Route::get('/test-timezone', function () {
+    return [
+        'app_timezone' => config('app.timezone'),
+        'php_timezone' => date_default_timezone_get(),
+        'current_time' => now()->format('Y-m-d H:i:s'),
+        'db_timezone' => config('database.connections.sqlite.timezone', 'not set')
+        ];
     });
 
     // comments
