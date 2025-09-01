@@ -39,7 +39,7 @@ class CouponUpdateRequest extends FormRequest
                 'required',
                 'numeric',
                 'between:0.00,99999999.99',
-                new DiscountValueCoupon(Coupon::query()->find($this->route('coupon_id'))->course->price, $this->input('discount_type'))
+                new DiscountValueCoupon(Coupon::find($this->route('coupon_id'))->course->price, $this->input('discount_type'))
             ],
             'expires_at' => 'nullable|date|after:now',
             'max_uses' => 'nullable|integer|min:1',

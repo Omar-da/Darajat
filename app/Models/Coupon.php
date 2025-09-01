@@ -54,8 +54,8 @@ class Coupon extends Model
     {
         if(isset($id))
         {
-            return !Coupon::query()->where('code', strtoupper($value))->whereNot('id', $id)->exists();
+            return !Coupon::where('code', strtoupper($value))->whereNot('id', $id)->exists();
         }
-        return !Coupon::query()->where('code', strtoupper($value))->exists();
+        return !Coupon::where('code', strtoupper($value))->exists();
     }
 }

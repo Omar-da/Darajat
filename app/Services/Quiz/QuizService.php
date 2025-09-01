@@ -43,7 +43,7 @@ class QuizService
             ]);
         }
 
-//        $quiz->questions()->createMany($request['questions']);
+        //        $quiz->questions()->createMany($request['questions']);
 
         $quiz->episode->course->increment('total_quizzes');
 
@@ -53,7 +53,7 @@ class QuizService
     public function processAnswer($request): array
     {
         $user = auth('api')->user();
-        $quiz = Quiz::query()->find($request['quiz_id']);
+        $quiz = Quiz::find($request['quiz_id']);
 
         $question = $quiz->questions()->where('question_number', $request['question_number'])->first();
         if (is_null($question)) {
@@ -79,7 +79,7 @@ class QuizService
     public function calculateQuizResult($quiz_id, $request): array
     {
         $user = auth('api')->user();
-        $quiz = Quiz::query()->find($quiz_id);
+        $quiz = Quiz::find($quiz_id);
         if (is_null($quiz)) {
             return ['message' => __('msg.quiz_not_found'), 'code' => 404];
         }
@@ -102,7 +102,7 @@ class QuizService
         $quiz_user = $user->quizzes()->find($quiz_id);
         $mark = 0;
         foreach ($request as $question) {
-            if ($question['answer'] == Question::query()->findOrFail($question['question_id'])->right_answer) {
+            if ($question['answer'] == Question::findOrFail($question['question_id'])->right_answer) {
                 $mark++;
             }
         }
@@ -112,7 +112,8 @@ class QuizService
                 'mark' => $mark,
                 'percentage_mark' => $percentage_mark,
                 'success' => $percentage_mark >= 60 ? 1 : 0,
-            ]);
+            ]
+        );
 
         $result = new ResultResource($quiz_user);
 
@@ -166,7 +167,7 @@ class QuizService
             ]);
         }
 
-//        $quiz->questions()->createMany($request['questions']);
+        //        $quiz->questions()->createMany($request['questions']);
 
         return ['data' => new TeacherQuizResource($quiz), 'message' => __('msg.quiz_updated'), 'code' => 201];
     }

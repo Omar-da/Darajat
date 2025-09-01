@@ -15,7 +15,7 @@ class CouponService
 {
     public function index($course_id): array
     {
-        $course = Course::query()->find($course_id);
+        $course = Course::find($course_id);
 
         $coupons = $course->coupons;
 
@@ -24,11 +24,11 @@ class CouponService
 
     public function store($request, $course_id): array
     {
-        $course = Course::query()->find($course_id);
+        $course = Course::find($course_id);
 
         Gate::authorize('statusApproved', $course);
 
-        $coupon = Coupon::query()->create([
+        $coupon = Coupon::create([
             'course_id' => $course_id,
             'code' => strtoupper($request['code']),
             'discount_type' => $request['discount_type'],
@@ -42,7 +42,7 @@ class CouponService
 
     public function update($request, $id): array
     {
-        $coupon = Coupon::query()->find($id);
+        $coupon = Coupon::find($id);
 
         $coupon->update([
             'code' => strtoupper($request['code']),
@@ -57,14 +57,14 @@ class CouponService
 
     public function show($id): array
     {
-        $coupon = Coupon::query()->find($id);
+        $coupon = Coupon::find($id);
 
         return ['data' => new CouponWithDetailsResource($coupon), 'message' => __('msg.coupon_retrieved'), 'code' => 200];
     }
 
     public function destroy($id): array
     {
-        $coupon = Coupon::query()->find($id);
+        $coupon = Coupon::find($id);
 
         $coupon->delete();
 
@@ -77,7 +77,7 @@ class CouponService
         $user = auth('api')->user();
 
         // Make query for get a specific course.
-        $course = Course::query()->find($id);
+        $course = Course::find($id);
 
         // Check the course is existing.
         if (is_null($course)) {
@@ -114,7 +114,8 @@ class CouponService
             $course->price - $course->price * $coupon->discount_value / 100;
 
         // Return array with keys (data, message, code).
-        return ['data' =>
+        return [
+            'data' =>
             [
                 'original_price' => $course->price,
                 'price_after_discount' => $price_after_discount,
@@ -122,6 +123,5 @@ class CouponService
             'message' => __('msg.coupon_applied'),
             'code' => 200
         ];
-
     }
 }

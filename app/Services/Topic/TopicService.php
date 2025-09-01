@@ -10,11 +10,10 @@ class TopicService
     // Get all topics for specific category.
     public function index($category_id): array
     {
-        if (!Category::query()->find($category_id)) {
+        if (!Category::find($category_id)) {
             return ['message' => __('msg.category_not_found'), 'code' => 404];
         }
-        $topics = Topic::query()
-            ->select('id', 'title')
+        $topics = Topic::select('id', 'title')
             ->where('category_id', $category_id)
             ->orderBy('title')
             ->get();
@@ -23,16 +22,15 @@ class TopicService
 
     public function search($title): array
     {
-        $topics = Topic::query()
-            ->select('id', 'title')
-            ->where('title', 'LIKE' ,"%$title%")
+        $topics = Topic::select('id', 'title')
+            ->where('title', 'LIKE', "%$title%")
             ->orderBy('title')
             ->get();
-        if($topics->isEmpty()) {
+        if ($topics->isEmpty()) {
             return [
                 'data' => [],
                 'message' =>  __('msg.no_topics') . $title,
-                'suggestions' => Topic::popular(Topic::query())->pluck('title'),
+                'suggestions' => Topic::popular()->pluck('title'),
                 'code' => 200
             ];
         }

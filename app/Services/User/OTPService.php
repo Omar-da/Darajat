@@ -22,7 +22,7 @@ class OTPService
 
     public function resendOTP($request): array
     {
-        $user = User::query()->where('email', $request['email'])->first();
+        $user = User::where('email', $request['email'])->first();
         if ($user->otp_locked_until && now()->lessThan($user->otp_locked_until)) {
             return ['message' => __('msg.account_locked') . $user->otp_locked_until->diffForHumans() . '.', 'code' => 429];
         }
@@ -32,7 +32,7 @@ class OTPService
 
     public function verifyOTP($request): array
     {
-        $user = User::query()->where('email', $request['email'])->first();
+        $user = User::where('email', $request['email'])->first();
         if ($user->otp_locked_until && now()->lessThan($user->otp_locked_until)) {
             return ['message' => __('msg.many_failed_otp_attempts') . $user->otp_locked_until->diffForHumans() . '.', 'code' => 429];
         } else if (!$user || $user->otp_code !== $request['otp_code'] || now()->greaterThan($user->expire_at)) {
