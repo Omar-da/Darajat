@@ -16,7 +16,7 @@ class UserService
 {
     public function updateProfile($request): array
     {
-        $user = User::query()->find(auth('api')->id());
+        $user = User::find(auth('api')->id());
         $moreDetail = $user->moreDetail;
 
         $user->update([
@@ -25,7 +25,7 @@ class UserService
         ]);
 
         if (request()->has('speciality') && !is_numeric($request['speciality'])) {
-            $speciality = Speciality::query()->create([
+            $speciality = Speciality::create([
                 'name' => $request['speciality'],
             ]);
             $request['speciality'] = $speciality->id;
@@ -87,7 +87,7 @@ class UserService
 
     public function updateProfileImage($request): array
     {
-        $user = User::query()->find(auth('api')->id());
+        $user = User::find(auth('api')->id());
         if (!is_null($user->profile_image_url)) {
             Storage::delete("profiles/$user->profile_image_url");
         }
@@ -106,7 +106,7 @@ class UserService
 
     public function changePassword($request): array
     {
-        $user = User::query()->find(auth('api')->id());
+        $user = User::find(auth('api')->id());
         if (!Hash::check($request['old_password'], $user['password'])) {
             $message = __('msg.old_password');
             $code = 401;
@@ -122,7 +122,7 @@ class UserService
 
     public function showProfile($id): array
     {
-        $user = User::query()->find($id);
+        $user = User::find($id);
         if (!$user) {
             $message = __('msg.user_not_found');
             $code = 404;
@@ -157,9 +157,8 @@ class UserService
 
     public function delete(): array
     {
-        $user = User::query()->find(auth('api')->id());
+        $user = User::find(auth('api')->id());
         $user->delete();
         return ['user' => [], 'message' => __('msg.user_deleted')];
     }
-
 }

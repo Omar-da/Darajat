@@ -22,8 +22,7 @@ class EpisodeService
 
     public function getToTeacher($course_id): array
     {
-        $course = Course::query()
-            ->with(['episodes.quiz.questions'])// Eager load relationships
+        $course = Course::with(['episodes.quiz.questions']) // Eager load relationships
             ->find($course_id);
 
         $episodes = $course->episodes;
@@ -34,7 +33,7 @@ class EpisodeService
     {
         $user = auth('api')->user();
         $course = Course::find($course_id);
-        if($user->id == $course->teacher_id) {
+        if ($user->id == $course->teacher_id) {
             $episodes['episodes'] = EpisodeStudentResource::collection($course->episodes);
             return ['data' => $episodes, 'message' => __('msg.episodes_retrieved'), 'code' => 200];
         } else {
@@ -62,7 +61,7 @@ class EpisodeService
         // Create episode
         $request['course_id'] = $course->id;
         $request['episode_number'] = $course->num_of_episodes + 1;
-        $episode = Episode::query()->create($request);
+        $episode = Episode::create($request);
 
         // Video, thumbnail and file
         $episode_path = "courses/$course->id/episodes/$episode->id";
@@ -87,7 +86,7 @@ class EpisodeService
 
     public function update($request, $id): array
     {
-        $episode = Episode::query()->find($id);
+        $episode = Episode::find($id);
         $course = $episode->course;
 
         if ($episode->course->status !== CourseStatusEnum::DRAFT)
@@ -110,7 +109,6 @@ class EpisodeService
             $course->update([
                 'total_time' => $course['total_time'] + $request['duration']
             ]);
-
         }
 
         if (request()->hasFile('file_url')) {
@@ -125,16 +123,16 @@ class EpisodeService
     public function showToTeacher($request, $id): array
     {
         if ($request->query('copy') == 'true')
-            $episode = DraftEpisode::query()->findOrFail($id);
+            $episode = DraftEpisode::findOrFail($id);
         else
-            $episode = Episode::query()->findOrFail($id);
+            $episode = Episode::findOrFail($id);
 
         return ['data' => new EpisodeTeacherResource($episode), 'message' => __('msg.episode_retrieved'), 'code' => 200];
     }
 
     public function showToStudent($id): array
     {
-        $episode = Episode::query()->find($id);
+        $episode = Episode::find($id);
 
         return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_retrieved'), 'code' => 200];
     }
@@ -180,7 +178,7 @@ class EpisodeService
     public function finishEpisode($id): array
     {
         $user = auth('api')->user();
-        $episode = Episode::query()->find($id);
+        $episode = Episode::find($id);
 
         if ($episode->course->teacher_id == auth('api')->id())
             return ['message' => __('msg.teacher_watched_his_course'), 'code' => 409];
@@ -218,7 +216,7 @@ class EpisodeService
     public function like($id): array
     {
         $user = auth('api')->user();
-        $episode = Episode::query()->find($id);
+        $episode = Episode::find($id);
 
         if ($episode->course->teacher_id == auth('api')->id())
             return ['message' => __('msg.teacher_liked_his_episode'), 'code' => 409];
@@ -236,12 +234,11 @@ class EpisodeService
             $episode->course->teacher->statistics()->where('title->en', 'Acquired Likes')->first()->pivot->increment('progress');
             return ['data' => new EpisodeWithDetailsResource($episode), 'message' => __('msg.episode_liked'), 'code' => 200];
         }
-
     }
 
     public function downloadFile($episode_id): StreamedResponse|array
     {
-        $episode = Episode::query()->find($episode_id);
+        $episode = Episode::find($episode_id);
 
         $directory = "courses/{$episode->course_id}/episodes/{$episode_id}";
 
@@ -260,21 +257,18 @@ class EpisodeService
 
     public function destroyFile($request, $episode_id): array
     {
-        $episode = Episode::query()->find($episode_id);
+        $episode = Episode::find($episode_id);
 
         $directory = "courses/{$episode->course_id}/episodes/{$episode_id}";
 
-        if ($request->query('copy') == 'true')
-        {
+        if ($request->query('copy') == 'true') {
             $file = collect(Storage::disk('local')->files($directory))
                 ->first(fn($f) => str_contains(basename($f), 'file_copy'));
             if (!$file) {
                 return ['message' => __('msg.file_not_found'), 'code' => 404];
             }
             Storage::disk('local')->delete("$directory/file_copy." . pathinfo($file, PATHINFO_EXTENSION));
-        }
-        else
-        {
+        } else {
             $file = collect(Storage::disk('local')->files($directory))
                 ->first(fn($f) => str_contains(basename($f), 'file'));
             if (!$file) {

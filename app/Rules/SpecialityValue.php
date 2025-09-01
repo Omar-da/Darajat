@@ -17,13 +17,13 @@ class SpecialityValue implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if(is_numeric($value)) {
-            if(is_null(Speciality::query()->find($value))) {
+        if (is_numeric($value)) {
+            if (is_null(Speciality::find($value))) {
                 $fail('Speciality id is not exist');
             }
         }
         $lang = $this->detectLanguage($value);
-        if(Speciality::query()->where("name->{$lang}", $value)->exists()) {
+        if (Speciality::where("name->{$lang}", $value)->exists()) {
             $fail('Speciality already exists');
         }
     }

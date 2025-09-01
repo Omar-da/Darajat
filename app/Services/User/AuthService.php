@@ -24,7 +24,7 @@ class AuthService
 
     public function register($request): array
     {
-        $user = User::query()->create([
+        $user = User::create([
             'first_name' => $request['first_name'],
             'last_name' => $request['last_name'],
             'email' => $request['email'],
@@ -36,18 +36,20 @@ class AuthService
             $code = 422;
         } else {
             $this->otpService->sendOTP($user);
-            $moreDetail = MoreDetail::query()->create([
+            $moreDetail = MoreDetail::create([
                 'user_id' => $user->id,
                 'country_id' => $request['country_id'],
             ]);
-            if(MoreDetail::where('country_id', $moreDetail->country_id)->doesntExist())
+            if (MoreDetail::where('country_id', $moreDetail->country_id)->doesntExist())
                 PlatformStatistics::incrementStat('num_of_countries');
-            $moreDetail->languages()->attach(Language::query()->findOrfail($request['language_id']),
+            $moreDetail->languages()->attach(
+                Language::findOrfail($request['language_id']),
                 [
                     'language_id' => $request['language_id'],
                     'more_detail_id' => $moreDetail->id,
                     'level' => LevelEnum::MOTHER_TONGUE
-                ]);
+                ]
+            );
             PlatformStatistics::incrementStat('num_of_students');
             $message = __('msg.registration_success');
             $code = 202;
@@ -57,7 +59,7 @@ class AuthService
 
     public function login($request): array
     {
-        $user = User::query()->where('email', $request['email'])->first();
+        $user = User::where('email', $request['email'])->first();
 
         if (!is_null($user)) {
             if (!Auth::attempt($request->only(['email', 'password']))) {

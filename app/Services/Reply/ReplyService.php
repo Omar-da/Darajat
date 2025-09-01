@@ -11,7 +11,7 @@ class ReplyService
     // Get all replies for specific comment.
     public function index($comment_id): array
     {
-        $comment = Comment::query()->find($comment_id);
+        $comment = Comment::find($comment_id);
         if (is_null($comment)) {
             return ['message' => __('msg.comment_not_found'), 'code' => 404];
         }
@@ -22,7 +22,7 @@ class ReplyService
     // Add reply for specific comment.
     public function store($request, $comment_id): array
     {
-        if (is_null(Comment::query()->find($comment_id))) {
+        if (is_null(Comment::find($comment_id))) {
             return ['message' => __('msg.comment_not_found'), 'code' => 404];
         }
 
@@ -30,7 +30,7 @@ class ReplyService
         if ($user->is_banned)
             return ['message' => __('msg.you_are_baned'), 'code' => 403];
 
-        $reply = Reply::query()->create([
+        $reply = Reply::create([
             'comment_id' => $comment_id,
             'user_id' => $user->id,
             'content' => $request['content']
@@ -45,13 +45,12 @@ class ReplyService
         if ($user->is_banned)
             return ['message' => __('msg.you_are_baned'), 'code' => 403];
 
-        $reply = Reply::query()
-            ->where([
+        $reply = Reply::where([
                 'id' => $id,
                 'user_id' => $user->id
             ])->first();
         if (is_null($reply)) {
-            if (is_null(Reply::query()->find($id))) {
+            if (is_null(Reply::find($id))) {
                 return ['message' => __('msg.reply_not_found'), 'code' => 404];
             } else {
                 return ['message' => __('msg.unauthorized'), 'code' => 401];
@@ -67,13 +66,9 @@ class ReplyService
     // Delete specific reply.
     public function destroy($id): array
     {
-        $reply = Reply::query()
-            ->where([
-                'id' => $id,
-                'user_id' => auth('api')->id()
-            ])->first();
+        $reply = Reply::where(['id' => $id, 'user_id' => auth('api')->id()])->first();
         if (is_null($reply)) {
-            if (is_null(Reply::query()->find($id))) {
+            if (is_null(Reply::find($id))) {
                 return ['message' => __('msg.reply_not_found'), 'code' => 404];
             } else {
                 return ['message' => __('msg.unauthorized'), 'code' => 401];
@@ -86,7 +81,7 @@ class ReplyService
     // Add Like to specific reply.
     public function like($id): array
     {
-        $reply = Reply::query()->find($id);
+        $reply = Reply::find($id);
 
         if (is_null($reply)) {
             return ['message' => __('msg.reply_not_found'), 'code' => 404];
@@ -108,5 +103,4 @@ class ReplyService
             return ['data' => new ReplyResource($reply), 'message' => __('msg.reply_liked'), 'code' => 200];
         }
     }
-
 }

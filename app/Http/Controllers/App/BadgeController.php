@@ -12,9 +12,9 @@ class BadgeController extends Controller
     public function index(): JsonResponse
     {
         $user = auth('api')->user();
-        $bronzeBadges = Badge::query()->where('level', 1)->get();
-        $silverBadges = Badge::query()->where('level', 2)->get();
-        $goldBadges = Badge::query()->where('level', 3)->get();
+        $bronzeBadges = Badge::where('level', 1)->get();
+        $silverBadges = Badge::where('level', 2)->get();
+        $goldBadges = Badge::where('level', 3)->get();
 
         return Response::success([
             'bronze' => BadgeResource::collection($bronzeBadges),

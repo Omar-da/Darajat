@@ -238,7 +238,7 @@ class EpisodeController extends Controller
 
     public function getFile(Request $request, $episode_id): StreamedResponse|JsonResponse
     {
-        $episode = Episode::query()->findOrFail($episode_id);
+        $episode = Episode::->findOrFail($episode_id);
 
         $directory = "courses/{$episode->course_id}/episodes/{$episode_id}";
         if ($request->query('copy') == 'true')

@@ -13,16 +13,16 @@ class ResetPasswordService
 {
     public function forgotPassword($request): array
     {
-        ResetPassword::query()->where('email', $request['email'])->delete();
+        ResetPassword::where('email', $request['email'])->delete();
         $request['code'] = mt_rand(100000, 999999);
-        $passwordReset = ResetPassword::query()->create($request);
+        $passwordReset = ResetPassword::create($request);
         Mail::to($request['email'])->send(new SendCodeResetPassword($passwordReset['code']));
         return ['data' => $passwordReset, 'message' => __('msg.sent_code'), 'code' => 201];
     }
 
     public function checkCode($request): array
     {
-        $passwordReset = ResetPassword::query()->firstWhere('code', $request['code']);
+        $passwordReset = ResetPassword::firstWhere('code', $request['code']);
         if ($passwordReset['created_at']->addMinutes(15) < now()) {
             $passwordReset->delete();
             $message = __('msg.code_expired');
@@ -36,13 +36,13 @@ class ResetPasswordService
 
     public function resetPassword($request): array
     {
-        $passwordReset = ResetPassword::query()->firstWhere('code', $request['code']);
+        $passwordReset = ResetPassword::firstWhere('code', $request['code']);
         if ($passwordReset['created_at']->addMinutes(15) < now()) {
             $passwordReset->delete();
             $message = __('msg.code_expired');
             $code = 422;
         } else {
-            $user = User::query()->firstWhere('email', $passwordReset['email']);
+            $user = User::firstWhere('email', $passwordReset['email']);
             $user->update([
                 'password' => Hash::make($request['password'])
             ]);

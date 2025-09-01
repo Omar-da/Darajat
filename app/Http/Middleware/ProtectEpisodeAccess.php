@@ -12,7 +12,7 @@ class ProtectEpisodeAccess
     public function handle($request, Closure $next)
     {
         $episodeId = $request->route('episode_id'); // From route parameter
-        $episode = Episode::query()->find($episodeId);
+        $episode = Episode::find($episodeId);
 
         if(is_null($episode)) {
             return Response::error(__('msg.episode_not_found'), 404);
