@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignIdFor(Badge::class)->constrained();
             $table->foreignIdFor(User::class)->constrained();
             $table->unique(['badge_id', 'user_id']);
-            $table->timestamp('grant_date')->useCurrent();
+            $table->timestamp('grant_date')->default(now());
         });
     }
 

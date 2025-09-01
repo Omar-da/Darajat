@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignIdFor(User::class)->constrained();
             $table->text('content');
             $table->unsignedInteger('likes')->default(0);
-            $table->timestamp('reply_date')->useCurrent();
+            $table->timestamp('reply_date')->default(now());
         });
     }
 

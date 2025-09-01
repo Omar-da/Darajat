@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(DraftEpisode::class)->unique()->constrained()->cascadeOnDelete();
             $table->unsignedTinyInteger('num_of_questions');
-            $table->timestamp('quiz_writing_date')->useCurrent();
+            $table->timestamp('quiz_writing_date')->default(now());
         });
     }
 

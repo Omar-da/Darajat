@@ -37,7 +37,7 @@ return new class extends Migration
             $table->enum('status', CourseStatusEnum::values())->default(CourseStatusEnum::DRAFT);
             $table->boolean('has_certificate')->default(false);
             $table->unsignedSmallInteger('total_quizzes')->default(0);
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('created_at')->default(now());
             $table->softDeletes();
         });
     }

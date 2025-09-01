@@ -22,7 +22,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('progress')->default(0);
             $table->decimal('perc_progress', 4, 2)->default(0);
             $table->unsignedSmallInteger('num_of_completed_quizzes')->default(0);
-            $table->timestamp('purchase_date')->useCurrent();
+            $table->timestamp('purchase_date')->default(now());
             $table->tinyInteger('rate')->nullable();
             $table->boolean('is_episodes_completed')->default(false);
             $table->boolean('is_quizzes_completed')->default(false);
