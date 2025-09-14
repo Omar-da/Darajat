@@ -1,80 +1,109 @@
-<p align="center">
-  <a href="https://laravel.com" target="_blank">
-    <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
-  </a>
-  <br>
-  <img src="https://img.shields.io/badge/Laravel-11.x-FF2D20?logo=laravel">
-  <img src="https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter">
-  <img src="https://img.shields.io/badge/SQLite-3.43-blue?logo=sqlite">
-  <img src="https://img.shields.io/badge/Passport-OAuth2-4A154B?logo=laravel">
-</p>
+# Darajat Educational Platform 📚
 
-# 🎓 Learning Management System (Darajat Platform)
+[![Flutter](https://img.shields.io/badge/Flutter-Framework-blue?logo=flutter)](https://flutter.dev/)
+[![Laravel](https://img.shields.io/badge/Laravel-API-red?logo=laravel)](https://laravel.com/)
+[![Livewire](https://img.shields.io/badge/Livewire-Dashboard-orange)](https://laravel-livewire.com/)
 
-**Full-stack e-learning platform** with Laravel 11 backend + Flutter mobile app  
-🔗 **GitHub**: [github.com/AliAsaad715/Learning-Management-System](https://github.com/AliAsaad715/Learning-Management-System)
+**Inspired by the Quranic verse:** { يرفع الله الذين آمنوا منكم والذين أوتوا العلم درجات }
 
----
+Darajat is an innovative educational platform designed to facilitate knowledge sharing and learning through interactive courses, assessments, and community engagement.
 
-## 🌟 Key Features
+## ✨ Features
 
-### 👨‍🎓 **Students**
-- ✅ Google OAuth2 login with Laravel Passport
-- 🏆 Course certificates upon completion
-- 📊 Interactive quizzes with instant results
-- 💬 Social features (comments, likes, replies)
+### 🎓 Learning Experience
+- **Video Courses** in various sciences and specialties 💻
+- **Interactive Environment** (comments, replies, likes, views, ratings, attachment of explanation files) 👨‍💻
+- **Detailed Profile** showcasing expertise, skills, and educational achievements 👤
+- **Course Publishing** and knowledge sharing 👨‍🏫
+- **Course Categorization** and easy search functionality 🔎
+- **Exams and Certificates** delivered via email 📝
 
-### 👨‍🏫 **Teachers**
-- 🛠️ Course management (CRUD operations)
-- 📈 Advanced analytics dashboard
-- 📝 PDF lesson attachments
-- 🎯 Discount/coupon system
+### 🎯 User Engagement
+- **Notification System** 🔔
+- **Motivation Flame** to track continuity and progress 🔥
+- **Tasks and Incentive Badges** 🎖
+- **OTP Verification** or **Google Authentication** for account creation 🚪
 
-### 👨‍💻 **Admins**
-- 🔍 Content moderation tools
-- 📊 Platform-wide statistics
-- ⚙️ Badge/achievement system
+### 💰 Monetization
+- **Electronic Payment System** 💸
+- **Payment Process Notifications** via email 📨
+- **Electronic Wallet** for earnings 👝
 
----
+### 👨‍💼 Admin Dashboard
+- **Course Management** 🔧
+- **Content Filtering** for inappropriate material 🫣
+- **Publication Request Control** 🖋
+- **Platform Statistics** and user information viewing 📈
+- **User Banning** for usage policy violations ⛔️
 
-## 🛠️ Tech Stack
+## 🛠 Technology Stack
 
-| Component      | Technology                   |
-|----------------|------------------------------|
-| **Backend**    | Laravel 11                   |
-| **API**        | RESTful                      |
-| **Dashboard**  | Blade                        |
-| **Mobile App** | Flutter 3.x                  |
-| **Database**   | SQLite (Dev) / MySQL (Prod)  |
-| **Auth**       | Laravel Passport + Socialite |
+**Frontend:** Flutter (Hamza Al-Najjar)  
+**Backend API:** Laravel (Ali Asaad)  
+**Admin Dashboard:** Laravel + Livewire with Blade (Omar Al-Dalati)
 
----
+## 🚀 Getting Started
 
-## 🚀 Installation
+### Prerequisites
+- Flutter SDK
+- PHP >= 7.4
+- Composer
+- MySQL
 
+### Installation
+
+1. Clone the repository:
 ```bash
-# Clone repository
-git clone https://github.com/AliAsaad715/Learning-Management-System.git
-cd Learning-Management-System
+git clone https://github.com/your-username/darajat-platform.git
+cd darajat-platform
+```
 
-# Install dependencies
+2. Install backend dependencies:
+```bash
+cd backend
 composer install
-npm install
+```
 
-# Configure environment
+3. Set up environment configuration:
+```bash
 cp .env.example .env
 php artisan key:generate
+```
 
-# Setup SQLite database
-touch database/database.sqlite
-echo "DB_CONNECTION=sqlite" >> .env
-echo "DB_DATABASE=$(pwd)/database/database.sqlite" >> .env
+4. Configure your database settings in the `.env` file
 
-# Install Passport
-php artisan passport:install
+5. Run migrations:
+```bash
+php artisan migrate
+```
 
-# Run migrations
-php artisan migrate --seed
+6. Install frontend dependencies:
+```bash
+cd ../frontend
+flutter pub get
+```
 
-# Start development server
-php artisan serve
+7. Run the application:
+```bash
+flutter run
+```
+
+## 📱 Platform Structure
+
+```
+darajat-platform/
+├── backend/          # Laravel API
+├── frontend/         # Flutter Application
+└── dashboard/        # Admin Dashboard (Laravel + Livewire)
+```
+
+## 🤝 Contributing
+
+We welcome contributions to Darajat Educational Platform! Please feel free to submit pull requests or open issues for bugs and feature requests.
+
+
+## 📞 Contact
+
+For questions or support, please contact our development team.
+
+---
