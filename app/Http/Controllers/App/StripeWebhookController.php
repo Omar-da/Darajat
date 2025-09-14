@@ -112,11 +112,4 @@ class StripeWebhookController extends Controller
             Mail::to('omaraldalati3@gmail.com')->send(new PaymentNotification($student, $order));
     }
 
-
-    // public function hello()
-    // {
-    //     $student = User::findOrFail(3);
-    //     $order = Order::findOrFail(1);
-    //     Mail::to('omaraldalati3@gmail.com')->send(new PaymentNotification($student, $order));
-    // }
 }
