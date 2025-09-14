@@ -106,6 +106,7 @@ We welcome contributions to Darajat Educational Platform! Please feel free to su
 
 ## 📞 Contact
 
-For questions or support, please contact our development team.
+For questions or support, please contact with us: 
+omaraldalati3@gmail.com
 
 ---
