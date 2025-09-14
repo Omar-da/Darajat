@@ -26,10 +26,6 @@ use App\Http\Controllers\App\TopicController;
 use App\Http\Controllers\App\UniversityController;
 use App\Http\Controllers\App\UpdateCopiedCourseController;
 use App\Http\Controllers\App\UserController;
-use App\Mail\PaymentNotification;
-use App\Models\Order;
-use App\Models\User;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 
