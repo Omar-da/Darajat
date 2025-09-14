@@ -39,6 +39,8 @@ Darajat is an innovative educational platform designed to facilitate knowledge s
 ## 🛠 Technology Stack
 
 **Frontend:** Flutter (Hamza Al-Najjar)  
+https://github.com/hamza-alnaggar/Darajat.git
+
 **Backend API:** Laravel (Ali Asaad + Omar Al-Dalati)  
 **Admin Dashboard:** Laravel + Livewire with Blade (Omar Al-Dalati)
 
