@@ -57,8 +57,8 @@ https://github.com/hamza-alnaggar/Darajat.git
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/darajat-platform.git
-cd darajat-platform
+git clone https://github.com/Omar-da/Darajat
+cd Darajat
 ```
 
 2. Install backend dependencies:
