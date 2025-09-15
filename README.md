@@ -52,6 +52,7 @@ https://github.com/hamza-alnaggar/Darajat.git
 - Composer
 - MySQL
 
+
 ### Installation
 
 1. Clone the repository:
@@ -89,6 +90,63 @@ flutter pub get
 ```bash
 flutter run
 ```
+
+
+### 📋 External Services
+
+Before you can run this project, you must create accounts and set up the following services:
+
+#### 1. Firebase Project
+- **Purpose:** Used for **Push Notifications** (FCM) and **Google Authentication**.
+- **Setup:** 
+  1. Create a project in the [Firebase Console](https://console.firebase.google.com/)
+  2. Enable Authentication (with Google sign-in) and Cloud Messaging
+  3. Download the `google-services.json` (Android) and `GoogleService-Info.plist` (iOS) files
+  4. Place these files in the appropriate directories in your Flutter project
+
+#### 2. Stripe Account
+- **Purpose:** Handles all electronic payments and payouts to instructors.
+- **Setup:**
+  1. Create a developer account at [Stripe](https://stripe.com/)
+  2. Obtain your **Publishable Key** and **Secret Key** from the dashboard
+  3. **Webhook Setup** (Essential for payment confirmation):
+     - **Option 1 - Using ngrok** (Recommended for simplicity):
+       ```bash
+       # Install ngrok from https://ngrok.com/
+       ngrok http 8000
+       ```
+     - **Option 2 - Using Stripe CLI**:
+       ```bash
+       # Install Stripe CLI from https://stripe.com/docs/stripe-cli
+       stripe login
+       stripe listen --forward-to localhost:8000/api/stripe/webhook
+       ```
+  4. In Stripe Dashboard → Developers → Webhooks, add your endpoint URL:
+     - For ngrok: `https://your-ngrok-url.ngrok.io/api/stripe/webhook`
+     - For CLI: Use the URL provided by the CLI
+  5. Subscribe to these events: `payment_intent.succeeded`, `payment_intent.payment_failed`
+  6. Add the webhook **Signing Secret** to your `.env` file
+ 
+#### 3. Certifier Service Setup
+- **Purpose:** Used to automatically generate and issue professional course completion certificates for users.
+- **Setup:**
+  1. **Create an Account:**
+     - Sign up for a Certifier account at [certifier.io](https://certifier.io/) (or your chosen certificate service)
+  
+  2. **Obtain API Credentials:**
+     - After registration, navigate to your account settings or API section
+     - Generate an **Access Key** or **API Key** for authentication
+     - Copy this key for use in your environment configuration
+
+  3. **Create Certificate Templates:**
+     - In your Certifier account, create certificate templates for different courses
+     - Design templates with your preferred layout, logos, and signature fields
+     - Configure dynamic fields (student name, course name, date, etc.)
+     - Note the **Group ID** for each certificate template
+    
+  4. **Configure Dynamic Fields:**
+     - Map your course and user data and **Group ID** with to Certifier's dynamic fields in the `getCertificate` function
+
 
 ## 📱 Platform Structure
 
