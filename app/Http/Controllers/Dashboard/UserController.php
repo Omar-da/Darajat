@@ -59,7 +59,7 @@ class UserController extends Controller
             ->where('courses.id', $course_id)
             ->first();
 
-        $quizzes = Quiz::select('quizzes.*', 'quiz_user.mark', 'quiz_user.quiz_submission_date', 'quiz_user.success')
+        $quizzes = Quiz::select('quizzes.*', 'quiz_user.percentage_mark', 'quiz_user.quiz_submission_date', 'quiz_user.success')
             ->join('episodes', 'quizzes.episode_id', '=', 'episodes.id')
             ->join('quiz_user', 'quizzes.id', '=', 'quiz_user.quiz_id')
             ->where('episodes.course_id', $course_id)

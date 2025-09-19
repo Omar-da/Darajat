@@ -130,7 +130,7 @@
                             </div>
                             <div class="quiz-status">
                                 @if($quiz->success)
-                                    <span class="quiz-score"><i class="fas fa-check-circle"></i> Passed ({{ $quiz->mark }}%)</span>
+                                    <span class="quiz-score"><i class="fas fa-check-circle"></i> Passed ({{ $quiz->percentage_mark }}%)</span>
                                 @else
                                     <span class="quiz-score"><i class="fas fa-exclamation-circle"></i> Failed</span>
                                 @endif
