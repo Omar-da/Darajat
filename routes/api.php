@@ -6,7 +6,6 @@ use App\Http\Controllers\App\BadgeController;
 use App\Http\Controllers\App\CategoryController;
 use App\Http\Controllers\App\CommentController;
 use App\Http\Controllers\App\CountryController;
-use App\Http\Controllers\App\CouponController;
 use App\Http\Controllers\App\CourseController;
 use App\Http\Controllers\App\EnumController;
 use App\Http\Controllers\App\EpisodeController;
@@ -123,19 +122,6 @@ Route::middleware('localization')->group(function () {
         });
     });
 
-    // coupons
-    Route::controller(CouponController::class)->middleware('regular_or_socialite')->prefix('coupons')->group(function () {
-        Route::middleware('is_owner')->group(function () {
-            Route::get('{course_id}', 'index');
-            Route::post('create/{course_id}', 'store');
-            Route::put('update/{coupon_id}', 'update');
-            Route::get('show/{coupon_id}', 'show');
-            Route::delete('delete/{coupon_id}', 'destroy');
-        });
-        Route::post('apply/{course_id}', 'applyCoupon');
-    });
-
-
     // episodes
     Route::controller(EpisodeController::class)->middleware('regular_or_socialite')->prefix('episodes')->group(function () {
         Route::middleware('episode_protection')->group(function () {
@@ -228,13 +214,6 @@ Route::middleware('localization')->group(function () {
     Route::post('/stripe-webhook', [StripeWebhookController::class, 'handleWebhook']);
 
     Route::middleware('regular_or_socialite')->group(function () {
-
-        // badges
-        Route::get('specialities', [SpecialityController::class, 'index']);
-
-        // universities
-        Route::get('universities', [UniversityController::class, 'index']);
-
         // badges
         Route::get('badges/get', [BadgeController::class, 'index']);
 
@@ -247,6 +226,10 @@ Route::middleware('localization')->group(function () {
     });
 
     // constant values
+    Route::get('specialities', [SpecialityController::class, 'index']);
+
+    Route::get('universities', [UniversityController::class, 'index']);
+
     Route::get('countries', [CountryController::class, 'index']);
 
     Route::get('languages', [LanguageController::class, 'index']);

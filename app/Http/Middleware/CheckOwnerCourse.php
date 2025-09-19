@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Coupon;
 use App\Models\Course;
 use App\Models\Episode;
 use App\Models\Quiz;
@@ -23,7 +22,7 @@ class CheckOwnerCourse
             $courseId = $request->route('course_id');
             $episodeId = $request->route('episode_id');
             $quizId = $request->route('quiz_id');
-            
+
             // Determine which course to check based on available parameters
             if ($courseId) {
                 $course = Course::findOrFail($courseId);
@@ -34,12 +33,12 @@ class CheckOwnerCourse
             } else {
                 return Response::error(__('msg.unauthorized'), 403);
             }
-            
+
             // Check ownership
             if ($course->teacher_id != auth('api')->id()) {
                 return Response::error(__('msg.unauthorized'), 403);
             }
-            
+
             return $next($request);
     }
 }
