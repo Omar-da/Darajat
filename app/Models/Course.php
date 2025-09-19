@@ -122,11 +122,6 @@ class Course extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function coupons(): HasMany
-    {
-        return $this->hasMany(Coupon::class);
-    }
-
     public function draft_course(): HasOne
     {
         return $this->hasOne(DraftCourse::class);
