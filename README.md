@@ -52,7 +52,7 @@ You can view all screenshots of the project here:
 ## 🧪 API Testing with Postman
 Postman Collection
 We provide a comprehensive Postman collection for testing API endpoints:                                                     
-👉 https://documenter.getpostman.com/view/39537559/2sB2xCi9dr#1008275a-b31a-4725-99a1-6424744718f1
+👉 [Postman Collection](https://documenter.getpostman.com/view/39537559/2sB2xCi9dr#1008275a-b31a-4725-99a1-6424744718f1)
 
 ## 🚀 Getting Started
 
