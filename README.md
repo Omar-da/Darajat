@@ -57,7 +57,6 @@ You can view all screenshots of the project here:
 - Composer
 - MySQL
 
-
 ### Installation
 
 1. Clone the repository:
