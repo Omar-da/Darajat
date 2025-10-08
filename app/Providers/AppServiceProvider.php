@@ -2,12 +2,8 @@
 
 namespace App\Providers;
 
-use App\Models\Course;
-use App\Models\Quiz;
 use App\Models\User;
 use App\Observers\UserObserver;
-use App\Policies\CoursePolicy;
-use App\Policies\QuizPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\RateLimiter;
