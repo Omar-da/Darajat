@@ -36,6 +36,18 @@ Darajat is an innovative educational platform designed to facilitate knowledge s
 - **Platform Statistics** and user information viewing 📈
 - **User Banning** for usage policy violations ⛔️
 
+## 🔄 Background Jobs & Queue System
+
+Our platform uses Redis-powered background jobs to handle essential tasks efficiently:
+
+- **Daily activity tracking** to monitor user activity
+- **Inactivity notifications** for users inactive 3 days  
+- **Abandoned payment cleanup** to cancel expired orders
+- **Enthusiasm flame updates** based on user participation
+- **Bulk notification delivery** for efficient messaging
+
+These Redis-queued automated processes ensure high-performance platform operation and maintain user engagement without manual intervention.
+
 ## 🛠 Technology Stack
 
 **Frontend:** Flutter (Hamza Al-Najjar)  
