@@ -36,7 +36,7 @@ Darajat is an innovative educational platform designed to facilitate knowledge s
 - **Platform Statistics** and user information viewing 📈
 - **User Banning** for usage policy violations ⛔️
 
-## 🔄 Background Jobs & Queue System
+### 🔄 Background Jobs & Queue System
 
 Our platform uses Redis-powered background jobs to handle essential tasks efficiently:
 
