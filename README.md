@@ -49,6 +49,11 @@ https://github.com/hamza-alnaggar/Darajat.git
 You can view all screenshots of the project here:  
 👉 [Screenshots Folder](./Screenshots)
 
+## 🧪 API Testing with Postman
+Postman Collection
+We provide a comprehensive Postman collection for testing API endpoints:                                                     
+👉 [Postman Collection](https://documenter.getpostman.com/view/39537559/2sB2xCi9dr#1008275a-b31a-4725-99a1-6424744718f1)
+
 ## 🚀 Getting Started
 
 ### Prerequisites
