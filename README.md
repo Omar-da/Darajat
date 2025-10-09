@@ -48,6 +48,43 @@ Our platform uses Redis-powered background jobs to handle essential tasks effici
 
 These Redis-queued automated processes ensure high-performance platform operation and maintain user engagement without manual intervention.
 
+## 🛡️ Security Features
+
+### Authentication & Authorization
+- **Token-based Authentication** for API endpoints
+- **Session-based Authentication** for Dashboard routes
+- **Role-based Access Control** (Student, Teacher, Admin)
+- **Socialite Google OAuth** integration
+- **Password reset** with secure token verification
+- **OTP verification** for critical operations
+
+### Data Protection
+- **SQL Injection Prevention** using Laravel Eloquent ORM
+- **XSS Protection** with Blade template engine
+- **CSRF Protection** for web forms
+- **Input Validation** using Form Request classes
+- **File Upload Sanitization** with type and size restrictions
+- **Soft Deletes** for data recovery capability
+
+### Payment Security
+- **Stripe Integration** for secure payment processing
+- **Webhook Signature Verification**
+- **PCI DSS Compliance** through Stripe
+
+### ⚡ Rate Limiting Strategy
+
+Our application uses Laravel's built-in rate limiting with custom configurations:
+
+### Rate Limiter Definitions
+
+| Limiter Name | Requests | Window | Scope | Purpose |
+|--------------|----------|---------|-------|----------|
+| `general` | 60 | 1 minute | User/IP | Default for authenticated API/Web routes |
+| `auth` | 10 | 1 minute | IP | Authentication endpoints |
+| `sensitive` | 5 | 1 minute | User/IP | Critical operations |
+| `uploads` | 3 | 1 minute | User/IP | File upload operations |
+| `resend-otp` | 3 | 1 hour | User/IP | OTP resending |
+
 ## 🛠 Technology Stack
 
 **Frontend:** Flutter (Hamza Al-Najjar)  
