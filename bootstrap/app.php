@@ -16,7 +16,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
-use Illuminate\Routing\Middleware\ThrottleRequests;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withCommands([
@@ -32,7 +31,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo('dashboard/login');
         $middleware->redirectUsersTo('dashboard/home');
         $middleware->alias([
-            'throttle:resend-otp' => ThrottleRequests::class . ':resend-otp',
             'is_teacher' => CheckTeacherRole::class,
             'get_certificate' => CertificateMiddleware::class,
             'episode_protection' => ProtectEpisodeAccess::class,
@@ -42,6 +40,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'is_subscribed' => CheckSubscribed::class,
             'regular_or_socialite' => AuthMiddleware::class
         ]);
+        $middleware->api('throttle:general');
+        $middleware->web('throttle:general');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->renderable(function (ThrottleRequestsException $e, $request) {
@@ -51,7 +51,17 @@ return Application::configure(basePath: dirname(__DIR__))
                 $retryAfterSeconds = (int)$e->getHeaders()['Retry-After'];
                 $message = 'Too many attempts. Please wait ' . $retryAfterSeconds . ' seconds before trying again.';
             }
-            return Response::error([], $message, $code);
+
+            // For API requests, return JSON
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $message,
+                    'retry_after' => $retryAfterSeconds ?? null,
+                ], $code);
+            }
+            
+            // For web requests, return the 429 error page
+            return null;
         });
         $exceptions->renderable(function (AuthenticationException $e, $request) {
             if ($request->is('api/*')) {

@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('localization')->group(function () {
 
     // auth
-    Route::controller(AuthController::class)->prefix('users')->group(function () {
+    Route::controller(AuthController::class)->prefix('users')->middleware('throttle:auth')->group(function () {
         Route::post('register', 'register');
         Route::post('login', 'login');
         Route::post('login/google', 'loginWithGoogle');
@@ -42,10 +42,12 @@ Route::middleware('localization')->group(function () {
     Route::controller(UserController::class)->prefix('users')->group(function () {
         Route::middleware('regular_or_socialite')->group(function () {
             Route::post('update-profile', 'updateProfile');
-            Route::post('update-profile-image', 'updateProfileImage');
-            Route::post('change-password', 'changePassword');
-            Route::post('promote-student-to-teacher', 'promoteStudentToTeacher');
-            Route::delete('delete', 'destroy');
+            Route::post('update-profile-image', 'updateProfileImage')->middleware('throttle:uploads');
+            Route::middleware('throttle:sensitive')->group(function(){
+                Route::post('change-password', 'changePassword');
+                Route::post('promote-student-to-teacher', 'promoteStudentToTeacher');
+                Route::delete('delete', 'destroy');
+            });
             Route::post('store-fcm-token', 'storeFCMToken');
             Route::get('show-my-profile', 'showMyProfile');
         });
@@ -54,7 +56,7 @@ Route::middleware('localization')->group(function () {
 
 
     // reset password
-    Route::controller(ResetPasswordController::class)->prefix('users/password')->group(function () {
+    Route::controller(ResetPasswordController::class)->prefix('users/password')->middleware('throttle:auth')->group(function () {
         Route::post('email', 'forgotPassword');
         Route::post('code-check', 'checkCode');
         Route::post('reset', 'resetPassword');
@@ -63,7 +65,7 @@ Route::middleware('localization')->group(function () {
     // otp
     Route::controller(OTPController::class)->prefix('users/otp')->group(function () {
         Route::post('resend', 'resendOtp')->middleware('throttle:resend-otp');
-        Route::post('verify', 'verifyOtp');
+        Route::post('verify', 'verifyOtp')->middleware('throttle:auth');
     });
 
     // quizzes
@@ -99,7 +101,7 @@ Route::middleware('localization')->group(function () {
         Route::get('search/{title}', 'search');
         Route::get('free', 'getFreeCourses');
         Route::get('paid', 'getPaidCourses');
-        Route::post('get-certificate/{course_id}', 'getCertificate')->name('courses.get_certificate')->middleware('get_certificate');
+        Route::post('get-certificate/{course_id}', 'getCertificate')->name('courses.get_certificate')->middleware(['get_certificate', 'throttle:sensitive']);
         Route::middleware('regular_or_socialite')->group(function () {
             Route::get('draft', 'getDraftCoursesToTeacher');
             Route::get('pending', 'getPendingCoursesToTeacher');
@@ -113,11 +115,11 @@ Route::middleware('localization')->group(function () {
             Route::patch('evaluation/{course_id}', 'evaluation')->middleware('is_subscribed');
             Route::get('followed', 'getFollowedCoursesForStudent');
             Route::middleware('is_owner')->group(function () {
-                Route::put('update-draft/{course_id}', 'updateDraftCourse');
+                Route::put('update-draft/{course_id}', 'updateDraftCourse')->middleware('throttle:uploads');
                 Route::delete('delete-draft/{course_id}', 'destroyDraftCourse');
                 Route::patch('update-approved/{course_id}', 'updateApprovedCourse');
                 Route::get('teacher/{course_id}', 'showToTeacher');
-                Route::patch('submit/{course_id}', 'submitCourse');
+                Route::patch('submit/{course_id}', 'submitCourse')->middleware('throttle:sensitive');
             });
         });
     });
@@ -134,8 +136,8 @@ Route::middleware('localization')->group(function () {
         });
         Route::middleware('is_owner')->group(function () {
             Route::get('teacher/{course_id}', 'getToTeacher');
-            Route::post('create/{course_id}', 'store');
-            Route::put('update/{episode_id}', 'update');
+            Route::post('create/{course_id}', 'store')->middleware('throttle:uploads');
+            Route::put('update/{episode_id}', 'update')->middleware('throttle:uploads');
             Route::get('show/teacher/{episode_id}', 'showToTeacher');
             Route::delete('delete/{episode_id}', 'destroy');
             Route::get('get-file/{episode_id}', 'getFile');
@@ -205,13 +207,13 @@ Route::middleware('localization')->group(function () {
     });
 
     // Payment
-    Route::controller(PaymentController::class)->prefix('orders')->group(function () {
+    Route::controller(PaymentController::class)->prefix('orders')->middleware('throttle:sensitive')->group(function () {
         Route::post('create-payment-intent', 'createPaymentIntent');
         Route::post('{order}/cancel', 'cancelProcess');
         Route::get('history/student', 'getHistoryForStudent');
         Route::get('history/teacher', 'getHistoryForTeacher');
     });
-    Route::post('/stripe-webhook', [StripeWebhookController::class, 'handleWebhook']);
+    Route::post('/stripe-webhook', [StripeWebhookController::class, 'handleWebhook'])->withoutMiddleware('throttle:api');
 
     Route::middleware('regular_or_socialite')->group(function () {
         // badges

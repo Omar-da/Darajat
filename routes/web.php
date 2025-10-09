@@ -16,7 +16,6 @@ use App\Livewire\RegisterForm;
 use App\Livewire\RejectedCourses;
 use App\Livewire\ShowEpisode;
 use App\Livewire\UserManagement;
-use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -25,7 +24,7 @@ Route::get('/', function () {
 
 
 Route::prefix('dashboard')->group(function () {
-    Route::middleware('guest:web')->controller(WebAuthController::class)->group(function () {
+    Route::middleware(['guest:web', 'throttle:auth'])->controller(WebAuthController::class)->group(function () {
         Route::get('login', LoginForm::class)->name('dashboard.login');
         Route::post('login', LoginForm::class);
 
@@ -33,7 +32,7 @@ Route::prefix('dashboard')->group(function () {
         Route::post('register', RegisterForm::class);
     });
 
-    Route::middleware('auth:web')->group(function () {
+    Route::middleware(['auth:web', 'throttle:auth'])->group(function () {
         Route::post('logout', [WebAuthController::class, 'logout'])->name('dashboard.logout');
         Route::get('home', [HomeController::class, 'index'])->name('home');
 
@@ -47,8 +46,8 @@ Route::prefix('dashboard')->group(function () {
             Route::get('like/{episode}',                 'like')->                  name('like');
             Route::delete('comments/delete/{comment}',   'destroy_comment')->       name('destroy_comment');
             Route::get('quiz/{episode}',                 'quiz')->                  name('quiz')->withTrashed();
-            Route::post('approve/{episode}',             'approve')->               name('approve');
-            Route::post('reject/{episode}',              'reject')->                name('reject');
+            Route::post('approve/{episode}',             'approve')->               name('approve')->middleware('throttle:sensitive');
+            Route::post('reject/{episode}',              'reject')->                name('reject')->middleware('throttle:sensitive');
             // get videos
             Route::middleware('episode_protection')->controller(EpisodeController::class)->group(function () {
                 Route::get('/get_video/{episode_id}', 'get_video')->name('get_video');
@@ -60,7 +59,7 @@ Route::prefix('dashboard')->group(function () {
         Route::get('profile/edit', EditProfile::class)->name('profile.edit');
         Route::prefix('profile')->name('profile.')->controller(AdminProfileController::class)->group(function(){
             Route::get('show', 'show')->name('show');
-            Route::delete('delete', 'destroy_account')->name('destroy_account');
+            Route::delete('delete', 'destroy_account')->name('destroy_account')->middleware('throttle:sensitive');
         });
 
         // badges
@@ -77,8 +76,8 @@ Route::prefix('dashboard')->group(function () {
             Route::get('show_user/{user_id}',                    'show_user')->      name('show_user');
             Route::get('followed_courses/{user_id}/{course_id}', 'followed_course')->name('followed_course');
             Route::get('show_teacher/{teacher_id}',              'show_teacher')->   name('show_teacher');
-            Route::delete('ban/{user}',                          'ban_user')->       name('ban');
-            Route::get('unban/{user}',                           'unban_user')->     name('unban')->withTrashed();
+            Route::delete('ban/{user}',                          'ban_user')->       name('ban')->middleware('throttle:sensitive');
+            Route::get('unban/{user}',                           'unban_user')->     name('unban')->withTrashed()->middleware('throttle:sensitive');
         });
 
 
